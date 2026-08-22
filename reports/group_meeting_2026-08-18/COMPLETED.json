@@ -1,0 +1,19 @@
+{
+  "overall_status": "CADTRANSFORMER_CONSERVATIVE_BASELINE_COMPLETE",
+  "completed_run": {
+    "job_id": 968,
+    "name": "cadtrans-smoke",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:02:17"
+  },
+  "formal_run": {
+    "job_id": 969,
+    "name": "cadtrans-train",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "10:21:28",
+    "best_total_fg_f1": 0.827501118183136
+  },
+  "report_note": "This report freezes completed setup, smoke, and conservative full-data CADTransformer artifacts. The run is not paper-faithful because it used img_size=384 and rgb_dim=0."
+}

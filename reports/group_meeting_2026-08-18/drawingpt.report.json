@@ -1,0 +1,33 @@
+{
+  "title": "DrawingPT · CADTransformer baseline setup report",
+  "project": "DrawingPT",
+  "frozen": [
+    "FloorPlanCAD processed counts: train/val/test NPY = 6965 / 810 / 3827",
+    "HRNet checkpoint sha 0efec102 · size 310643500 bytes",
+    "Smoke job 968 completed: F1 0.256508 · log sha 99a5f8a2 · best checkpoint sha 86c534ef · last checkpoint sha 72526d71",
+    "Conservative full-data job 969 completed: best F1 0.827501 · train log sha fe88160d · best checkpoint sha 642da466 · last checkpoint sha d29a4da0",
+    "Code state for CADTransformer submission scripts: commit 5b545dc"
+  ],
+  "new_numbers": [
+    "Smoke Total FG Precision = 0.437268, Recall = 0.181527, F1 = 0.256508",
+    "Smoke elapsed = 00:02:17 on one RTX 5090",
+    "Formal run 969 started with full train/val/test data; train after filter = 6962, val = 810, test = 3827",
+    "Formal run 969 completed in 10:21:28 on one RTX 5090; best validation Total FG Precision = 0.832457, Recall = 0.822702, F1 = 0.827501"
+  ],
+  "next_gate": "Decide and document whether to restore CADTransformer default img_size=700 and rgb_dim=32/npy_rgb; only then compare to paper numbers or DrawingPT.",
+  "human_notes": "human_notes.md",
+  "checklist": "checklist.md",
+  "prereg": "prereg.txt",
+  "artifacts": [
+    "protocol.json",
+    "summary.json",
+    "COMPLETED.json"
+  ],
+  "tables": [
+    "results.csv",
+    "assets.csv",
+    "jobs.csv"
+  ],
+  "figures": [],
+  "out": "report.html"
+}

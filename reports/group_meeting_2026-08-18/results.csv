@@ -1,0 +1,17 @@
+item,split_or_job,metric,value,unit,source
+processed_data,train,npy_files,6965,count,processed/FloorPlanCAD/npy/train
+processed_data,val,npy_files,810,count,processed/FloorPlanCAD/npy/val
+processed_data,test,npy_files,3827,count,processed/FloorPlanCAD/npy/test
+smoke,968,state,COMPLETED,status,sacct
+smoke,968,elapsed,00:02:17,time,sacct
+smoke,968,total_fg_precision,0.4372682273387909,ratio,CADTransformer smoke log
+smoke,968,total_fg_recall,0.18152661621570587,ratio,CADTransformer smoke log
+smoke,968,total_fg_f1,0.2565082311630249,ratio,CADTransformer smoke log
+formal_train,969,state,COMPLETED,status,sacct
+formal_train,969,elapsed,10:21:28,time,sacct
+formal_train,969,train_after_filter,6962,count,Slurm log
+formal_train,969,val_after_filter,810,count,Slurm log
+formal_train,969,test_after_filter,3827,count,Slurm log
+formal_train,969,best_total_fg_precision,0.8324572443962097,ratio,CADTransformer validation log
+formal_train,969,best_total_fg_recall,0.8227024674415588,ratio,CADTransformer validation log
+formal_train,969,best_total_fg_f1,0.827501118183136,ratio,CADTransformer validation log

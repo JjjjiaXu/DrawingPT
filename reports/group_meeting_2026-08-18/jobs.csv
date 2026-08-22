@@ -1,0 +1,12 @@
+job_id,name,state,elapsed,issue_or_result,fix_or_next_action
+892,cadtrans-prep,CANCELLED,00:00:34,early interrupted preprocessing,reran after script fixes
+893,cadtrans-prep,FAILED,00:00:04,missing lxml,added lxml to environment
+894,cadtrans-prep,CANCELLED,00:03:43,cairosvg CLI permission denied,patched to Python cairosvg API
+895,cadtrans-prep,TIMEOUT,04:00:20,npy preprocessing exceeded 4h,added resumable preprocessing and longer low-resource job
+929,cadtrans-prep,COMPLETED,22:43:49,full NPY preprocessing completed,used as data basis for smoke/formal runs
+930,cadtrans-smoke,FAILED,00:00:11,timm missing _init_vit_weights,added timm compatibility shim
+965,cadtrans-smoke,FAILED,00:00:10,NumPy np.int removed,patched NumPy alias usage
+966,cadtrans-smoke,FAILED,00:00:11,timm build_model_with_cfg default_cfg mismatch,patched custom ViT constructor
+967,cadtrans-smoke,CANCELLED,00:00:47,missing optional npy_rgb files,used rgb_dim=0 for smoke/full-data conservative run
+968,cadtrans-smoke,COMPLETED,00:02:17,smoke passed,used to validate environment and pipeline
+969,cadtrans-train,COMPLETED,10:21:28,best validation Total FG F1 0.827501,freeze job 969 as conservative baseline anchor; decide whether to restore paper-faithful settings

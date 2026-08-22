@@ -1,0 +1,16 @@
+project_root: D:/DrawingPT
+
+data:
+  floorplancad_raw: D:/DrawingPT/data/raw/FloorPlanCAD
+  floorplancad_processed: D:/DrawingPT/data/processed/FloorPlanCAD
+  public_dwg_or_dxf: D:/DrawingPT/data/raw/public_cad
+
+baselines:
+  cadtransformer: D:/DrawingPT/third_party/CADTransformer
+  sympoint: D:/DrawingPT/third_party/SymPoint
+  gat_cadnet: D:/DrawingPT/third_party/GAT-CADNet
+
+outputs:
+  reports: D:/DrawingPT/outputs/reports
+  checkpoints: D:/DrawingPT/checkpoints
+

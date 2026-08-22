@@ -1,0 +1,32 @@
+{
+  "status": "WEEK1_BASELINE_ANCHOR_COMPLETE",
+  "headline": "CADTransformer environment and FloorPlanCAD preprocessing are ready; smoke test and conservative full-data baseline completed successfully.",
+  "completed": [
+    "FloorPlanCAD raw data staged and processed into SVG/PNG/NPY for train/val/test",
+    "HRNet-W48 ImageNet checkpoint downloaded and hash verified",
+    "CADTransformer compatibility patches applied for Python 3.11 / NumPy 1.26 / timm 0.6.13 / torchrun",
+    "Slurm smoke job 968 completed successfully on one RTX 5090",
+    "Slurm full-data conservative training job 969 completed successfully on one RTX 5090"
+  ],
+  "current_run": {
+    "job_id": 969,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "checked_at": "2026-08-19 13:29:16 CST",
+    "run_name": "cadtransformer_train_e10_img384_rgb0_20260818_192739"
+  },
+  "key_numbers": {
+    "processed_train_npy": 6965,
+    "processed_val_npy": 810,
+    "processed_test_npy": 3827,
+    "smoke_total_fg_precision": 0.4372682273387909,
+    "smoke_total_fg_recall": 0.18152661621570587,
+    "smoke_total_fg_f1": 0.2565082311630249,
+    "smoke_elapsed": "00:02:17",
+    "formal_elapsed": "10:21:28",
+    "formal_best_total_fg_precision": 0.8324572443962097,
+    "formal_best_total_fg_recall": 0.8227024674415588,
+    "formal_best_total_fg_f1": 0.827501118183136
+  },
+  "next_gate": "Decide whether to restore original CADTransformer settings (img_size=700, rgb_dim=32 with npy_rgb) before DrawingPT comparison; run only after freezing a paper-faithful protocol."
+}

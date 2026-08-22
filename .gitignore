@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+.venv-codex/
+venv/
+
+# Local data and generated artifacts
+data/raw/
+data/processed/
+data/external/
+outputs/
+checkpoints/
+runs/
+wandb/
+tmp/
+
+# Large research artifacts
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+*.pth
+*.pt
+*.ckpt
+*.npy
+*.npz
+*.pdf
+
+# Private or redundant report-kit helper files
+reports/**/prereg.txt
+reports/**/AUTHOR_TODO.md
+reports/**/B_LAYER_FILLING_AID.md
+reports/**/report_filled_*.html
+
+# External baseline clones: keep only our manifest/readme.
+third_party/*
+!third_party/README.md
+!third_party/MANIFEST.md
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

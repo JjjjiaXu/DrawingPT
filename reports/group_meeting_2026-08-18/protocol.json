@@ -1,0 +1,82 @@
+{
+  "project": "DrawingPT",
+  "experiment": "CADTransformer baseline setup, smoke test, and conservative full-data training",
+  "date_local": "2026-08-18",
+  "server": {
+    "host": "yao-gpu01",
+    "scheduler": "Slurm",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "driver": "595.84",
+    "cuda_runtime_reported_by_nvidia_smi": "13.2"
+  },
+  "software": {
+    "python": "3.11.15",
+    "torch": "2.11.0+cu128",
+    "timm": "0.6.13",
+    "numpy": "1.26.4",
+    "local_code_commit": "5b545dc"
+  },
+  "data": {
+    "dataset": "FloorPlanCAD",
+    "processed_root": "server:processed/FloorPlanCAD",
+    "splits": {
+      "train": {"svg": 6965, "png": 6965, "npy": 6965},
+      "val": {"svg": 810, "png": 810, "npy": 810},
+      "test": {"svg": 3827, "png": 3827, "npy": 3827}
+    }
+  },
+  "model": {
+    "baseline": "CADTransformer",
+    "input_embed": "HRNet-W48",
+    "parameter_count_cpu_preflight": 91367080,
+    "hrnet_pretrained_sha256": "0efec102d97f2ef58f0e258b2c3076b3704b93ffc2b73f64c8da5462c0037ef8"
+  },
+  "smoke_job": {
+    "job_id": 968,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:02:17",
+    "config": {
+      "debug": true,
+      "epochs": 1,
+      "img_size": 384,
+      "max_prim": 2500,
+      "rgb_dim": 0,
+      "vit_pretrained_online_download": false
+    }
+  },
+  "formal_job": {
+    "job_id": 969,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "10:21:28",
+    "start_cst": "2026-08-18 19:27:38",
+    "end_cst": "2026-08-19 05:49:06",
+    "run_name": "cadtransformer_train_e10_img384_rgb0_20260818_192739",
+    "best_validation": {
+      "epoch_marker": "Epoch 6 / Best Epoch 5",
+      "total_fg_precision": 0.8324572443962097,
+      "total_fg_recall": 0.8227024674415588,
+      "total_fg_f1": 0.827501118183136
+    },
+    "config": {
+      "epochs": 10,
+      "img_size": 384,
+      "batch_size": 1,
+      "test_batch_size": 1,
+      "workers": 0,
+      "rgb_dim": 0,
+      "qos": "normal",
+      "gpu": 1,
+      "cpus": 4,
+      "memory_gb": 40,
+      "time_limit": "16:00:00"
+    }
+  },
+  "important_protocol_deviations": [
+    "prereg.txt was created after earlier smoke/setup work, so it is not a valid pre-run preregistration for completed runs",
+    "smoke and conservative training use rgb_dim=0 because npy_rgb features were not generated",
+    "smoke and conservative training use img_size=384 instead of the CADTransformer default 700",
+    "ViT online pretrained download is disabled for smoke/training; local HRNet pretrained checkpoint is still loaded"
+  ]
+}
