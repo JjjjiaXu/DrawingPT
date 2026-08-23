@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>工程造价自动估算调研汇报</title>
+  <style>
+:root {
+  color-scheme: light;
+  --fg: #142033;
+  --muted: #607086;
+  --line: #dfe6f0;
+  --soft: #f5f8fc;
+  --blue: #1f5eff;
+  --cyan: #007f9f;
+  --green: #0e8a62;
+  --orange: #b76700;
+  --red: #b42318;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 30px 18px 56px;
+  background:
+    radial-gradient(circle at top left, rgba(31, 94, 255, .13), transparent 32rem),
+    linear-gradient(180deg, #eef3f9, #e8eef7);
+  color: var(--fg);
+  font: 16px/1.78 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+}
+main {
+  max-width: 1160px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 20px 55px rgba(20, 32, 51, .12);
+  overflow: hidden;
+}
+.hero {
+  padding: 34px 42px 28px;
+  background:
+    linear-gradient(135deg, rgba(12, 25, 58, .96), rgba(24, 80, 204, .92)),
+    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, .25), transparent 15rem);
+  color: white;
+}
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 31px;
+  line-height: 1.24;
+  letter-spacing: .01em;
+}
+.hero p {
+  max-width: 780px;
+  margin: 0;
+  opacity: .88;
+}
+.badge {
+  display: inline-block;
+  margin: 0 8px 12px 0;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, .22);
+  font-size: 13px;
+  font-weight: 700;
+}
+.content {
+  padding: 28px 42px 44px;
+}
+h2 {
+  margin: 34px 0 14px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  font-size: 23px;
+}
+h3 {
+  margin: 26px 0 10px;
+  font-size: 18px;
+}
+p { margin: 10px 0; }
+a {
+  color: #1e55d6;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(30, 85, 214, .28);
+}
+a:hover { border-bottom-color: currentColor; }
+blockquote {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 4px solid var(--blue);
+  background: #f2f6ff;
+  border-radius: 10px;
+}
+code {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #f0f4f8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .92em;
+}
+pre {
+  margin: 14px 0 20px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border: 1px solid #d9e3ef;
+  border-radius: 12px;
+  background: #0f1a2a;
+  color: #e8eef7;
+  font: 14px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 22px;
+  font-size: 14px;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 9px 11px;
+  vertical-align: top;
+}
+th {
+  background: #f2f6fb;
+  text-align: left;
+  font-weight: 750;
+}
+tr:nth-child(even) td { background: #fbfcfe; }
+ul, ol { padding-left: 24px; }
+li { margin: 5px 0; }
+.lead-card {
+  margin: 8px 0 24px;
+  padding: 16px 18px;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(180deg, #eff6ff, #f8fbff);
+  border-radius: 14px;
+}
+.lead-card p {
+  margin: 6px 0;
+}
+@media (max-width: 760px) {
+  body { padding: 12px; }
+  .hero, .content { padding-left: 20px; padding-right: 20px; }
+  table { display: block; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="badge">DrawingPT</span>
+      <span class="badge">工程造价</span>
+      <span class="badge">文献调研</span>
+      <h1>工程造价自动估算调研汇报</h1>
+      <p>围绕“2D CAD / 施工图能否端到端输出工程造价”整理研究现状、可行链路和 DrawingPT 的切入点。</p>
+    </section>
+    <section class="content">
+      <p>生成日期：2026-08-23</p>
+<h2>1. 一句话结论</h2>
+<div class="lead-card"><p>工程造价自动估算已经有较多 AI/BIM/机器学习研究，但成熟路线主要是 <strong>BIM/结构化工程量 → 造价</strong> 或 <strong>项目特征/历史数据 → 造价预测</strong>。真正从 <strong>2D CAD/施工图原始图元 → 完整工程造价</strong> 的端到端学术路线还不成熟。</p></div>
+<p>对 DrawingPT 最稳的定位不是直接做“CAD 图纸一键出总价”，而是做造价链路前端的图纸理解与表示学习模块：先把 2D 图纸里的构件、符号、尺寸、数量和文本关系抽出来，再服务 quantity takeoff、BoQ/BoM 生成和造价估算。</p>
+<h2>2. 领域链路：造价不是只看图纸</h2>
+<p>工程造价通常不是单一视觉任务，而是一条多阶段链路：</p>
+<table>
+<tr><th>阶段</th><th>需要的信息</th><th>AI 可以做什么</th></tr>
+<tr><td>图纸理解</td><td>构件、符号、尺寸、房间/系统关系</td><td>CAD/图纸解析、符号检测、文字识别、实例分组</td></tr>
+<tr><td>工程量计算</td><td>长度、面积、体积、个数、材料规格</td><td>quantity takeoff、BoQ/BoM 生成</td></tr>
+<tr><td>计价规则</td><td>清单编码、定额、地区、时间、施工方法</td><td>规则匹配、知识库检索、LLM 辅助解释</td></tr>
+<tr><td>价格估算</td><td>材料价、人工价、机械价、历史项目数据</td><td>价格预测、成本回归、风险/不确定性估计</td></tr>
+<tr><td>审核输出</td><td>总价、分项价、置信度、可追溯证据</td><td>可解释报告、差异检查、人工复核提示</td></tr>
+</table>
+<p>这意味着：只靠 DrawingPT 直接输出总造价风险很大；更合理的研究闭环是先做“图纸 → 可计量结构”，再接造价规则和价格模型。</p>
+<h2>3. 文献现状分成三类</h2>
+<h3>3.1 BIM / 结构化模型到造价：相对成熟</h3>
+<p>BIM 路线最接近工程造价实际流程，因为 BIM 模型已经包含构件、尺寸、材料、工程量等结构化信息。近期研究包括：</p>
+<table>
+<tr><th>代表工作</th><th>输入</th><th>输出</th><th>启发</th></tr>
+<tr><td>BIM-based quantity takeoff 综述</td><td>BIM 模型</td><td>工程量、QTO 流程总结</td><td>说明 BIM 自动算量是主流成熟路线</td></tr>
+<tr><td>BIM + LLM cost estimation</td><td>BIM 数据、价格数据库、地区修正</td><td>造价估算报告</td><td>说明 LLM 更适合规则/数据库/解释层，不是单独读图</td></tr>
+<tr><td>BIM + SSA-PGNN</td><td>BIM5D 工程量、材料价格序列</td><td>水利工程造价预测</td><td>说明结构化工程量 + 价格预测是可行路线</td></tr>
+</table>
+<p>这类工作的共性是：输入已经比较结构化，AI 主要做工程量抽取、成本映射、价格预测或报告生成。</p>
+<h3>3.2 2D 施工图到工程量/BoM：和 DrawingPT 最相关</h3>
+<p>这一类研究更接近 DrawingPT，但多数还停在“图纸识别 / 自动算量前置步骤”，没有直接做到完整造价。</p>
+<table>
+<tr><th>代表工作</th><th>输入</th><th>输出</th><th>启发</th></tr>
+<tr><td>AI-powered symbol detection for construction diagrams</td><td>高分辨率施工图</td><td>设备/符号检测结果</td><td>证明施工图自动理解可以服务 material takeoff</td></tr>
+<tr><td>Mask R-CNN 生成 Bill of Materials</td><td>2D 图纸图像/模板</td><td>BoM / 材料清单</td><td>说明视觉模型能把图纸转为清单结构</td></tr>
+<tr><td>Work descriptions 信息抽取</td><td>工程描述文本</td><td>QTO 相关实体/关系</td><td>说明造价还依赖文本、规则和清单语言</td></tr>
+</table>
+<p>这一类的共同限制是：常依赖特定图纸类型、特定行业符号或图片检测模型；距离“任意 CAD 图纸直接出最终造价”还有一段工程链路。</p>
+<h3>3.3 2D 工程图直接到成本：制造业已有相近案例</h3>
+<p>制造成本方向已有很接近 DrawingPT 想法的工作。2025 年 arXiv 文章提出从 13,684 张 2D DWG 工程图中抽取约 200 个几何/统计特征，用 XGBoost/CatBoost/LightGBM 预测汽车零部件制造成本，报告约 10% MAPE，并强调这是 end-to-end CAD-to-cost pipeline。</p>
+<p>这不是建筑工程造价，但技术启发很强：</p>
+<ol>
+<li>从 DWG/DXF 抽几何特征比单纯 raster vision 更可解释。</li>
+<li>成本预测需要历史成本标签，而不仅是图纸。</li>
+<li>可解释性很重要，例如用 SHAP 找成本驱动几何因素。</li>
+<li>“图纸表示 + 成本模型”比“端到端黑箱总价”更容易被工程人员接受。</li>
+</ol>
+<h2>4. 成熟度判断</h2>
+<table>
+<tr><th>路线</th><th>是否已有研究</th><th>成熟度</th><th>DrawingPT 的机会</th></tr>
+<tr><td>BIM → 工程量 → 造价</td><td>很多</td><td>高</td><td>可作为后端流程参考</td></tr>
+<tr><td>项目特征/历史数据 → 总造价预测</td><td>很多</td><td>中高</td><td>偏早期估算，不直接读图</td></tr>
+<tr><td>2D 图纸 → 符号/构件/BoM/QTO</td><td>有增长</td><td>中</td><td>DrawingPT 可提供更强图纸表示</td></tr>
+<tr><td>2D CAD 原始图元 → 完整工程造价</td><td>少</td><td>低到中</td><td>可能是创新空间，但需要真实造价标签</td></tr>
+</table>
+<p>因此，如果老板问“有没有端到端输出工程造价估算”，可以答：有端到端造价预测研究，但大多不是直接从 2D CAD 图纸输入；直接从 2D CAD/施工图到完整造价的成熟工作还少。</p>
+<h2>5. DrawingPT 可以怎么切入</h2>
+<p>DrawingPT 不应第一步承诺“自动造价”，而应切成三个可验证子任务：</p>
+<ol>
+<li><strong>图纸表示学习</strong></li>
+</ol>
+<p>用 SVG/DXF primitives 预训练，学习构件、符号、空间关系、文本关系。</p>
+<ol>
+<li><strong>工程量代理任务</strong></li>
+</ol>
+<p>在 FloorPlanCAD 上先做符号/构件识别、实例分组、计数、长度/面积估计。这里可以把 <code>wall</code>、<code>door</code>、<code>window</code>、<code>stairs</code>、<code>parking spot</code> 等类别转成“可计量对象”。</p>
+<ol>
+<li><strong>造价估算模拟或真实接入</strong></li>
+</ol>
+<p>如果没有真实清单/成本标签，先用公开规则或合成单价做 proof-of-concept；如果有真实项目 BoQ/成本数据，再训练从“图纸表示 + 工程量 + 文本”到分项造价的模型。</p>
+<p>推荐路线：</p>
+<pre><code>FloorPlanCAD / DXF
+  → DrawingPT primitive representation
+  → symbol / component / dimension extraction
+  → quantity takeoff proxy
+  → BoQ/BoM or cost-rule table
+  → cost estimate with evidence</code></pre>
+<h2>6. 需要的数据和资源</h2>
+<p>要真正做“工程造价估算”，至少需要以下数据之一：</p>
+<table>
+<tr><th>数据类型</th><th>是否当前已有</th><th>用途</th></tr>
+<tr><td>公开 CAD/SVG/DXF 图纸</td><td>部分已有，FloorPlanCAD</td><td>图纸理解和预训练</td></tr>
+<tr><td>构件/符号标注</td><td>已有，FloorPlanCAD</td><td>下游识别任务</td></tr>
+<tr><td>尺寸/材料/文本标注</td><td>不完整</td><td>工程量计算</td></tr>
+<tr><td>BoQ/BoM 清单</td><td>暂无</td><td>把图纸对象转成清单项</td></tr>
+<tr><td>单价/定额/地区价格库</td><td>暂无</td><td>造价计算</td></tr>
+<tr><td>项目总价或分项造价标签</td><td>暂无</td><td>训练真实 cost prediction</td></tr>
+</table>
+<p>所以当前阶段最现实的产出不是最终造价模型，而是“面向工程量提取的图纸表示学习与解析”。</p>
+<h2>7. 下次组会建议表述</h2>
+<p>可以这样汇报：</p>
+<blockquote><p>工程造价自动估算已有 BIM 和机器学习相关研究，但从 2D CAD 图纸直接端到端输出完整造价的路线还不成熟。现有文献更常见的是 BIM 自动算量、施工图符号检测、BoM/BoQ 自动生成、以及结构化成本预测。DrawingPT 的机会是作为前端图纸表示学习模块，把 2D CAD/SVG/DXF 图元转成可计量、可解释的构件和符号表示，再接工程量清单和价格模型。短期建议先做 quantity takeoff proxy，而不是直接做最终造价。</p></blockquote>
+<h2>8. 可以立刻设计的实验</h2>
+<table>
+<tr><th>实验</th><th>输入</th><th>输出</th><th>成功标准</th></tr>
+<tr><td>FloorPlanCAD 构件计数</td><td>SVG primitives</td><td>每类实例数量</td><td>与 <code>instanceId</code> 统计接近</td></tr>
+<tr><td>墙/门/窗工程量 proxy</td><td>SVG primitives + 语义预测</td><td>长度/数量/类别</td><td>与 GT 标注统计误差可控</td></tr>
+<tr><td>DrawingPT 预训练增益</td><td>train split 自监督 + 少标注 fine-tune</td><td>低标注 F1/PQ</td><td>1%-10% 标注区间优于从零训练</td></tr>
+<tr><td>合成单价造价 demo</td><td>识别结果 + 手工单价表</td><td>分项估算表</td><td>能解释每个价格来自哪些图纸对象</td></tr>
+</table>
+<p>这组实验可以形成一条很清楚的故事线：不是一步到位做造价，而是先证明 DrawingPT 能把图纸变成造价所需的结构化中间层。</p>
+<h2>9. 公开来源</h2>
+<table>
+<tr><th>来源</th><th>关键信息</th></tr>
+<tr><td><a href="https://www.mdpi.com/2075-5309/16/3/485" target="_blank" rel="noreferrer">AI-Driven Automation of Construction Cost Estimation: Integrating BIM with Large Language Models</a></td><td>BIM + LLM + cost database 的端到端造价系统方向</td></tr>
+<tr><td><a href="https://www.mdpi.com/2075-5309/16/15/3050" target="_blank" rel="noreferrer">Artificial Intelligence in Preconstruction Cost Estimation: A Systematic Review</a></td><td>AI 造价估算综述，适合作为 related work 入口</td></tr>
+<tr><td><a href="https://www.sciencedirect.com/science/article/pii/S0926580524002851" target="_blank" rel="noreferrer">BIM-based quantity takeoff: Current state and future opportunities</a></td><td>BIM 自动算量综述</td></tr>
+<tr><td><a href="https://www.nature.com/articles/s41598-025-10153-4" target="_blank" rel="noreferrer">Construction cost prediction model for agricultural water conservancy engineering based on BIM and neural network</a></td><td>BIM5D 工程量 + 神经网络价格预测</td></tr>
+<tr><td><a href="https://link.springer.com/article/10.1007/s10032-024-00492-9" target="_blank" rel="noreferrer">Towards fully automated processing and analysis of construction diagrams: AI-powered symbol detection</a></td><td>施工图符号检测服务 material takeoff</td></tr>
+<tr><td><a href="https://www.sciencedirect.com/science/article/pii/S0926580522005143" target="_blank" rel="noreferrer">Generating integrated bill of materials using Mask R-CNN artificial intelligence model</a></td><td>图纸/视觉模型生成 BoM</td></tr>
+<tr><td><a href="https://www.mdpi.com/2075-5309/12/3/354" target="_blank" rel="noreferrer">Towards Automated Construction Quantity Take-Off: An Integrated Approach to Information Extraction from Work Descriptions</a></td><td>从工程描述文本抽取 QTO 信息</td></tr>
+<tr><td><a href="https://arxiv.org/abs/2508.12440" target="_blank" rel="noreferrer">Machine Learning-Based Manufacturing Cost Prediction from 2D Engineering Drawings via Geometric Features</a></td><td>2D DWG 工程图到制造成本预测，是最接近 DrawingPT 的技术类比</td></tr>
+</table>
+    </section>
+  </main>
+</body>
+</html>
