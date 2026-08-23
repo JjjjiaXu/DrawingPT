@@ -1,0 +1,7 @@
+metric,paper_cadtransformer,paper_cadtransformer_rl,reproduction_job969,runtime,comparison_status,reason
+PQ,0.6732,0.6894,未产出,10:21:28,不可直接比较,本次没有跑 README 中的 panoptic quality 评估链路，日志里的 Total FG F1 不是 PQ。
+SQ,0.8754,0.8832,未产出,10:21:28,不可直接比较,SQ 是匹配符号的平均 IoU，本次训练日志没有输出该指标。
+RQ,0.7226,0.7333,未产出,10:21:28,不可直接比较,RQ 可理解为符号匹配层面的 F1，但不同于代码日志的 primitive-level Total FG F1。
+Total FG Precision,未报告,未报告,0.832457,10:21:28,只可作为本次日志指标,这是 CADTransformer eval.py 对前景 primitive 语义分类累计得到的 precision。
+Total FG Recall,未报告,未报告,0.822702,10:21:28,只可作为本次日志指标,这是 CADTransformer eval.py 对前景 primitive 语义分类累计得到的 recall。
+Total FG F1,未报告,未报告,0.827501,10:21:28,不可冒充论文主指标,可用于证明训练/验证链路跑通，但不能与论文 Table 1 的 PQ/SQ/RQ 直接相减。

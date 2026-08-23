@@ -1,0 +1,36 @@
+class_id,class_name,count,share,split_coverage
+33,wall,1362387,0.233726,test+train+val
+12,bed,568827,0.097586,test+train+val
+31,row chairs,541080,0.092826,test+train+val
+19,sink,353667,0.060674,test+train+val
+27,toilet,277052,0.047530,test+train+val
+32,parking spot,271245,0.046534,test+train+val
+13,chair,253205,0.043439,test+train+val
+28,stairs,222429,0.038159,test+train+val
+7,window,197789,0.033932,test+train+val
+16,Wardrobe,183836,0.031538,test+train+val
+1,single door,179588,0.030809,test+train+val
+2,double door,173840,0.029823,test+train+val
+34,curtain wall,139157,0.023873,test+train+val
+25,squat toilet,126250,0.021659,test+train+val
+29,elevator,102054,0.017508,test+train+val
+26,urinal,94334,0.016184,test+train+val
+18,gas stove,93174,0.015985,test+train+val
+17,cabinet,91450,0.015689,test+train+val
+22,bath,80928,0.013884,test+train+val
+3,sliding door,79229,0.013592,test+train+val
+24,washing machine,68662,0.011779,test+train+val
+14,table,65512,0.011239,test+train+val
+35,railing,46915,0.008049,test+train+val
+11,sofa,44284,0.007597,test+train+val
+23,bath tub,44023,0.007552,test+train+val
+9,blind window,36091,0.006192,test+train+val
+21,airconditioner,31452,0.005396,test+train+val
+20,refrigerator,30298,0.005198,test+train+val
+15,TV cabinet,27687,0.004750,test+train+val
+30,escalator,22138,0.003798,test+train+val
+10,opening symbol,9897,0.001698,test+train+val
+8,bay window,6071,0.001042,test+train+val
+4,folding door,3309,0.000568,test+train+val
+5,revolving door,1036,0.000178,test+train
+6,rolling door,98,0.000017,test+train

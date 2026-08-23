@@ -6,7 +6,7 @@
 
 ## 1. 一句话结论
 
-第一周的主线任务已经基本完成：FloorPlanCAD 数据已经下载、解析和统计；CADTransformer 已经在组内单卡 GPU 上跑通 smoke test 和一个 10 epoch 的保守 full-data baseline；第一批必读文献已经整理成 10 行笔记。
+第一周的主线任务已经基本完成：FloorPlanCAD 数据已经下载、解析和统计；CADTransformer 已经在组内单卡 GPU 上跑通 smoke test 和一个 10 epoch 的保守 full-data baseline；第一批必读文献已经整理成 10 行笔记。根据 checklist 追问，本版报告又补齐了 FloorPlanCAD 图元类型/数量分布，以及 CADTransformer 论文指标 vs 本次复现指标 vs runtime 的差距说明。
 
 但要注意：目前的 CADTransformer 结果是“能跑通的保守基线锚点”，还不是论文严格复现。它使用了 `img_size=384` 和 `rgb_dim=0`，没有恢复 CADTransformer 原始设定里的 `img_size=700` 和 `rgb_dim=32/npy_rgb`。所以它可以用于证明环境和数据链路通了，但不能直接拿去和论文数字宣称对齐。
 
@@ -17,6 +17,8 @@
 | 资产 | 数字 / hash | 说明 |
 |---|---|---|
 | FloorPlanCAD 处理后数据量 | train 6965 / val 810 / test 3827 | 三个 split 的 SVG/PNG/NPY 数量一致 |
+| FloorPlanCAD raw SVG primitive | 12,621,288 | `path` 占 98.68%，`circle` 占 1.24%，`ellipse` 占 0.08% |
+| FloorPlanCAD 语义标注元素 | 5,828,994 | 全量 35 类都出现；val 只覆盖 33/35 类 |
 | HRNet-W48 预训练权重 | `0efec102d97f2ef58f0e258b2c3076b3704b93ffc2b73f64c8da5462c0037ef8` | 本地加载，不提交权重文件 |
 | CADTransformer smoke 日志 | `99a5f8a2bac787ec59336fc0562c27176b6e3f758e31de7126a0aa82f126ce57` | job 968 |
 | CADTransformer smoke best checkpoint | `86c534ef8d1bdec0efb37fecda5b3304dcd82ebf8a9ccdc16a5d062cae233302` | 大文件不提交 |
@@ -34,13 +36,16 @@
 | CADTransformer 保守 full-data baseline，job 969 | Best Total FG Recall | 0.822702 |
 | CADTransformer 保守 full-data baseline，job 969 | Best Total FG F1 | 0.827501 |
 | CADTransformer 保守 full-data baseline，job 969 | Runtime | 10:21:28 |
+| CADTransformer 论文 Table 1，CADTransformer+RL | PQ / SQ / RQ | 0.6894 / 0.8832 / 0.7333 |
+| 本次 job 969 | PQ / SQ / RQ | 未产出，不能与论文主表直接相减 |
 
 ### 2.3 下周要过的门禁
 
 1. 决定是否恢复 CADTransformer 论文默认设定：`img_size=700`、`rgb_dim=32`、补齐 `npy_rgb`。
-2. 在恢复或明确放弃默认设定之前，不把 job 969 的 F1 当作论文复现数字。
-3. 做 train / val / test 跨 split 重复样本检查，确认没有同源图或重复图泄漏。
-4. 找一个公开 DXF 样例跑 `inspect_dxf.py`，冻结 JSON 摘要 hash，验证 DWG→DXF→矢量图元解析链路。
+2. 补齐 CADTransformer README 中的 panoptic quality 评估链路，产出 PQ / SQ / RQ。
+3. 在恢复或明确放弃默认设定之前，不把 job 969 的 F1 当作论文复现数字。
+4. 做 train / val / test 跨 split 重复样本检查，确认没有同源图或重复图泄漏。
+5. 找一个公开 DXF 样例跑 `inspect_dxf.py`，冻结 JSON 摘要 hash，验证 DWG→DXF→矢量图元解析链路。
 
 ## 3. 第一周任务完成度
 
@@ -48,22 +53,63 @@
 |---|---|---|
 | 建独立学术仓库 | 已完成 | GitHub 仓库已同步，且没有上传数据集/权重/私有信息 |
 | 下载 FloorPlanCAD | 已完成 | 11,602 张公开版本：6965 / 810 / 3827 |
-| 跑通数据加载和统计 | 已完成 | `docs/floorplancad_data_report.md` 和本地 `outputs/reports/*` |
+| 跑通数据加载和统计 | 已完成 | `docs/floorplancad_data_report.md`、`docs/floorplancad_distribution_report.md` 和本地 `outputs/reports/*` |
 | 确认 SVG 标注字段 | 已完成 | `semanticId`、`instanceId`、几何字段、style 字段已记录 |
 | 调研 DWG/DXF 工具链 | 基本完成 | `scripts/inspect_dxf.py` 已支持 DXF 图元/文字/图层/块引用解析；还缺公开 DXF 样例实测 |
 | 调研可复现基线 | 已完成 | CADTransformer / SymPoint / GAT-CADNet 已登记 |
 | 至少跑通一个基线命令 | 已完成 | CADTransformer smoke job 968 |
+| 统计图元类型/数量分布 | 已补齐 | 12,621,288 个 raw primitive；path 98.68%；全量 35 类语义标注覆盖 |
+| 记录论文指标 vs 复现指标 vs runtime | 已补齐比较表，但未过 paper-faithful 门禁 | 论文 PQ/SQ/RQ 已记录；本次只有 Total FG F1，不能直接相减 |
 | 记录指标、runtime、硬件 | 已完成 | job 969：RTX 5090，10:21:28，best F1 0.827501 |
 | 必读论文 10 行笔记 | 已完成 | FloorPlanCAD、CADSpotting、Brep2Shape、GeoPT、HouseMind、Text-Enhanced CAD、ArchPlanVQA |
 | DrawingPT v0 草案 | 已完成 | `docs/drawingpt_v0_design_draft.md` |
 
-## 4. 真正跑过的复现：CADTransformer
+## 4. 补齐的 FloorPlanCAD 图元类型/数量分布
 
-### 4.1 为什么先复现 CADTransformer
+这一项之前确实没有在组会报告里展开。本次补齐后，最该记住的结论是：FloorPlanCAD 的 raw SVG primitive 极度集中在 `path`，并且单图 primitive 数有明显长尾。
+
+| SVG tag | 数量 | 占 raw primitive 比例 |
+|---|---:|---:|
+| path | 12,454,181 | 98.68% |
+| circle | 157,009 | 1.24% |
+| ellipse | 10,098 | 0.08% |
+
+| 单图 raw primitive 数 | SVG 文件数 | 占比 |
+|---|---:|---:|
+| 0-99 | 530 | 4.57% |
+| 100-499 | 4,895 | 42.19% |
+| 500-999 | 2,641 | 22.76% |
+| 1,000-1,999 | 2,125 | 18.32% |
+| 2,000-4,999 | 1,043 | 8.99% |
+| 5,000-9,999 | 289 | 2.49% |
+| 10,000+ | 79 | 0.68% |
+
+语义标注元素共 5,828,994 个。全量 35 类都出现，但类别分布很不均衡：`wall` 一类就占 23.37%，而 `rolling door` 只有 98 个带 `semanticId` 的元素，占 0.0017%。这意味着后续做少样本或低标注比例实验时，rare class 很容易被采样噪声吞掉。
+
+完整表格见 `docs/floorplancad_distribution_report.md`，可提交 CSV 摘要见 `reports/group_meeting_2026-08-18/floorplancad_*_distribution.csv`。
+
+## 5. CADTransformer 论文指标 vs 本次复现指标 vs runtime
+
+这项之前也没有写清楚。CADTransformer 原论文 Table 1 的主指标是 panoptic symbol spotting 的 PQ/SQ/RQ；本次 job 969 日志冻结的是代码 `eval.py` 输出的前景 primitive 语义 Total FG Precision/Recall/F1。两组指标不是同一口径，不能直接相减。论文指标来自 CVPR 2022 CADTransformer 论文 Table 1；PQ 评估链路来自官方 README 中的 `scripts/evaluate_pq.py` 说明。
+
+| 指标 | 论文 CADTransformer | 论文 CADTransformer+RL | 本次 job 969 | runtime | 当前判断 |
+|---|---:|---:|---:|---|---|
+| PQ | 0.6732 | 0.6894 | 未产出 | 10:21:28 | 不可直接比较 |
+| SQ | 0.8754 | 0.8832 | 未产出 | 10:21:28 | 不可直接比较 |
+| RQ | 0.7226 | 0.7333 | 未产出 | 10:21:28 | 不可直接比较 |
+| Total FG Precision | 论文未报告 | 论文未报告 | 0.832457 | 10:21:28 | 只可作为本次日志指标 |
+| Total FG Recall | 论文未报告 | 论文未报告 | 0.822702 | 10:21:28 | 只可作为本次日志指标 |
+| Total FG F1 | 论文未报告 | 论文未报告 | 0.827501 | 10:21:28 | 不能冒充论文主指标 |
+
+所以“差距超过 2 个点要找原因”当前应这样回答：现在还不能计算严格论文差距，因为 paper-faithful 的 PQ/SQ/RQ 还没产出；真正需要记录的原因是**指标口径和实验协议尚未对齐**。后续如果跑出 PQ/SQ/RQ，任一主指标与论文 CADTransformer+RL 差距超过 0.02 absolute，再按指标口径、训练配置、`npy_rgb`、数据版本、Random Layer augmentation、兼容补丁六个方向排查。
+
+## 6. 真正跑过的复现：CADTransformer
+
+### 6.1 为什么先复现 CADTransformer
 
 CADTransformer 是目前最适合第一周打通链路的基线：它有公开代码、FloorPlanCAD 预处理脚本、HRNet 输入分支和训练入口。相比 SymPoint / GAT-CADNet，它更适合作为“先把数据和 GPU 环境跑通”的第一块石头。
 
-### 4.2 跑通过程
+### 6.2 跑通过程
 
 整个过程不是一次成功，而是逐步排掉环境和兼容性问题：
 
@@ -81,7 +127,7 @@ CADTransformer 是目前最适合第一周打通链路的基线：它有公开�
 | 968 | COMPLETED | smoke test 跑通 | 验证训练链路 |
 | 969 | COMPLETED | 10 epoch full-data 保守训练完成 | 冻结为第一版 baseline anchor |
 
-### 4.3 当前结果怎么理解
+### 6.3 当前结果怎么理解
 
 job 969 的 best validation Total FG F1 是 `0.827501`。这个数字说明 CADTransformer 的训练、验证、checkpoint 保存、指标打印都跑通了，而且 full-data 训练没有崩。
 
@@ -94,7 +140,7 @@ job 969 的 best validation Total FG F1 是 `0.827501`。这个数字说明 CADT
 
 所以组会上最稳的说法是：**CADTransformer 已经作为保守 baseline anchor 跑通，best F1 0.827501；下一步要恢复或论证 paper-faithful 配置后再和论文数字比较。**
 
-## 5. 其他文章/基线现在处于什么状态
+## 7. 其他文章/基线现在处于什么状态
 
 | 文章 / 方法 | 当前状态 | 这周产出 | 下一步 |
 |---|---|---|---|
@@ -109,7 +155,7 @@ job 969 的 best validation Total FG F1 是 `0.827501`。这个数字说明 CADT
 | Text-Enhanced CAD | 已读文献 | 明确文本流 novelty 风险 | 论文表述不能说“首次 CAD+文本”，要收窄到自监督/矢量原生 |
 | ArchPlanVQA | 已读元数据和任务定位 | 明确 VLM floor-plan VQA 对照方向 | 后续做计数/测量/空间关系 prompt suite |
 
-## 6. 红线与纪律检查
+## 8. 红线与纪律检查
 
 本次同步到 GitHub 的内容遵守以下边界：
 
@@ -120,16 +166,17 @@ job 969 的 best validation Total FG F1 是 `0.827501`。这个数字说明 CADT
 - 报告里只保留 hash、指标、配置和结论边界。
 - 对未完成的 paper-faithful 复现明确写 caveat，不把保守运行包装成论文复现。
 
-## 7. 下周建议安排
+## 9. 下周建议安排
 
 优先级从高到低：
 
 1. **CADTransformer paper-faithful 门禁**：补 `npy_rgb`，恢复或评估 `img_size=700`，重新跑一个更接近论文设定的 baseline。
-2. **数据泄漏检查**：对 train/val/test 做文件 hash、结构摘要、图元统计相似性检查。
-3. **DXF 公共样例验证**：找公开 DXF 或生成合成 DXF，跑 `inspect_dxf.py`，冻结 JSON 摘要。
-4. **DrawingPT v0 预训练协议**：把 label fractions、主指标、从零训练 baseline、seed 数写成正式 prereg。
-5. **VLM 对照准备**：参考 HouseMind / ArchPlanVQA，冻结 prompt 和评分方式，但不要急着跑大规模 API。
+2. **PQ/SQ/RQ 门禁**：跑通 CADTransformer README 里的 panoptic quality 评估链路，避免只拿 Total FG F1 对论文主表。
+3. **数据泄漏检查**：对 train/val/test 做文件 hash、结构摘要、图元统计相似性检查。
+4. **DXF 公共样例验证**：找公开 DXF 或生成合成 DXF，跑 `inspect_dxf.py`，冻结 JSON 摘要。
+5. **DrawingPT v0 预训练协议**：把 label fractions、主指标、从零训练 baseline、seed 数写成正式 prereg。
+6. **VLM 对照准备**：参考 HouseMind / ArchPlanVQA，冻结 prompt 和评分方式，但不要急着跑大规模 API。
 
-## 8. 当前可放心引用的句子
+## 10. 当前可放心引用的句子
 
-> 第一周已经完成 FloorPlanCAD 数据链路和 CADTransformer 保守 baseline 跑通。全量保守训练 job 969 在单卡 RTX 5090 上完成，耗时 10:21:28，best validation Total FG F1 为 0.827501。这个结果证明环境、数据和训练链路已通，但还不是 paper-faithful 复现；下一步门禁是恢复或论证 `img_size=700`、`rgb_dim=32/npy_rgb` 配置，并做跨 split 泄漏检查。
+> 第一周已经完成 FloorPlanCAD 数据链路和 CADTransformer 保守 baseline 跑通。FloorPlanCAD 当前 11,602 张 SVG 共统计到 12,621,288 个 raw primitive，其中 `path` 占 98.68%，全量 35 类语义标注均出现。CADTransformer job 969 在单卡 RTX 5090 上完成，耗时 10:21:28，best validation Total FG F1 为 0.827501。这个结果证明环境、数据和训练链路已通，但还不是 paper-faithful 复现；论文 Table 1 的 PQ/SQ/RQ 仍需按原评估链路补齐，下一步门禁是恢复或论证 `img_size=700`、`rgb_dim=32/npy_rgb` 配置，并做跨 split 泄漏检查。

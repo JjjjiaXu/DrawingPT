@@ -76,15 +76,34 @@ Slurm job 969：
 
 ## 与论文数字的关系
 
-当前还不能计算“与论文数字差多少”，因为这次运行不是 paper-faithful 配置。
+当前还不能计算严格的“与论文数字差多少”，因为这次运行不是 paper-faithful 配置，而且本次日志指标和论文主指标不是同一口径。
+
+CADTransformer 原论文 Table 1 的主指标是 panoptic symbol spotting 的 PQ/SQ/RQ：
+
+| 指标 | 论文 CADTransformer | 论文 CADTransformer+RL | 本次 job 969 |
+|---|---:|---:|---:|
+| PQ | 0.6732 | 0.6894 | 未产出 |
+| SQ | 0.8754 | 0.8832 | 未产出 |
+| RQ | 0.7226 | 0.7333 | 未产出 |
+| Total FG Precision | 论文未报告 | 论文未报告 | 0.832457 |
+| Total FG Recall | 论文未报告 | 论文未报告 | 0.822702 |
+| Total FG F1 | 论文未报告 | 论文未报告 | 0.827501 |
+
+本次 `Total FG F1` 来自 CADTransformer `eval.py`，是前景 primitive 语义分类累计指标；论文 Table 1 的 PQ/SQ/RQ 是 panoptic symbol spotting 指标。因此它们不能直接相减，也不能把 `0.827501` 写成论文复现 PQ。
 
 主要差异：
 
+- 论文训练 40 epochs；本次只训练 10 epochs。
+- 论文使用 4 张 NVIDIA RTX A6000；本次使用 1 张 NVIDIA GeForce RTX 5090。
 - 使用 `img_size=384`，不是原始默认 700。
 - 使用 `rgb_dim=0`，没有使用 `npy_rgb` 特征。
+- 本次未使用 Random Layer augmentation。
+- 本次尚未跑 README 中的 panoptic quality 评估链路。
 - batch size、workers 等也为了稳定和节省资源做了保守设置。
 
 因此这次结果的定位是：**证明 CADTransformer 在当前服务器、当前 FloorPlanCAD 版本、当前兼容补丁下已经完整跑通；它是 baseline anchor，不是最终论文复现数字。**
+
+后续如果跑出 PQ/SQ/RQ，任一主指标与论文 CADTransformer+RL 差距超过 0.02 absolute，再按指标口径、训练配置、输入特征、数据版本、增强策略和兼容补丁逐项排查。
 
 ## 调试记录
 

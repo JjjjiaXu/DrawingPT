@@ -1,25 +1,24 @@
-# FloorPlanCAD data report
+# FloorPlanCAD 数据报告
 
-Generated locally on 2026-08-15.
+生成日期：2026-08-15
+更新日期：2026-08-23
 
-## Download status
+## 1. 下载状态
 
-The public Google Drive IDs embedded in CADTransformer/SymPoint/GAT-CADNet were reachable from this machine.
+当前本地使用的是 CADTransformer / SymPoint / GAT-CADNet 公开脚本可直接使用的 FloorPlanCAD 11,602 张版本。
 
-Downloaded and extracted under `data/raw/FloorPlanCAD/`:
-
-| Split | SVG files | Zip size |
+| split | SVG 文件数 | zip 大小 |
 |---|---:|---:|
 | train | 6,965 | 84.9 MB |
 | val | 810 | 10.2 MB |
 | test | 3,827 | 40.4 MB |
 | total | 11,602 | 135.5 MB |
 
-This is the 11,602-file version used by public baseline scripts. The official website mentions a later 15,663-file update, so use the 11,602 version for baseline reproduction unless we intentionally switch all methods to the newer release.
+注意：FloorPlanCAD 官网后续提到过 15,663 张更新版。本轮 baseline 为了和公开复现脚本对齐，使用的是 11,602 张版本；如果切换数据版本，所有 baseline 都要一起切换并重新冻结 hash。
 
-## File structure
+## 2. 文件结构
 
-Each downloaded zip extracts into a nested split directory:
+每个 zip 解压后是嵌套 split 目录：
 
 ```text
 data/raw/FloorPlanCAD/
@@ -28,39 +27,69 @@ data/raw/FloorPlanCAD/
   test/test/svg_gt/*.svg
 ```
 
-## Annotation fields
+## 3. SVG 标注字段
 
-SVG primitives carry:
+SVG 图元上主要使用这些字段：
 
-- `semanticId`: class id
-- `instanceId`: object instance id; `-1` appears for stuff/background-like primitives
-- geometry fields such as `d`, `cx`, `cy`, `r`, `rx`, `ry`
-- drawing style fields such as `stroke`, `fill`, `stroke-width`
+- `semanticId`：语义类别 id。
+- `instanceId`：对象实例 id；`-1` 出现在 stuff/background-like 图元上。
+- 几何字段：例如 `d`、`cx`、`cy`、`r`、`rx`、`ry`。
+- 绘图样式字段：例如 `stroke`、`fill`、`stroke-width`。
 
-In sampled SVGs, the main primitive tags are `path`, `circle`, and `ellipse`. I did not observe DWG-native block references in this SVG release, which matters for DrawingPT: FloorPlanCAD is vector, but not fully DWG-native.
+本轮样本和全量统计中实际出现的 raw SVG primitive tag 主要是 `path`、`circle`、`ellipse`。这说明 FloorPlanCAD 是 SVG 矢量标注，但不是完整 DWG-native 结构：目前没有在这一版本里观察到可直接复用的 DWG block reference 层级。
 
-## Per-split statistics
+## 4. 图元类型与数量分布
 
-| Split | Files | Primitive median | Primitive mean | Primitive max | Instance median | Instance mean | Instance max |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| train | 6,965 | 540 | 1,114.79 | 32,416 | 7 | 14.93 | 211 |
-| val | 810 | 571 | 1,116.69 | 53,919 | 7 | 14.76 | 181 |
-| test | 3,827 | 551 | 1,032.73 | 27,993 | 7 | 14.28 | 170 |
+完整统计已补齐在 [floorplancad_distribution_report.md](floorplancad_distribution_report.md)。核心结论如下：
 
-## Top semantic classes by primitive count
+| 指标 | 数值 |
+|---|---:|
+| SVG 文件总数 | 11,602 |
+| raw SVG primitive 总数 | 12,621,288 |
+| 单图 primitive 中位数 | 544 |
+| 单图 primitive 均值 | 1,087.85 |
+| 单图 primitive p95 | 3,541 |
+| 单图 primitive 最大值 | 53,919 |
+| 带 `semanticId` 的元素总数 | 5,828,994 |
 
-Across all splits, the heavy classes are wall, bed, row chairs, sink, toilet, parking spot, chair, stairs, wardrobe, doors, and windows. The distribution is highly imbalanced: rare classes include folding door, revolving door, rolling door, bay window, and opening symbol.
+| SVG tag | 数量 | 占 raw primitive 比例 |
+|---|---:|---:|
+| path | 12,454,181 | 98.68% |
+| circle | 157,009 | 1.24% |
+| ellipse | 10,098 | 0.08% |
 
-This confirms two practical points:
+## 5. 每 split 统计
 
-1. A baseline must report proper panoptic/instance metrics, not only primitive-level semantic accuracy.
-2. DrawingPT should evaluate low-label regimes carefully because rare classes may disappear under small label fractions.
+| split | 文件数 | raw primitive 总数 | 单图中位数 | 单图均值 | 单图最大值 | instance 均值 |
+|---|---:|---:|---:|---:|---:|---:|
+| train | 6,965 | 7,764,513 | 540 | 1,114.79 | 32,416 | 14.93 |
+| val | 810 | 904,517 | 571 | 1,116.69 | 53,919 | 14.76 |
+| test | 3,827 | 3,952,258 | 551 | 1,032.73 | 27,993 | 14.28 |
 
-## Generated reports
+## 6. 语义类别分布
 
-- `outputs/reports/floorplancad_scan_all.json`
-- `outputs/reports/floorplancad_train_stats.json`
-- `outputs/reports/floorplancad_val_stats.json`
-- `outputs/reports/floorplancad_test_stats.json`
-- `outputs/reports/floorplancad_*_file_stats.csv`
+全量 train+val+test 中 35 类均出现，但分布高度不均衡：
 
+- 最大类：`wall`，1,362,387 个带 `semanticId` 元素，占 23.37%。
+- 其次：`bed`、`row chairs`、`sink`、`toilet`、`parking spot`。
+- 极少类：`rolling door` 只有 98 个，`revolving door` 只有 1,036 个。
+- val split 只覆盖 33/35 类，缺少极少见的 `revolving door` 和 `rolling door`。
+
+这会影响后续实验设计：少样本设置、低标注比例实验和 small-val 指标都要特别警惕 rare class 方差，不能只看总体 F1。
+
+## 7. 生成产物
+
+本地原始统计产物位于 `outputs/reports/`，不提交到 GitHub：
+
+- `floorplancad_scan_all.json`
+- `floorplancad_train_stats.json`
+- `floorplancad_val_stats.json`
+- `floorplancad_test_stats.json`
+- `floorplancad_*_file_stats.csv`
+
+可提交的公开汇总产物：
+
+- `docs/floorplancad_distribution_report.md`
+- `reports/group_meeting_2026-08-18/floorplancad_tag_distribution.csv`
+- `reports/group_meeting_2026-08-18/floorplancad_primitive_count_bins.csv`
+- `reports/group_meeting_2026-08-18/floorplancad_semantic_distribution.csv`

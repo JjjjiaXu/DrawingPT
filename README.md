@@ -65,8 +65,10 @@ python scripts/inspect_dxf.py --input path\to\drawing.dxf
 
 ## 当前第一周状态
 
-第一周完成度见 `docs/week1_completion_report.md`，组会可读版中文报告见 `reports/group_meeting_2026-08-18/report.html`。
+第一周完成度见 `docs/week1_completion_report.md`，组会可读版中文报告见 `reports/group_meeting_2026-08-18/report.html`。FloorPlanCAD 图元分布与 CADTransformer 指标差距检查见 `docs/floorplancad_distribution_report.md`。
 
 第一版 CADTransformer 保守 full-data baseline 已经完成，Slurm job 969 的 best validation Total FG F1 为 `0.827501118183136`。这个结果是可运行基线锚点，还不是 paper-faithful 论文复现。
+
+目前已补齐 FloorPlanCAD 图元类型/数量分布：11,602 张 SVG 共 12,621,288 个 raw primitive，其中 `path` 占 98.68%。也已补齐论文指标 vs 复现指标 vs runtime 对照：CADTransformer 原论文主指标是 PQ/SQ/RQ，本次 job 969 只产出 Total FG F1，因此不能直接相减；下一门禁是跑出 paper-faithful PQ/SQ/RQ。
 
 面向项目推进和组会的记录默认使用中文；只有论文标题、API/config 名、指标名和命令保留英文。
