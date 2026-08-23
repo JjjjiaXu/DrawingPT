@@ -1,69 +1,70 @@
-# CADTransformer conservative baseline run
+# CADTransformer 保守基线复现实验记录
 
-## Date
+## 日期
 
-Submitted 2026-08-18; completed 2026-08-19.
+提交时间：2026-08-18
+完成时间：2026-08-19
 
-## Git commit
+## 代码状态
 
-Local code state at submission: `5b545dc` (`Use normal QoS for conservative CADTransformer training`).
+提交作业时的本地代码状态：`5b545dc`（`Use normal QoS for conservative CADTransformer training`）。
 
-## Dataset version and split
+## 数据集版本
 
-FloorPlanCAD public 11,602-file baseline version:
+FloorPlanCAD 公开 11,602 张版本：
 
-- train: 6,965 SVG/PNG/NPY files; CADTransformer training filter kept 6,962
-- val: 810
-- test: 3,827
+- train：6,965；CADTransformer 训练过滤后保留 6,962
+- val：810
+- test：3,827
 
-This is the version distributed through the public Google Drive IDs used by CADTransformer/SymPoint/GAT-CADNet, not the later 15,663-file website update.
+说明：这是 CADTransformer / SymPoint / GAT-CADNet 公开脚本常用的 Google Drive 版本，不是官网后续提到的 15,663 张更新版。
 
-## Hardware
+## 硬件
 
-YaoGroup Slurm server, one NVIDIA GeForce RTX 5090.
+YaoGroup Slurm 服务器，单卡 NVIDIA GeForce RTX 5090。
 
-## Command
+## 运行入口
 
-Submitted through `scripts/server/cadtransformer_train.sbatch`.
+通过 `scripts/server/cadtransformer_train.sbatch` 提交。
 
-Key settings:
+关键配置：
 
-- epochs: 10
-- image size: 384
-- batch size: 1
-- test batch size: 1
-- workers: 0
+- epochs：10
+- image size：384
+- batch size：1
+- test batch size：1
+- workers：0
 - `rgb_dim=0`
-- ViT online pretrained download disabled
-- HRNet-W48 ImageNet checkpoint loaded from local file
+- 禁用 ViT 在线下载预训练权重
+- HRNet-W48 ImageNet 预训练权重从本地文件加载
 
-## Runtime
+## 运行时间
 
-Slurm job 969:
+Slurm job 969：
 
-- state: `COMPLETED`
-- exit code: `0:0`
-- start: 2026-08-18 19:27:38 CST
-- end: 2026-08-19 05:49:06 CST
-- elapsed: 10:21:28
+- state：`COMPLETED`
+- exit code：`0:0`
+- start：2026-08-18 19:27:38 CST
+- end：2026-08-19 05:49:06 CST
+- elapsed：10:21:28
 
-## Metrics
+## 指标
 
-Validation metrics reported during training:
+训练过程中验证集打印的 Total FG 指标：
 
-| Epoch marker | Total FG Precision | Total FG Recall | Total FG F1 |
+| epoch 标记 | Total FG Precision | Total FG Recall | Total FG F1 |
 |---|---:|---:|---:|
 | Epoch 1 | 0.750009 | 0.713377 | 0.731184 |
 | Epoch 2 | 0.793087 | 0.768256 | 0.780424 |
 | Epoch 6 / Best Epoch 5 | 0.832457 | 0.822702 | 0.827501 |
 
-Best model selected by validation Total FG F1:
+当前 best model 按验证集 Total FG F1 选择：
 
 `0.827501118183136`
 
-## Frozen artifacts
+## 冻结产物
 
-| Artifact | Size | SHA-256 |
+| 产物 | 大小 | SHA-256 |
 |---|---:|---|
 | train log | 64,635 bytes | `fe88160d0a83a5f0aa9b517d39901ce186f2682d9577e9376a05753267c917a4` |
 | best model | 1,085,562,061 bytes | `642da46678d5f8d76cdeb958df4e6c77d5d9e3462a640467d9d83c6283a35530` |
@@ -71,12 +72,29 @@ Best model selected by validation Total FG F1:
 | Slurm stdout | - | `61fe8aab418f82659b9b6dc4c2c18bdcb1b33b8d1946b5ffdf1d6e57d9f65d9f` |
 | Slurm stderr | - | `200b84a634f5c01233da19b23986357b863ed74803bf017225dbe62f95675ac8` |
 
-The large model files are intentionally not committed to git.
+大模型文件不提交到 git，只记录 hash。
 
-## Gap from reported paper number
+## 与论文数字的关系
 
-Not computed yet. This run is not paper-faithful because it uses conservative settings (`img_size=384`, `rgb_dim=0`) rather than the original-style feature path.
+当前还不能计算“与论文数字差多少”，因为这次运行不是 paper-faithful 配置。
 
-## Failure notes
+主要差异：
 
-Earlier failures were environment/compatibility issues: missing `lxml`, CairoSVG CLI permission, NumPy alias removal, timm ViT API mismatch, optional `npy_rgb` missing, and Slurm QoS adjustment. The final job completed with Python multiprocessing/NCCL cleanup warnings, but Slurm exit code was `0:0` and both best/last checkpoints were saved.
+- 使用 `img_size=384`，不是原始默认 700。
+- 使用 `rgb_dim=0`，没有使用 `npy_rgb` 特征。
+- batch size、workers 等也为了稳定和节省资源做了保守设置。
+
+因此这次结果的定位是：**证明 CADTransformer 在当前服务器、当前 FloorPlanCAD 版本、当前兼容补丁下已经完整跑通；它是 baseline anchor，不是最终论文复现数字。**
+
+## 调试记录
+
+前置失败主要来自环境和兼容问题：
+
+- 缺少 `lxml`；
+- CairoSVG CLI 权限问题；
+- NumPy 旧别名被移除；
+- timm ViT API 变化；
+- optional `npy_rgb` 文件缺失；
+- Slurm QoS / 资源设置需要调整。
+
+最终 job 969 有 Python multiprocessing / NCCL 清理 warning，但 Slurm exit code 是 `0:0`，best/last checkpoint 都已保存，所以不视为训练失败。

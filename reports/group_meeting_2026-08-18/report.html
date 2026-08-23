@@ -1,286 +1,246 @@
-<!doctype html><meta charset='utf-8'><title>DrawingPT · CADTransformer baseline setup report</title>
-<style>
-:root{--fg:#1a1a1a;--mut:#666;--bd:#e0e0e0;--bg:#fff;--acc:#0b5fff;--warn:#b00020;--ok:#0a7d33}
-*{box-sizing:border-box}
-body{margin:0;padding:2rem;font:15px/1.65 -apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif;
-     color:var(--fg);background:var(--bg);max-width:1080px;margin-inline:auto}
-h1{font-size:1.7rem;margin:0 0 .2rem} h2{font-size:1.25rem;margin:2.2rem 0 .6rem;
-   padding-bottom:.3rem;border-bottom:2px solid var(--bd)} h3{font-size:1.05rem;margin:1.4rem 0 .4rem}
-.sub{color:var(--mut);margin:0 0 1.5rem}
-table{border-collapse:collapse;width:100%;margin:.6rem 0;font-size:14px;display:block;overflow-x:auto}
-th,td{border:1px solid var(--bd);padding:.4rem .6rem;text-align:left;white-space:nowrap}
-th{background:#f6f7f9;font-weight:600}
-.card{border:1px solid var(--bd);border-radius:8px;padding:1rem 1.2rem;margin:.8rem 0;background:#fafbfc}
-.hero{border-left:4px solid var(--acc);background:#f5f8ff}
-.bad{border-left:4px solid var(--warn);background:#fff5f5}
-.good{border-left:4px solid var(--ok);background:#f4fbf6}
-.k{color:var(--mut);font-size:13px} code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
-.pill{display:inline-block;padding:.1rem .5rem;border-radius:99px;font-size:12px;background:#eef1f5;margin-right:.3rem}
-.miss{color:var(--warn);font-weight:600}
-pre{white-space:pre-wrap;margin:.3rem 0}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DrawingPT 第一周复现与调研报告（中文可读版）</title>
+  <style>
+:root {
+  color-scheme: light;
+  --fg: #162033;
+  --muted: #5f6b7a;
+  --line: #dfe5ee;
+  --soft: #f6f8fb;
+  --blue: #1f5eff;
+  --green: #0f8a5f;
+  --orange: #b76600;
+  --red: #b42318;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 32px 18px 56px;
+  background: #eef2f7;
+  color: var(--fg);
+  font: 16px/1.78 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+}
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(21, 31, 50, .10);
+  overflow: hidden;
+}
+.hero {
+  padding: 34px 42px 28px;
+  background: linear-gradient(135deg, #102044, #244bd6);
+  color: white;
+}
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  line-height: 1.25;
+}
+.hero p {
+  margin: 0;
+  opacity: .88;
+}
+.content {
+  padding: 28px 42px 42px;
+}
+h2 {
+  margin: 34px 0 14px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 23px;
+}
+h3 {
+  margin: 26px 0 10px;
+  font-size: 18px;
+}
+p { margin: 10px 0; }
+blockquote {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 4px solid var(--blue);
+  background: #f2f6ff;
+  border-radius: 8px;
+}
+code {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #f1f4f8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .92em;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 20px;
+  font-size: 14px;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 9px 11px;
+  vertical-align: top;
+}
+th {
+  background: #f3f6fa;
+  text-align: left;
+  font-weight: 700;
+}
+tr:nth-child(even) td { background: #fbfcfe; }
+ul, ol { padding-left: 24px; }
+li { margin: 5px 0; }
+.badge {
+  display: inline-block;
+  margin: 0 8px 8px 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #2145a8;
+  font-size: 13px;
+  font-weight: 650;
+}
+.note {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #f0d6a3;
+  background: #fff8eb;
+}
+@media (max-width: 760px) {
+  body { padding: 12px; }
+  .hero, .content { padding-left: 20px; padding-right: 20px; }
+  table { display: block; overflow-x: auto; }
+}
 </style>
-<h1>DrawingPT · CADTransformer baseline setup report</h1>
-<p class='sub'>DrawingPT · 生成于 2026-08-22 20:36 中国标准时间</p>
-<h2>0 · 组会一页（会上只讲这三样）</h2>
-<div class='card hero'><b>① 新冻结的资产</b><br>FloorPlanCAD processed counts: train/val/test NPY = 6965 / 810 / 3827<br>HRNet checkpoint sha 0efec102 · size 310643500 bytes<br>Smoke job 968 completed: F1 0.256508 · log sha 99a5f8a2 · best checkpoint sha 86c534ef · last checkpoint sha 72526d71<br>Conservative full-data job 969 completed: best F1 0.827501 · train log sha fe88160d · best checkpoint sha 642da466 · last checkpoint sha d29a4da0<br>Code state for CADTransformer submission scripts: commit 5b545dc</div>
-<div class='card hero'><b>② 上周新增的数字</b><br>Smoke Total FG Precision = 0.437268, Recall = 0.181527, F1 = 0.256508<br>Smoke elapsed = 00:02:17 on one RTX 5090<br>Formal run 969 started with full train/val/test data; train after filter = 6962, val = 810, test = 3827<br>Formal run 969 completed in 10:21:28 on one RTX 5090; best validation Total FG Precision = 0.832457, Recall = 0.822702, F1 = 0.827501</div>
-<div class='card hero'><b>③ 下周要过的那道门禁</b><br>Decide and document whether to restore CADTransformer default img_size=700 and rgb_dim=32/npy_rgb; only then compare to paper numbers or DrawingPT.</div>
-<div class='card'><b>可被追问清单（作者自评）</b><pre>&lt;!--
-请逐条列：
-敢：____
-不敢：____
---&gt;
-敢被追问：FloorPlanCAD 三个 split 数量、HRNet 权重 hash、smoke 指标、job 969 的 best F1/runtime/checkpoint hash。不敢直接拿去和论文数字比较：因为当前 job 969 是 img_size=384、rgb_dim=0 的保守配置，还不是 paper-faithful 复现。
-
----</pre></div>
-<h2>1 · 自检</h2>
-<div class='card good'><b>全部通过 ✅</b></div>
-<h2>2 · 模型卡与配置（自动）</h2>
-<h3>protocol.json</h3><div class='card'><pre class='mono'>{
-  &quot;project&quot;: &quot;DrawingPT&quot;,
-  &quot;experiment&quot;: &quot;CADTransformer baseline setup, smoke test, and conservative full-data training&quot;,
-  &quot;date_local&quot;: &quot;2026-08-18&quot;,
-  &quot;server&quot;: {
-    &quot;host&quot;: &quot;yao-gpu01&quot;,
-    &quot;scheduler&quot;: &quot;Slurm&quot;,
-    &quot;gpu&quot;: &quot;NVIDIA GeForce RTX 5090&quot;,
-    &quot;driver&quot;: &quot;595.84&quot;,
-    &quot;cuda_runtime_reported_by_nvidia_smi&quot;: &quot;13.2&quot;
-  },
-  &quot;software&quot;: {
-    &quot;python&quot;: &quot;3.11.15&quot;,
-    &quot;torch&quot;: &quot;2.11.0+cu128&quot;,
-    &quot;timm&quot;: &quot;0.6.13&quot;,
-    &quot;numpy&quot;: &quot;1.26.4&quot;,
-    &quot;local_code_commit&quot;: &quot;5b545dc&quot;
-  },
-  &quot;data&quot;: {
-    &quot;dataset&quot;: &quot;FloorPlanCAD&quot;,
-    &quot;processed_root&quot;: &quot;server:processed/FloorPlanCAD&quot;,
-    &quot;splits&quot;: {
-      &quot;train&quot;: {
-        &quot;svg&quot;: 6965,
-        &quot;png&quot;: 6965,
-        &quot;npy&quot;: 6965
-      },
-      &quot;val&quot;: {
-        &quot;svg&quot;: 810,
-        &quot;png&quot;: 810,
-        &quot;npy&quot;: 810
-      },
-      &quot;test&quot;: {
-        &quot;svg&quot;: 3827,
-        &quot;png&quot;: 3827,
-        &quot;npy&quot;: 3827
-      }
-    }
-  },
-  &quot;model&quot;: {
-    &quot;baseline&quot;: &quot;CADTransformer&quot;,
-    &quot;input_embed&quot;: &quot;HRNet-W48&quot;,
-    &quot;parameter_count_cpu_preflight&quot;: 91367080,
-    &quot;hrnet_pretrained_sha256&quot;: &quot;0efec102d97f2ef58f0e258b2c3076b3704b93ffc2b73f64c8da5462c0037ef8&quot;
-  },
-  &quot;smoke_job&quot;: {
-    &quot;job_id&quot;: 968,
-    &quot;state&quot;: &quot;COMPLETED&quot;,
-    &quot;exit_code&quot;: &quot;0:0&quot;,
-    &quot;elapsed&quot;: &quot;00:02:17&quot;,
-    &quot;config&quot;: {
-      &quot;debug&quot;: true,
-      &quot;epochs&quot;: 1,
-      &quot;img_size&quot;: 384,
-      &quot;max_prim&quot;: 2500,
-      &quot;rgb_dim&quot;: 0,
-      &quot;vit_pretrained_online_download&quot;: false
-    }
-  },
-  &quot;formal_job&quot;: {
-    &quot;job_id&quot;: 969,
-    &quot;state&quot;: &quot;COMPLETED&quot;,
-    &quot;exit_code&quot;: &quot;0:0&quot;,
-    &quot;elapsed&quot;: &quot;10:21:28&quot;,
-    &quot;start_cst&quot;: &quot;2026-08-18 19:27:38&quot;,
-    &quot;end_cst&quot;: &quot;2026-08-19 05:49:06&quot;,
-    &quot;run_name&quot;: &quot;cadtransformer_train_e10_img384_rgb0_20260818_192739&quot;,
-    &quot;best_validation&quot;: {
-      &quot;epoch_marker&quot;: &quot;Epoch 6 / Best Epoch 5&quot;,
-      &quot;total_fg_precision&quot;: 0.8324572443962097,
-      &quot;total_fg_recall&quot;: 0.8227024674415588,
-      &quot;total_fg_f1&quot;: 0.827501118183136
-    },
-    &quot;config&quot;: {
-      &quot;epochs&quot;: 10,
-      &quot;img_size&quot;: 384,
-      &quot;batch_size&quot;: 1,
-      &quot;test_batch_size&quot;: 1,
-      &quot;workers&quot;: 0,
-      &quot;rgb_dim&quot;: 0,
-      &quot;qos&quot;: &quot;normal&quot;,
-      &quot;gpu&quot;: 1,
-      &quot;cpus&quot;: 4,
-      &quot;memory_gb&quot;: 40,
-      &quot;time_limit&quot;: &quot;16:00:00&quot;
-    }
-  },
-  &quot;important_protocol_deviations&quot;: [
-    &quot;prereg.txt was created after earlier smoke/setup work, so it is not a valid pre-run preregistration for completed runs&quot;,
-    &quot;smoke and conservative training use rgb_dim=0 because npy_rgb features were not generated&quot;,
-    &quot;smoke and conservative training use img_size=384 instead of the CADTransformer default 700&quot;,
-    &quot;ViT online pretrained download is disabled for smoke/training; local HRNet pretrained checkpoint is still loaded&quot;
-  ]
-}</pre></div>
-<h3>summary.json</h3><div class='card'><pre class='mono'>{
-  &quot;status&quot;: &quot;WEEK1_BASELINE_ANCHOR_COMPLETE&quot;,
-  &quot;headline&quot;: &quot;CADTransformer environment and FloorPlanCAD preprocessing are ready; smoke test and conservative full-data baseline completed successfully.&quot;,
-  &quot;completed&quot;: [
-    &quot;FloorPlanCAD raw data staged and processed into SVG/PNG/NPY for train/val/test&quot;,
-    &quot;HRNet-W48 ImageNet checkpoint downloaded and hash verified&quot;,
-    &quot;CADTransformer compatibility patches applied for Python 3.11 / NumPy 1.26 / timm 0.6.13 / torchrun&quot;,
-    &quot;Slurm smoke job 968 completed successfully on one RTX 5090&quot;,
-    &quot;Slurm full-data conservative training job 969 completed successfully on one RTX 5090&quot;
-  ],
-  &quot;current_run&quot;: {
-    &quot;job_id&quot;: 969,
-    &quot;state&quot;: &quot;COMPLETED&quot;,
-    &quot;exit_code&quot;: &quot;0:0&quot;,
-    &quot;checked_at&quot;: &quot;2026-08-19 13:29:16 CST&quot;,
-    &quot;run_name&quot;: &quot;cadtransformer_train_e10_img384_rgb0_20260818_192739&quot;
-  },
-  &quot;key_numbers&quot;: {
-    &quot;processed_train_npy&quot;: 6965,
-    &quot;processed_val_npy&quot;: 810,
-    &quot;processed_test_npy&quot;: 3827,
-    &quot;smoke_total_fg_precision&quot;: 0.4372682273387909,
-    &quot;smoke_total_fg_recall&quot;: 0.18152661621570587,
-    &quot;smoke_total_fg_f1&quot;: 0.2565082311630249,
-    &quot;smoke_elapsed&quot;: &quot;00:02:17&quot;,
-    &quot;formal_elapsed&quot;: &quot;10:21:28&quot;,
-    &quot;formal_best_total_fg_precision&quot;: 0.8324572443962097,
-    &quot;formal_best_total_fg_recall&quot;: 0.8227024674415588,
-    &quot;formal_best_total_fg_f1&quot;: 0.827501118183136
-  },
-  &quot;next_gate&quot;: &quot;Decide whether to restore original CADTransformer settings (img_size=700, rgb_dim=32 with npy_rgb) before DrawingPT comparison; run only after freezing a paper-faithful protocol.&quot;
-}</pre></div>
-<h3>COMPLETED.json</h3><div class='card'><pre class='mono'>{
-  &quot;overall_status&quot;: &quot;CADTRANSFORMER_CONSERVATIVE_BASELINE_COMPLETE&quot;,
-  &quot;completed_run&quot;: {
-    &quot;job_id&quot;: 968,
-    &quot;name&quot;: &quot;cadtrans-smoke&quot;,
-    &quot;state&quot;: &quot;COMPLETED&quot;,
-    &quot;exit_code&quot;: &quot;0:0&quot;,
-    &quot;elapsed&quot;: &quot;00:02:17&quot;
-  },
-  &quot;formal_run&quot;: {
-    &quot;job_id&quot;: 969,
-    &quot;name&quot;: &quot;cadtrans-train&quot;,
-    &quot;state&quot;: &quot;COMPLETED&quot;,
-    &quot;exit_code&quot;: &quot;0:0&quot;,
-    &quot;elapsed&quot;: &quot;10:21:28&quot;,
-    &quot;best_total_fg_f1&quot;: 0.827501118183136
-  },
-  &quot;report_note&quot;: &quot;This report freezes completed setup, smoke, and conservative full-data CADTransformer artifacts. The run is not paper-faithful because it used img_size=384 and rgb_dim=0.&quot;
-}</pre></div>
-<h2>3 · 结果（自动）</h2>
-<h3>results.csv <span class='k'>（16 行）</span></h3>
-<table><tr><th>item</th><th>split_or_job</th><th>metric</th><th>value</th><th>unit</th><th>source</th></tr>
-<tr><td>processed_data</td><td>train</td><td>npy_files</td><td>6965</td><td>count</td><td>processed/FloorPlanCAD/npy/train</td></tr>
-<tr><td>processed_data</td><td>val</td><td>npy_files</td><td>810</td><td>count</td><td>processed/FloorPlanCAD/npy/val</td></tr>
-<tr><td>processed_data</td><td>test</td><td>npy_files</td><td>3827</td><td>count</td><td>processed/FloorPlanCAD/npy/test</td></tr>
-<tr><td>smoke</td><td>968</td><td>state</td><td>COMPLETED</td><td>status</td><td>sacct</td></tr>
-<tr><td>smoke</td><td>968</td><td>elapsed</td><td>00:02:17</td><td>time</td><td>sacct</td></tr>
-<tr><td>smoke</td><td>968</td><td>total_fg_precision</td><td>0.4372682273387909</td><td>ratio</td><td>CADTransformer smoke log</td></tr>
-<tr><td>smoke</td><td>968</td><td>total_fg_recall</td><td>0.18152661621570587</td><td>ratio</td><td>CADTransformer smoke log</td></tr>
-<tr><td>smoke</td><td>968</td><td>total_fg_f1</td><td>0.2565082311630249</td><td>ratio</td><td>CADTransformer smoke log</td></tr>
-<tr><td>formal_train</td><td>969</td><td>state</td><td>COMPLETED</td><td>status</td><td>sacct</td></tr>
-<tr><td>formal_train</td><td>969</td><td>elapsed</td><td>10:21:28</td><td>time</td><td>sacct</td></tr>
-<tr><td>formal_train</td><td>969</td><td>train_after_filter</td><td>6962</td><td>count</td><td>Slurm log</td></tr>
-<tr><td>formal_train</td><td>969</td><td>val_after_filter</td><td>810</td><td>count</td><td>Slurm log</td></tr>
-<tr><td>formal_train</td><td>969</td><td>test_after_filter</td><td>3827</td><td>count</td><td>Slurm log</td></tr>
-<tr><td>formal_train</td><td>969</td><td>best_total_fg_precision</td><td>0.8324572443962097</td><td>ratio</td><td>CADTransformer validation log</td></tr>
-<tr><td>formal_train</td><td>969</td><td>best_total_fg_recall</td><td>0.8227024674415588</td><td>ratio</td><td>CADTransformer validation log</td></tr>
-<tr><td>formal_train</td><td>969</td><td>best_total_fg_f1</td><td>0.827501118183136</td><td>ratio</td><td>CADTransformer validation log</td></tr>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="badge">DrawingPT</span>
+      <span class="badge">第一周复现</span>
+      <span class="badge">中文可读版</span>
+      <h1>DrawingPT 第一周复现与调研报告（中文可读版）</h1>
+      <p>把机器产物、Slurm 日志、baseline 数字和文献调研整理成组会上能直接讲的版本。</p>
+    </section>
+    <section class="content">
+      <p>生成日期：2026-08-23 项目阶段：第一周收口 / 第二周基线复现准备 结论口径：只讲公开数据、已冻结数字和下一步门禁；不提交原始数据、模型权重、私有图纸或服务器敏感信息。</p>
+<h2>1. 一句话结论</h2>
+<p>第一周的主线任务已经基本完成：FloorPlanCAD 数据已经下载、解析和统计；CADTransformer 已经在组内单卡 GPU 上跑通 smoke test 和一个 10 epoch 的保守 full-data baseline；第一批必读文献已经整理成 10 行笔记。</p>
+<p>但要注意：目前的 CADTransformer 结果是“能跑通的保守基线锚点”，还不是论文严格复现。它使用了 <code>img_size=384</code> 和 <code>rgb_dim=0</code>，没有恢复 CADTransformer 原始设定里的 <code>img_size=700</code> 和 <code>rgb_dim=32/npy_rgb</code>。所以它可以用于证明环境和数据链路通了，但不能直接拿去和论文数字宣称对齐。</p>
+<h2>2. 组会只讲三件事</h2>
+<h3>2.1 新冻结的资产</h3>
+<table>
+<tr><th>资产</th><th>数字 / hash</th><th>说明</th></tr>
+<tr><td>FloorPlanCAD 处理后数据量</td><td>train 6965 / val 810 / test 3827</td><td>三个 split 的 SVG/PNG/NPY 数量一致</td></tr>
+<tr><td>HRNet-W48 预训练权重</td><td><code>0efec102d97f2ef58f0e258b2c3076b3704b93ffc2b73f64c8da5462c0037ef8</code></td><td>本地加载，不提交权重文件</td></tr>
+<tr><td>CADTransformer smoke 日志</td><td><code>99a5f8a2bac787ec59336fc0562c27176b6e3f758e31de7126a0aa82f126ce57</code></td><td>job 968</td></tr>
+<tr><td>CADTransformer smoke best checkpoint</td><td><code>86c534ef8d1bdec0efb37fecda5b3304dcd82ebf8a9ccdc16a5d062cae233302</code></td><td>大文件不提交</td></tr>
+<tr><td>CADTransformer 正式训练日志</td><td><code>fe88160d0a83a5f0aa9b517d39901ce186f2682d9577e9376a05753267c917a4</code></td><td>job 969</td></tr>
+<tr><td>CADTransformer 正式 best checkpoint</td><td><code>642da46678d5f8d76cdeb958df4e6c77d5d9e3462a640467d9d83c6283a35530</code></td><td>大文件不提交</td></tr>
 </table>
-<h3>assets.csv <span class='k'>（7 行）</span></h3>
-<table><tr><th>asset</th><th>path_or_identifier</th><th>sha256</th><th>size_bytes</th><th>note</th></tr>
-<tr><td>HRNet pretrained checkpoint</td><td>third_party/CADTransformer/pretrained_models/hrnetv2_w48_imagenet_pretrained.pth</td><td>0efec102d97f2ef58f0e258b2c3076b3704b93ffc2b73f64c8da5462c0037ef8</td><td>310643500</td><td>local HRNet-W48 ImageNet pretrained checkpoint; large file not committed</td></tr>
-<tr><td>Smoke train log</td><td>CADTransformer/logs/cadtransformer_smoke/2026-08-18-19-09_train.log</td><td>99a5f8a2bac787ec59336fc0562c27176b6e3f758e31de7126a0aa82f126ce57</td><td>6172</td><td>completed smoke report log</td></tr>
-<tr><td>Smoke best checkpoint</td><td>CADTransformer/logs/cadtransformer_smoke/best_model.pth</td><td>86c534ef8d1bdec0efb37fecda5b3304dcd82ebf8a9ccdc16a5d062cae233302</td><td>1085562061</td><td>completed smoke best checkpoint; large file not committed</td></tr>
-<tr><td>Smoke last checkpoint</td><td>CADTransformer/logs/cadtransformer_smoke/last_model.pth</td><td>72526d719d3ab0b6e4ffa8ff1f920db09fd6c1ce863ef3530b2a136d89778390</td><td>1085561803</td><td>completed smoke last checkpoint; large file not committed</td></tr>
-<tr><td>Formal train log</td><td>CADTransformer/logs/cadtransformer_train_e10_img384_rgb0_20260818_192739/2026-08-18-19-27_train.log</td><td>fe88160d0a83a5f0aa9b517d39901ce186f2682d9577e9376a05753267c917a4</td><td>64635</td><td>completed formal train log</td></tr>
-<tr><td>Formal best checkpoint</td><td>CADTransformer/logs/cadtransformer_train_e10_img384_rgb0_20260818_192739/best_model.pth</td><td>642da46678d5f8d76cdeb958df4e6c77d5d9e3462a640467d9d83c6283a35530</td><td>1085562061</td><td>completed formal best checkpoint; large file not committed</td></tr>
-<tr><td>Formal last checkpoint</td><td>CADTransformer/logs/cadtransformer_train_e10_img384_rgb0_20260818_192739/last_model.pth</td><td>d29a4da0e541f1faf827fcdd41a612ba7ef1c0fa6ddbb69a1d7d9196db9df5db</td><td>1085562061</td><td>completed formal last checkpoint; large file not committed</td></tr>
+<h3>2.2 新增的数字</h3>
+<table>
+<tr><th>项目</th><th>指标</th><th>数值</th></tr>
+<tr><td>CADTransformer smoke，job 968</td><td>Total FG Precision</td><td>0.437268</td></tr>
+<tr><td>CADTransformer smoke，job 968</td><td>Total FG Recall</td><td>0.181527</td></tr>
+<tr><td>CADTransformer smoke，job 968</td><td>Total FG F1</td><td>0.256508</td></tr>
+<tr><td>CADTransformer 保守 full-data baseline，job 969</td><td>Best Total FG Precision</td><td>0.832457</td></tr>
+<tr><td>CADTransformer 保守 full-data baseline，job 969</td><td>Best Total FG Recall</td><td>0.822702</td></tr>
+<tr><td>CADTransformer 保守 full-data baseline，job 969</td><td>Best Total FG F1</td><td>0.827501</td></tr>
+<tr><td>CADTransformer 保守 full-data baseline，job 969</td><td>Runtime</td><td>10:21:28</td></tr>
 </table>
-<h3>jobs.csv <span class='k'>（11 行）</span></h3>
-<table><tr><th>job_id</th><th>name</th><th>state</th><th>elapsed</th><th>issue_or_result</th><th>fix_or_next_action</th></tr>
-<tr><td>892</td><td>cadtrans-prep</td><td>CANCELLED</td><td>00:00:34</td><td>early interrupted preprocessing</td><td>reran after script fixes</td></tr>
-<tr><td>893</td><td>cadtrans-prep</td><td>FAILED</td><td>00:00:04</td><td>missing lxml</td><td>added lxml to environment</td></tr>
-<tr><td>894</td><td>cadtrans-prep</td><td>CANCELLED</td><td>00:03:43</td><td>cairosvg CLI permission denied</td><td>patched to Python cairosvg API</td></tr>
-<tr><td>895</td><td>cadtrans-prep</td><td>TIMEOUT</td><td>04:00:20</td><td>npy preprocessing exceeded 4h</td><td>added resumable preprocessing and longer low-resource job</td></tr>
-<tr><td>929</td><td>cadtrans-prep</td><td>COMPLETED</td><td>22:43:49</td><td>full NPY preprocessing completed</td><td>used as data basis for smoke/formal runs</td></tr>
-<tr><td>930</td><td>cadtrans-smoke</td><td>FAILED</td><td>00:00:11</td><td>timm missing _init_vit_weights</td><td>added timm compatibility shim</td></tr>
-<tr><td>965</td><td>cadtrans-smoke</td><td>FAILED</td><td>00:00:10</td><td>NumPy np.int removed</td><td>patched NumPy alias usage</td></tr>
-<tr><td>966</td><td>cadtrans-smoke</td><td>FAILED</td><td>00:00:11</td><td>timm build_model_with_cfg default_cfg mismatch</td><td>patched custom ViT constructor</td></tr>
-<tr><td>967</td><td>cadtrans-smoke</td><td>CANCELLED</td><td>00:00:47</td><td>missing optional npy_rgb files</td><td>used rgb_dim=0 for smoke/full-data conservative run</td></tr>
-<tr><td>968</td><td>cadtrans-smoke</td><td>COMPLETED</td><td>00:02:17</td><td>smoke passed</td><td>used to validate environment and pipeline</td></tr>
-<tr><td>969</td><td>cadtrans-train</td><td>COMPLETED</td><td>10:21:28</td><td>best validation Total FG F1 0.827501</td><td>freeze job 969 as conservative baseline anchor; decide whether to restore paper-faithful settings</td></tr>
+<h3>2.3 下周要过的门禁</h3>
+<ol>
+<li>决定是否恢复 CADTransformer 论文默认设定：<code>img_size=700</code>、<code>rgb_dim=32</code>、补齐 <code>npy_rgb</code>。</li>
+<li>在恢复或明确放弃默认设定之前，不把 job 969 的 F1 当作论文复现数字。</li>
+<li>做 train / val / test 跨 split 重复样本检查，确认没有同源图或重复图泄漏。</li>
+<li>找一个公开 DXF 样例跑 <code>inspect_dxf.py</code>，冻结 JSON 摘要 hash，验证 DWG→DXF→矢量图元解析链路。</li>
+</ol>
+<h2>3. 第一周任务完成度</h2>
+<table>
+<tr><th>MD 要求</th><th>当前状态</th><th>证据</th></tr>
+<tr><td>建独立学术仓库</td><td>已完成</td><td>GitHub 仓库已同步，且没有上传数据集/权重/私有信息</td></tr>
+<tr><td>下载 FloorPlanCAD</td><td>已完成</td><td>11,602 张公开版本：6965 / 810 / 3827</td></tr>
+<tr><td>跑通数据加载和统计</td><td>已完成</td><td><code>docs/floorplancad_data_report.md</code> 和本地 <code>outputs/reports/*</code></td></tr>
+<tr><td>确认 SVG 标注字段</td><td>已完成</td><td><code>semanticId</code>、<code>instanceId</code>、几何字段、style 字段已记录</td></tr>
+<tr><td>调研 DWG/DXF 工具链</td><td>基本完成</td><td><code>scripts/inspect_dxf.py</code> 已支持 DXF 图元/文字/图层/块引用解析；还缺公开 DXF 样例实测</td></tr>
+<tr><td>调研可复现基线</td><td>已完成</td><td>CADTransformer / SymPoint / GAT-CADNet 已登记</td></tr>
+<tr><td>至少跑通一个基线命令</td><td>已完成</td><td>CADTransformer smoke job 968</td></tr>
+<tr><td>记录指标、runtime、硬件</td><td>已完成</td><td>job 969：RTX 5090，10:21:28，best F1 0.827501</td></tr>
+<tr><td>必读论文 10 行笔记</td><td>已完成</td><td>FloorPlanCAD、CADSpotting、Brep2Shape、GeoPT、HouseMind、Text-Enhanced CAD、ArchPlanVQA</td></tr>
+<tr><td>DrawingPT v0 草案</td><td>已完成</td><td><code>docs/drawingpt_v0_design_draft.md</code></td></tr>
 </table>
-<h2>4 · 作者填写（AI 不许代笔）</h2>
-<div class='card'><b>跑之前我预测这个数是多少</b><pre>这一实验我没有明确的跑前预测。</pre></div>
-<div class='card'><b>哪个数出乎我意料, 为什么</b><pre>smoke F1 = 0.256508：只跑 1 epoch、保守设定、禁用 ViT 在线预训练、rgb_dim=0，还能完整走通并给出非零 F1。</pre></div>
-<div class='card'><b>我改了什么才让它跑通</b><pre>处理了 timm 的 ViT 初始化和 `default_cfg` 参数兼容问题；当时 smoke test 已跑通，后续正式 job 969 也已完成，结果以 A 层冻结表格为准。</pre></div>
-<div class='card'><b>如果这个结论是错的, 最可能错在哪一步</b><pre>还需要确认 train/val/test 是否有跨 split 重复或数据泄漏，可能存在数据泄露？</pre></div>
-<div class='card'><b>哪几个数我敢在会上被追问, 哪几个不敢</b><pre>敢被追问：FloorPlanCAD 三个 split 数量、HRNet 权重 hash、smoke 指标、job 969 的 best F1/runtime/checkpoint hash。不敢直接拿去和论文数字比较：因为当前 job 969 是 img_size=384、rgb_dim=0 的保守配置，还不是 paper-faithful 复现。</pre></div>
-<h2>5 · 检查表（REFORMS 派生）</h2>
-<h3>1 研究设计</h3>
-<div>✅ 本次实验要回答的问题，一句话写下来了</div>
-<div>⬜ 判读规则（什么结果算支持 / 算否定）在看到结果之前就写死了 — 未做原因：本轮 prereg 为补写，需作者在下一轮正式对比前补有效预注册</div>
-<div>✅ 允许的结果不只有阳性——负结果的处置方式已写明</div>
-<h3>2 计算可复现性</h3>
-<div>✅ 代码 commit / 环境 / 依赖版本已记录</div>
-<div>⬜ 随机种子已固定并记录 — 未做原因：CADTransformer 代码内有固定种子路径，但本报告尚未把全部 seed 入口单独冻结，需作者复核</div>
-<div>✅ 原始产物（checkpoint / rollout / CSV）有 SHA-256</div>
-<div>⬜ 从干净目录能重跑（或已记录不能重跑的原因） — 未做原因：已在同一服务器环境跑通，尚未做干净目录重建</div>
-<h3>3 数据质量</h3>
-<div>✅ 数据来源、版本、许可已记录</div>
-<div>✅ 样本量、缺失率、异常值处理已记录</div>
-<div>⬜ 数据的已知局限已写明（不是&quot;没有局限&quot;） — 未做原因：需作者补充 FloorPlanCAD 与工程图任务的局限</div>
-<h3>4 数据预处理</h3>
-<div>✅ 预处理步骤对所有实验条件完全一致（若不一致，差异已列出）</div>
-<div>✅ 标准化 / 分箱 / 离散化的口径已写明，且不因条件而异</div>
-<div>⬜ 预处理只用训练集的统计量拟合（未用到测试集信息） — 未做原因：本轮是 baseline 链路验证，需作者复核 CADTransformer 原始预处理是否存在跨 split 统计</div>
-<h3>5 建模</h3>
-<div>✅ 模型结构、参数量、每层已记录（Model Card）</div>
-<div>✅ 训练超参、停止准则、算力已记录</div>
-<div>⬜ 与基线的比较是同预处理、同预算下的 — 未做原因：当前只跑 CADTransformer baseline，尚未进入 DrawingPT 对比</div>
-<h3>6 数据泄露 ⚠️</h3>
-<div>⬜ 测试集在任何环节都没有参与训练 / 选模 / 调阈值 — 未做原因：原始 split 已分离，但 eval/test 使用路径需作者复核</div>
-<div>✅ 训练与测试的划分方式已写明（随机 shuffle / 按时间 / 按组），且符合任务语义</div>
-<div>⬜ 检查过训练集与测试集的重叠（重复样本、同一实体跨集） — 未做原因：尚未做跨 split 去重/同源图检查</div>
-<div>✅ 新增的输入特征不含目标的函数，也不含只有事后才可得的信息</div>
-<div>⬜ 若某特征带来了异常大的提升（如 ≥5 个点），已专门做过泄露排查并记录结论 — 未做原因：当前没有新增特征提升结论</div>
-<div>✅ 时间序列：支持集/上下文的选取严格因果，未读取预测目标或与之重叠的窗口 — N/A：本任务不是时间序列</div>
-<h3>7 指标与不确定性</h3>
-<div>⬜ 主指标在跑之前就定了，且只有一个 — 未做原因：本轮主要是链路与 baseline 启动，需作者补主指标</div>
-<div>⬜ 报告了离散度（seed 间的原始值，不只是均值） — 未做原因：当前只有单次 smoke 与单个正式训练作业</div>
-<div>✅ seed 数 &lt; 5 时，同时报原始点，不用正态近似造窄区间</div>
-<div>✅ 指标名称与实际计算一致（例：Spearman 不能标成 Pearson）</div>
-<div>⬜ 配对比较用的是同一组条件（同 seed / 同初始状态 / 同策略顺序） — 未做原因：当前还没有配对比较</div>
-<h3>8 泛化性</h3>
-<div>✅ 明确写出结论的作用域（哪个环境 / 哪个数据分布 / 哪个表示下成立）</div>
-<div>⬜ 有至少一个分布外或规模外推的检查 — 未做原因：本轮只做 FloorPlanCAD / CADTransformer baseline</div>
-<div>✅ 没有把单环境 / 单数据集的结果表述成普遍结论</div>
-<h3>9 本项目专属（自行增补）</h3>
-<div>✅ CADTransformer smoke 已在 YaoGroup 服务器单卡 RTX 5090 上完整跑通</div>
-<div>✅ FloorPlanCAD 预处理产物三 split 数量一致：train 6965 / val 810 / test 3827</div>
-<div>✅ 正式 10 epoch baseline 完成后冻结 checkpoint 与指标</div>
-<div>⬜ 恢复论文默认设定（img_size=700、rgb_dim=32/npy_rgb）是否必要已决策 — 未做原因：当前为保守启动配置</div>
-<h2>6 · 血缘（自动）</h2><table><tr><th>文件</th><th>大小</th><th>修改时间(UTC)</th><th>SHA-256</th></tr>
-<tr><td class='mono'>protocol.json</td><td>2,531</td><td class='mono'>2026-08-22 12:34:11</td><td class='mono'>5dfbdde466bb6f3a…</td></tr>
-<tr><td class='mono'>summary.json</td><td>1,544</td><td class='mono'>2026-08-22 12:34:11</td><td class='mono'>b5a5986593f6e1d7…</td></tr>
-<tr><td class='mono'>COMPLETED.json</td><td>605</td><td class='mono'>2026-08-22 12:34:11</td><td class='mono'>64b5f2dafbd87efb…</td></tr>
-<tr><td class='mono'>results.csv</td><td>1,101</td><td class='mono'>2026-08-22 12:34:11</td><td class='mono'>f07fe6b913d7c15a…</td></tr>
-<tr><td class='mono'>assets.csv</td><td>1,617</td><td class='mono'>2026-08-22 12:34:11</td><td class='mono'>d703c51889a0da9f…</td></tr>
-<tr><td class='mono'>jobs.csv</td><td>1,239</td><td class='mono'>2026-08-22 12:34:11</td><td class='mono'>f5c14fcad52f7732…</td></tr>
+<h2>4. 真正跑过的复现：CADTransformer</h2>
+<h3>4.1 为什么先复现 CADTransformer</h3>
+<p>CADTransformer 是目前最适合第一周打通链路的基线：它有公开代码、FloorPlanCAD 预处理脚本、HRNet 输入分支和训练入口。相比 SymPoint / GAT-CADNet，它更适合作为“先把数据和 GPU 环境跑通”的第一块石头。</p>
+<h3>4.2 跑通过程</h3>
+<p>整个过程不是一次成功，而是逐步排掉环境和兼容性问题：</p>
+<table>
+<tr><th>job</th><th>状态</th><th>问题 / 结果</th><th>处理</th></tr>
+<tr><td>892</td><td>CANCELLED</td><td>早期预处理被中断</td><td>后续重跑</td></tr>
+<tr><td>893</td><td>FAILED</td><td>缺少 <code>lxml</code></td><td>补依赖</td></tr>
+<tr><td>894</td><td>CANCELLED</td><td><code>cairosvg</code> CLI 权限问题</td><td>改成 Python API</td></tr>
+<tr><td>895</td><td>TIMEOUT</td><td>NPY 预处理超过 4 小时</td><td>改成可续跑、延长低资源任务</td></tr>
+<tr><td>929</td><td>COMPLETED</td><td>全量 NPY 预处理完成</td><td>作为 smoke/full run 的数据基础</td></tr>
+<tr><td>930</td><td>FAILED</td><td>timm 缺 <code>_init_vit_weights</code></td><td>加兼容 shim</td></tr>
+<tr><td>965</td><td>FAILED</td><td>NumPy 移除了 <code>np.int</code></td><td>补 NumPy alias 兼容</td></tr>
+<tr><td>966</td><td>FAILED</td><td>timm <code>default_cfg</code> 参数不兼容</td><td>改自定义 ViT 构造函数</td></tr>
+<tr><td>967</td><td>CANCELLED</td><td>缺少可选 <code>npy_rgb</code></td><td>暂用 <code>rgb_dim=0</code> 跑保守配置</td></tr>
+<tr><td>968</td><td>COMPLETED</td><td>smoke test 跑通</td><td>验证训练链路</td></tr>
+<tr><td>969</td><td>COMPLETED</td><td>10 epoch full-data 保守训练完成</td><td>冻结为第一版 baseline anchor</td></tr>
 </table>
-<div class='card'><span class='pill'>python 3.12.13</span><span class='pill'>cwd D:\DrawingPT</span><span class='pill'>git (非 git 仓库)</span></div>
+<h3>4.3 当前结果怎么理解</h3>
+<p>job 969 的 best validation Total FG F1 是 <code>0.827501</code>。这个数字说明 CADTransformer 的训练、验证、checkpoint 保存、指标打印都跑通了，而且 full-data 训练没有崩。</p>
+<p>但这个数字不能直接说“复现论文成功”，原因是配置不是论文默认：</p>
+<ul>
+<li>当前 <code>img_size=384</code>，不是 CADTransformer 默认的 700。</li>
+<li>当前 <code>rgb_dim=0</code>，跳过了可选 RGB feature。</li>
+<li>当前是单次训练，没有多 seed，也没有 paper-faithful 对齐检查。</li>
+<li>还没有做 train/val/test 跨 split 重复样本检查。</li>
+</ul>
+<p>所以组会上最稳的说法是：<strong>CADTransformer 已经作为保守 baseline anchor 跑通，best F1 0.827501；下一步要恢复或论证 paper-faithful 配置后再和论文数字比较。</strong></p>
+<h2>5. 其他文章/基线现在处于什么状态</h2>
+<table>
+<tr><th>文章 / 方法</th><th>当前状态</th><th>这周产出</th><th>下一步</th></tr>
+<tr><td>FloorPlanCAD</td><td>数据集与主评测已吃透</td><td>数据报告、split 统计、标注字段说明</td><td>做跨 split 去重和泄漏检查</td></tr>
+<tr><td>CADTransformer</td><td>已实际跑通</td><td>smoke + 10 epoch full-data 保守 baseline</td><td>恢复 <code>img_size=700</code>、<code>rgb_dim=32/npy_rgb</code> 后做 paper-faithful 复现</td></tr>
+<tr><td>CADSpotting</td><td>已读文献，未复现</td><td>10 行笔记；确认它是重要监督基线</td><td>继续找官方代码；若无代码，暂作为 paper baseline</td></tr>
+<tr><td>SymPoint</td><td>已登记为候选</td><td>repo/依赖/风险记录</td><td>如果 CADTransformer 对齐后还有时间，再尝试 point-based baseline</td></tr>
+<tr><td>GAT-CADNet</td><td>已登记为候选</td><td>repo/依赖/风险记录</td><td>可作为轻量 sanity baseline</td></tr>
+<tr><td>Brep2Shape</td><td>已读文献</td><td>提炼为 DrawingPT v0 的 token 化/双流/自监督配方来源</td><td>把思想迁移到 2D 图元和文字流</td></tr>
+<tr><td>GeoPT</td><td>已读文献</td><td>提炼 label-efficiency 曲线设计</td><td>复刻它的“少标注 vs 从零训练”评估方式</td></tr>
+<tr><td>HouseMind</td><td>已读文献</td><td>明确 VLM/MLLM 对照边界</td><td>后续做 VLM 对比时冻结 prompt、分辨率和评分</td></tr>
+<tr><td>Text-Enhanced CAD</td><td>已读文献</td><td>明确文本流 novelty 风险</td><td>论文表述不能说“首次 CAD+文本”，要收窄到自监督/矢量原生</td></tr>
+<tr><td>ArchPlanVQA</td><td>已读元数据和任务定位</td><td>明确 VLM floor-plan VQA 对照方向</td><td>后续做计数/测量/空间关系 prompt suite</td></tr>
+</table>
+<h2>6. 红线与纪律检查</h2>
+<p>本次同步到 GitHub 的内容遵守以下边界：</p>
+<ul>
+<li>只使用公开数据集 FloorPlanCAD。</li>
+<li>不碰、不上传业务方真实图纸。</li>
+<li>不提交 raw dataset、processed dataset、checkpoint、PDF、大压缩包。</li>
+<li>不提交服务器密码、服务器地址、私有 SSH key 或用户目录路径。</li>
+<li>报告里只保留 hash、指标、配置和结论边界。</li>
+<li>对未完成的 paper-faithful 复现明确写 caveat，不把保守运行包装成论文复现。</li>
+</ul>
+<h2>7. 下周建议安排</h2>
+<p>优先级从高到低：</p>
+<ol>
+<li><strong>CADTransformer paper-faithful 门禁</strong>：补 <code>npy_rgb</code>，恢复或评估 <code>img_size=700</code>，重新跑一个更接近论文设定的 baseline。</li>
+<li><strong>数据泄漏检查</strong>：对 train/val/test 做文件 hash、结构摘要、图元统计相似性检查。</li>
+<li><strong>DXF 公共样例验证</strong>：找公开 DXF 或生成合成 DXF，跑 <code>inspect_dxf.py</code>，冻结 JSON 摘要。</li>
+<li><strong>DrawingPT v0 预训练协议</strong>：把 label fractions、主指标、从零训练 baseline、seed 数写成正式 prereg。</li>
+<li><strong>VLM 对照准备</strong>：参考 HouseMind / ArchPlanVQA，冻结 prompt 和评分方式，但不要急着跑大规模 API。</li>
+</ol>
+<h2>8. 当前可放心引用的句子</h2>
+<blockquote><p>第一周已经完成 FloorPlanCAD 数据链路和 CADTransformer 保守 baseline 跑通。全量保守训练 job 969 在单卡 RTX 5090 上完成，耗时 10:21:28，best validation Total FG F1 为 0.827501。这个结果证明环境、数据和训练链路已通，但还不是 paper-faithful 复现；下一步门禁是恢复或论证 <code>img_size=700</code>、<code>rgb_dim=32/npy_rgb</code> 配置，并做跨 split 泄漏检查。</p></blockquote>
+    </section>
+  </main>
+</body>
+</html>

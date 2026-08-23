@@ -1,14 +1,14 @@
-# Text-Enhanced Panoptic Symbol Spotting in CAD Drawings - 10-line note
+# Text-Enhanced Panoptic Symbol Spotting in CAD Drawings - 10 行笔记
 
-Source: arXiv:2510.11091, "Text-Enhanced Panoptic Symbol Spotting in CAD Drawings".
+来源：arXiv:2510.11091，《Text-Enhanced Panoptic Symbol Spotting in CAD Drawings》。
 
-1. This is a direct novelty-risk paper for DrawingPT because it explicitly adds textual annotations to CAD panoptic symbol spotting.
-2. The paper argues that geometry-only methods miss rich textual annotations and under-model relationships among CAD primitives.
-3. Its representation jointly models geometric primitives and textual primitives, so DrawingPT cannot claim "first to use text in CAD spotting".
-4. It initializes from pretrained CNN visual features and then uses a Transformer-style backbone, rather than being purely vector-native self-supervised pre-training.
-5. A type-aware attention mechanism models different spatial dependency types among primitives and text.
-6. The direct overlap is the geometry-plus-text/annotation stream and the panoptic symbol spotting target.
-7. The key difference to protect is DrawingPT's self-supervised pre-training objective, label-efficiency evaluation, and vector-native tokenization before supervised fine-tuning.
-8. For experiments, this paper suggests an ablation that removes text primitives and another that removes relation/type-aware attention.
-9. For novelty wording, say "self-supervised vector-native pre-training with optional text stream", not "first text-enhanced CAD understanding model".
-10. Before submission, compare against this paper's reported dataset, metric, and public code status; if no code exists, use it as a paper baseline and cite the limitation.
+1. 这篇文章是 DrawingPT 的直接 novelty 风险，因为它已经把文本标注引入 CAD panoptic symbol spotting。
+2. 它指出纯几何方法会忽略 CAD 图纸里的文字标注，也缺少对图元关系的显式建模。
+3. 它把几何图元和文本图元放到统一表示里联合建模。
+4. 它使用预训练 CNN 提取视觉特征，再接 Transformer backbone，而不是纯矢量原生自监督预训练。
+5. 它的 type-aware attention 用来建模不同类型图元之间的空间依赖。
+6. 与 DrawingPT 的直接重叠是“几何 + 文本/标注流”和 panoptic symbol spotting 目标。
+7. DrawingPT 需要守住的差异是：自监督预训练、label-efficiency 曲线、矢量原生 token 化和预训练后 fine-tune。
+8. 后续实验应该加入去掉文本流、去掉 relation/type-aware attention 的消融。
+9. 新颖性表述不能写“首次使用 CAD 文本”，而应收窄到“矢量原生自监督预训练 + 可选文本流”。
+10. 投稿前要确认这篇文章的数据集、指标和代码状态；若没有代码，可作为 paper baseline 并说明不可复现限制。

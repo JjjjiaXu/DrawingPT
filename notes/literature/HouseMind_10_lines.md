@@ -1,14 +1,14 @@
-# HouseMind - 10-line note
+# HouseMind - 10 行笔记
 
-Source: arXiv:2603.11640, "Tokenization Allows Multimodal Large Language Models to Understand, Generate and Edit Architectural Floor Plans".
+来源：arXiv:2603.11640，《Tokenization Allows Multimodal Large Language Models to Understand, Generate and Edit Architectural Floor Plans》。
 
-1. HouseMind represents the VLM/MLLM route for floor plans: unify understanding, generation, and editing through tokenization and instruction tuning.
-2. Its input is architectural floor-plan structure, but its center of gravity is room/layout reasoning rather than CAD primitive-level symbol spotting.
-3. The important technical idea is discrete room-instance tokens that bridge layout geometry and symbolic reasoning.
-4. This overlaps with DrawingPT at the broad "tokenize floor plans" level, but differs because DrawingPT starts from vector CAD primitives and targets low-label representation learning.
-5. A fair comparison should not ask HouseMind to output every primitive instance unless the prompt, resolution, and answer format are carefully controlled.
-6. For DrawingPT, HouseMind is most useful as a VLM-style baseline for room/layout understanding and controllable editing, not as a direct CADTransformer replacement.
-7. Counting and measurement should be treated as stress tests: ask exact symbol counts, dimensions, and object localization rather than vague captioning.
-8. Prompt protocol must be frozen before evaluation, including image rendering resolution, crop policy, coordinate convention, and whether chain-of-thought is hidden.
-9. Comparable metrics should be task-specific: exact-match / numeric error for VQA, detection/F1 for spotting, and validity/constraint satisfaction for generation.
-10. Do not overclaim that VLMs "cannot do floor plans"; the safer claim is that vector-native structure should be more sample-efficient and more auditable for precise engineering tasks.
+1. HouseMind 代表平面图理解中的 VLM / MLLM 路线。
+2. 它尝试把平面图理解、生成和编辑统一到一个多模态语言模型框架里。
+3. 关键技术是离散 room-instance token，用 token 连接布局几何和符号推理。
+4. 它和 DrawingPT 的重叠点是“把平面图 token 化”；不同点是 DrawingPT 从矢量 CAD 图元出发，目标是少标注表征学习。
+5. HouseMind 更偏房间/布局层面的理解和生成，不是 FloorPlanCAD 这种图元级 panoptic symbol spotting。
+6. 公平比较时不能简单让 VLM 输出所有 primitive instance，必须冻结 prompt、分辨率、裁剪和答案格式。
+7. 对 DrawingPT 最有价值的 stress test 是精确计数、测量、符号定位和空间关系，而不是泛泛 caption。
+8. 后续 VLM 对照实验要记录是否允许思维链、是否给坐标系、是否给图例/类别表。
+9. 指标要按任务拆分：VQA 用 exact match / 数值误差，spotting 用 F1，生成用几何有效性和约束满足率。
+10. 不能过度声称“VLM 不行”；更稳的主张是矢量原生路线在精确性、可审计性和样本效率上更适合工程图。

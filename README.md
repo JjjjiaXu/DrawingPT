@@ -63,6 +63,10 @@ python scripts/inspect_dxf.py --input path\to\drawing.dxf
 - Keep this academic repo separate from product/company code.
 - Do not commit raw datasets, private drawings, checkpoints, or customer information.
 
-## Current week-1 status
+## 当前第一周状态
 
-See `docs/week1_completion_report.md`. The first CADTransformer conservative full-data run completed as Slurm job 969 with best validation Total FG F1 `0.827501118183136`; this is a runnable baseline anchor, not yet a paper-faithful reproduction.
+第一周完成度见 `docs/week1_completion_report.md`，组会可读版中文报告见 `reports/group_meeting_2026-08-18/report.html`。
+
+第一版 CADTransformer 保守 full-data baseline 已经完成，Slurm job 969 的 best validation Total FG F1 为 `0.827501118183136`。这个结果是可运行基线锚点，还不是 paper-faithful 论文复现。
+
+面向项目推进和组会的记录默认使用中文；只有论文标题、API/config 名、指标名和命令保留英文。
