@@ -24,7 +24,7 @@ if [[ ! -d "$DATA_ROOT/train/train/svg_gt" && ! -d "$DATA_ROOT/svg/train" && -d 
   DATA_ROOT="$SCRATCH_ROOT/processed/FloorPlanCAD"
 fi
 
-RUN_NAME="${RUN_NAME:-drawingpt_v0_semantic_scratch_1pct_seed0304_smoke}"
+RUN_NAME="${RUN_NAME:-drawingpt_v0_semantic_scratch_1pct_seed0304_fg_loss_smoke}"
 LABEL_LIST="${LABEL_LIST:-configs/label_fractions/floorplancad_train_seed0304_001pct.txt}"
 WINDOW_SIZE="${WINDOW_SIZE:-2048}"
 LIMIT_WINDOWS="${LIMIT_WINDOWS:-0}"

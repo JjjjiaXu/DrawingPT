@@ -229,7 +229,21 @@ def compute_metrics(
     }
 
 
-def evaluate(model, loader, device, max_batches: int, rare_classes: List[int]) -> Dict[str, object]:
+def supervised_mask(labels: torch.Tensor, include_background_in_loss: bool) -> torch.Tensor:
+    valid = labels >= 0
+    if include_background_in_loss:
+        return valid
+    return valid & (labels > 0)
+
+
+def evaluate(
+    model,
+    loader,
+    device,
+    max_batches: int,
+    rare_classes: List[int],
+    include_background_in_loss: bool,
+) -> Dict[str, object]:
     model.eval()
     logits_list: List[torch.Tensor] = []
     labels_list: List[torch.Tensor] = []
@@ -244,11 +258,13 @@ def evaluate(model, loader, device, max_batches: int, rare_classes: List[int]) -
             attention_mask = batch["attention_mask"].to(device)
             logits = model(type_ids, features, attention_mask)
             valid = labels >= 0
+            supervised = supervised_mask(labels, include_background_in_loss)
             if valid.any():
-                loss = F.cross_entropy(logits[valid], labels[valid])
-                loss_values.append(float(loss.detach().cpu().item()))
                 logits_list.append(logits[valid].detach().cpu())
                 labels_list.append(labels[valid].detach().cpu())
+            if supervised.any():
+                loss = F.cross_entropy(logits[supervised], labels[supervised])
+                loss_values.append(float(loss.detach().cpu().item()))
     model.train()
     return compute_metrics(logits_list, labels_list, loss_values, rare_classes)
 
@@ -309,7 +325,11 @@ def train(args) -> Dict[str, object]:
     pretrain_report = load_pretrained_encoder(model, args.pretrained_checkpoint)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
-    initial_val = evaluate(model, val_loader, device, args.eval_batches, rare_classes) if len(val_dataset) else empty_metrics()
+    initial_val = (
+        evaluate(model, val_loader, device, args.eval_batches, rare_classes, args.include_background_in_loss)
+        if len(val_dataset)
+        else empty_metrics()
+    )
 
     started_at = time.time()
     train_losses: List[Dict[str, float]] = []
@@ -323,9 +343,10 @@ def train(args) -> Dict[str, object]:
             attention_mask = batch["attention_mask"].to(device)
             logits = model(type_ids, features, attention_mask)
             valid = labels >= 0
-            if not valid.any():
+            supervised = supervised_mask(labels, args.include_background_in_loss)
+            if not supervised.any():
                 continue
-            loss = F.cross_entropy(logits[valid], labels[valid])
+            loss = F.cross_entropy(logits[supervised], labels[supervised])
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
@@ -333,11 +354,17 @@ def train(args) -> Dict[str, object]:
             optimizer.step()
 
             step += 1
-            record = {"step": float(step), "loss": float(loss.detach().cpu().item()), "tokens": float(valid.sum().item())}
+            record = {
+                "step": float(step),
+                "loss": float(loss.detach().cpu().item()),
+                "tokens": float(supervised.sum().item()),
+                "valid_tokens": float(valid.sum().item()),
+                "foreground_tokens": float((valid & (labels > 0)).sum().item()),
+            }
             train_losses.append(record)
             if step == 1 or step % args.log_every == 0 or step == args.steps:
                 print(
-                    "step={step:d} loss={loss:.6f} tokens={tokens:.0f}".format(
+                    "step={step:d} loss={loss:.6f} supervised_tokens={tokens:.0f}".format(
                         step=step, loss=record["loss"], tokens=record["tokens"]
                     ),
                     flush=True,
@@ -345,7 +372,11 @@ def train(args) -> Dict[str, object]:
             if step >= args.steps:
                 break
 
-    final_val = evaluate(model, val_loader, device, args.eval_batches, rare_classes) if len(val_dataset) else empty_metrics()
+    final_val = (
+        evaluate(model, val_loader, device, args.eval_batches, rare_classes, args.include_background_in_loss)
+        if len(val_dataset)
+        else empty_metrics()
+    )
     runtime_seconds = round(time.time() - started_at, 3)
 
     checkpoint_sha256 = None
@@ -380,6 +411,9 @@ def train(args) -> Dict[str, object]:
         "heads": args.heads,
         "device": str(device),
         "torch_version": torch.__version__,
+        "loss_target": "all_valid_tokens_including_background"
+        if args.include_background_in_loss
+        else "foreground_semantic_ids_1_to_35",
         "runtime_seconds": runtime_seconds,
         "first_train_loss": train_losses[0]["loss"] if train_losses else None,
         "last_train_loss": train_losses[-1]["loss"] if train_losses else None,
@@ -391,7 +425,8 @@ def train(args) -> Dict[str, object]:
         "checkpoint_sha256": checkpoint_sha256,
         "caveats": [
             "This is a semantic fine-tuning smoke/baseline, not a paper-quality result.",
-            "The current primitive task predicts 0=background/unlabeled plus FloorPlanCAD semantic IDs 1..35.",
+            "The classifier predicts 0=background/unlabeled plus FloorPlanCAD semantic IDs 1..35.",
+            "By default the training loss ignores class 0 to avoid a trivial background-only shortcut.",
             "Macro/rare F1 are only meaningful when the validation window subset has enough class support.",
         ],
     }
@@ -429,6 +464,11 @@ def main() -> None:
     parser.add_argument("--log-every", type=int, default=1)
     parser.add_argument("--rare-classes", default=",".join(str(x) for x in DEFAULT_RARE_CLASSES))
     parser.add_argument("--pretrained-checkpoint", type=Path, default=None)
+    parser.add_argument(
+        "--include-background-in-loss",
+        action="store_true",
+        help="Also supervise semantic class 0. Default is to ignore class 0 and train only on semantic IDs 1..35.",
+    )
     parser.add_argument("--summary-out", type=Path, default=Path("outputs/reports/drawingpt_v0_semantic_scratch_smoke_summary.json"))
     parser.add_argument("--checkpoint-out", type=Path, default=Path("outputs/checkpoints/drawingpt_v0_semantic_scratch_smoke.pt"))
     args = parser.parse_args()
