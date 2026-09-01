@@ -118,6 +118,70 @@ def parse_class_list(value: str) -> List[int]:
     return [int(part.strip()) for part in value.split(",") if part.strip()]
 
 
+def compute_supervised_class_counts(dataset, include_background_in_loss: bool) -> np.ndarray:
+    counts = np.zeros((NUM_SEMANTIC_CLASSES,), dtype=np.int64)
+    for index in range(len(dataset)):
+        labels = dataset[index]["semantic_labels"]
+        valid = labels >= 0
+        supervised = valid if include_background_in_loss else valid & (labels > 0)
+        values = labels[supervised]
+        if values.size:
+            counts += np.bincount(values, minlength=NUM_SEMANTIC_CLASSES)[:NUM_SEMANTIC_CLASSES]
+    return counts
+
+
+def build_class_weights(
+    counts: np.ndarray,
+    method: str,
+    include_background_in_loss: bool,
+    max_class_weight: float,
+):
+    if method == "none":
+        return None
+
+    weights = np.zeros((NUM_SEMANTIC_CLASSES,), dtype=np.float32)
+    start_class = 0 if include_background_in_loss else 1
+    class_ids = np.arange(start_class, NUM_SEMANTIC_CLASSES)
+    positive = class_ids[counts[class_ids] > 0]
+    if positive.size == 0:
+        return None
+
+    positive_counts = counts[positive].astype(np.float32)
+    if method == "inverse":
+        weights[positive] = 1.0 / positive_counts
+    elif method == "inverse_sqrt":
+        weights[positive] = 1.0 / np.sqrt(positive_counts)
+    elif method == "median_frequency":
+        weights[positive] = float(np.median(positive_counts)) / positive_counts
+    else:
+        raise ValueError(f"Unsupported class weighting method: {method}")
+
+    nonzero = weights[positive]
+    weights[positive] = nonzero / max(float(nonzero.mean()), 1e-12)
+    if max_class_weight > 0:
+        weights[positive] = np.minimum(weights[positive], float(max_class_weight))
+    return torch.from_numpy(weights).float()
+
+
+def compact_class_stats(counts: np.ndarray, weights) -> List[Dict[str, object]]:
+    stats = []
+    weight_values = weights.detach().cpu().numpy() if weights is not None else None
+    for class_id in range(NUM_SEMANTIC_CLASSES):
+        count = int(counts[class_id]) if counts is not None else 0
+        weight = float(weight_values[class_id]) if weight_values is not None else None
+        if count == 0 and (weight is None or abs(weight) < 1e-12):
+            continue
+        stats.append(
+            {
+                "class_id": class_id,
+                "class_name": "background/unlabeled" if class_id == 0 else CLASS_NAMES.get(class_id, "<unknown>"),
+                "count": count,
+                "weight": weight,
+            }
+        )
+    return stats
+
+
 def load_checkpoint(path: Path, trust_checkpoint: bool) -> Dict[str, object]:
     load_kwargs = {"map_location": "cpu", "weights_only": not trust_checkpoint}
     try:
@@ -258,6 +322,17 @@ def supervised_mask(labels: torch.Tensor, include_background_in_loss: bool) -> t
     return valid & (labels > 0)
 
 
+def supervised_loss_mask(labels: torch.Tensor, include_background_in_loss: bool, class_weights=None) -> torch.Tensor:
+    mask = supervised_mask(labels, include_background_in_loss)
+    if class_weights is None or not mask.any():
+        return mask
+    selected_labels = labels[mask]
+    has_weight = class_weights[selected_labels] > 0
+    filtered = torch.zeros_like(mask, dtype=torch.bool)
+    filtered[mask] = has_weight
+    return filtered
+
+
 def evaluate(
     model,
     loader,
@@ -265,6 +340,7 @@ def evaluate(
     max_batches: int,
     rare_classes: List[int],
     include_background_in_loss: bool,
+    class_weights=None,
 ) -> Dict[str, object]:
     model.eval()
     logits_list: List[torch.Tensor] = []
@@ -280,12 +356,12 @@ def evaluate(
             attention_mask = batch["attention_mask"].to(device)
             logits = model(type_ids, features, attention_mask)
             valid = labels >= 0
-            supervised = supervised_mask(labels, include_background_in_loss)
+            supervised = supervised_loss_mask(labels, include_background_in_loss, class_weights)
             if valid.any():
                 logits_list.append(logits[valid].detach().cpu())
                 labels_list.append(labels[valid].detach().cpu())
             if supervised.any():
-                loss = F.cross_entropy(logits[supervised], labels[supervised])
+                loss = F.cross_entropy(logits[supervised], labels[supervised], weight=class_weights)
                 loss_values.append(float(loss.detach().cpu().item()))
     model.train()
     return compute_metrics(logits_list, labels_list, loss_values, rare_classes)
@@ -345,10 +421,30 @@ def train(args) -> Dict[str, object]:
         dropout=args.dropout,
     ).to(device)
     pretrain_report = load_pretrained_encoder(model, args.pretrained_checkpoint, args.trust_pretrained_checkpoint)
+    class_counts = (
+        compute_supervised_class_counts(train_dataset, args.include_background_in_loss)
+        if args.class_weighting != "none"
+        else np.zeros((NUM_SEMANTIC_CLASSES,), dtype=np.int64)
+    )
+    class_weights_cpu = build_class_weights(
+        class_counts,
+        args.class_weighting,
+        args.include_background_in_loss,
+        args.max_class_weight,
+    )
+    class_weights = class_weights_cpu.to(device) if class_weights_cpu is not None else None
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     initial_val = (
-        evaluate(model, val_loader, device, args.eval_batches, rare_classes, args.include_background_in_loss)
+        evaluate(
+            model,
+            val_loader,
+            device,
+            args.eval_batches,
+            rare_classes,
+            args.include_background_in_loss,
+            class_weights,
+        )
         if len(val_dataset)
         else empty_metrics()
     )
@@ -365,10 +461,10 @@ def train(args) -> Dict[str, object]:
             attention_mask = batch["attention_mask"].to(device)
             logits = model(type_ids, features, attention_mask)
             valid = labels >= 0
-            supervised = supervised_mask(labels, args.include_background_in_loss)
+            supervised = supervised_loss_mask(labels, args.include_background_in_loss, class_weights)
             if not supervised.any():
                 continue
-            loss = F.cross_entropy(logits[supervised], labels[supervised])
+            loss = F.cross_entropy(logits[supervised], labels[supervised], weight=class_weights)
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
@@ -395,7 +491,15 @@ def train(args) -> Dict[str, object]:
                 break
 
     final_val = (
-        evaluate(model, val_loader, device, args.eval_batches, rare_classes, args.include_background_in_loss)
+        evaluate(
+            model,
+            val_loader,
+            device,
+            args.eval_batches,
+            rare_classes,
+            args.include_background_in_loss,
+            class_weights,
+        )
         if len(val_dataset)
         else empty_metrics()
     )
@@ -436,6 +540,11 @@ def train(args) -> Dict[str, object]:
         "loss_target": "all_valid_tokens_including_background"
         if args.include_background_in_loss
         else "foreground_semantic_ids_1_to_35",
+        "class_weighting": args.class_weighting,
+        "max_class_weight": args.max_class_weight,
+        "supervised_class_stats": compact_class_stats(class_counts, class_weights_cpu)
+        if args.class_weighting != "none"
+        else [],
         "runtime_seconds": runtime_seconds,
         "first_train_loss": train_losses[0]["loss"] if train_losses else None,
         "last_train_loss": train_losses[-1]["loss"] if train_losses else None,
@@ -481,6 +590,13 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--grad-clip", type=float, default=1.0)
+    parser.add_argument(
+        "--class-weighting",
+        choices=["none", "inverse", "inverse_sqrt", "median_frequency"],
+        default="none",
+        help="Optional semantic class weighting computed from supervised train tokens.",
+    )
+    parser.add_argument("--max-class-weight", type=float, default=8.0)
     parser.add_argument("--seed", type=int, default=304)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--log-every", type=int, default=1)
