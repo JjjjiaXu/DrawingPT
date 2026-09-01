@@ -41,6 +41,10 @@
     {
       "label": "best smoke macro F1",
       "value": "0.0209"
+    },
+    {
+      "label": "class-aware audit windows",
+      "value": "88"
     }
   ],
   "meeting_summary": {
@@ -48,10 +52,10 @@
     "project_snapshots": [
       {
         "project": "DrawingPT v0",
-        "completed": "冻结 1262 万 primitive token、14,117 个 2048-token window、18 组低标注清单；服务器已跑通 2048-token pretrain 和 1% semantic smoke。",
-        "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并用低标注语义任务检验预训练价值。",
-        "boundary": "当前都是 smoke/诊断，不是论文级结果；semantic 仍向 wall/window/sink 高频类塌缩。",
-        "next": "做 class-aware window sampling，要求 1% seed0304 foreground macro F1 明显高于当前 best smoke 0.0209。"
+        "completed": "冻结 1262 万 primitive token、14,117 个 2048-token window、18 组低标注清单；服务器已跑通 2048-token pretrain 和 1% semantic smoke；新增 class-aware sampler 与 1% 窗口暴露审计。",
+        "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并把长尾诊断落实成可执行采样入口。",
+        "boundary": "当前都是 smoke/诊断，不是论文级结果；class-aware 审计只说明采样暴露被改变，尚不能证明模型效果提升。",
+        "next": "在服务器重跑 class-aware 100-step scratch/pretrained；要求 foreground macro F1 明显高于当前 best smoke 0.0209，同时 rare-class support 解释清楚。"
       },
       {
         "project": "FloorPlanCAD 数据画像",
@@ -87,15 +91,18 @@
     {
       "id": "drawingpt-v0",
       "name": "DrawingPT v0 数据资产与训练闭环",
-      "status": "smoke 完成，进入类别均衡诊断",
-      "headline": "DrawingPT v0 已从设计草案推进到服务器 GPU 可运行闭环，但 1% semantic smoke 暴露出高频类塌缩。",
+      "status": "smoke 完成，类别均衡入口已落地",
+      "headline": "DrawingPT v0 已从设计草案推进到服务器 GPU 可运行闭环；本期进一步把高频类塌缩问题落实为 class-aware sampler 和窗口暴露审计。",
       "progress": [
         "生成并冻结 FloorPlanCAD primitive token manifest：11,602 张 SVG，共 12,621,288 个 primitive token；按 2048 token/window 得到 14,117 个 window。",
         "固定 1%、5%、10%、25%、50%、100% train 低标注清单，seed 为 304、1004、2026；同一 seed 下小比例是大比例前缀，便于后续 label-efficiency curve 对比。",
         "补齐 Dataset、masked primitive pretrain、semantic primitive classification 三个最小训练入口；服务器 processed SVG 布局也已兼容。",
         "服务器完成 2048-token masked pretrain short：100 step，loss 1.642630 降到 0.107217，生成 checkpoint SHA-256 ceb52ad65ae94c69a9b0409fb2404b875f33a2de6975d5190862efb09d50317e。",
         "semantic scratch 诊断证明 class 0=background/unlabeled 参与 loss 会导致 all accuracy 虚高但 foreground F1 为 0；之后改成 foreground-only loss。",
-        "foreground-only scratch/pretrained/weighted smoke 都已跑通；weighted scratch 将 foreground macro F1 从 0.0168 小幅提高到 0.0209，下一步处理 wall/window/sink 高频类主导的问题。"
+        "foreground-only scratch/pretrained/weighted smoke 都已跑通；weighted scratch 将 foreground macro F1 从 0.0168 小幅提高到 0.0209，下一步处理 wall/window/sink 高频类主导的问题。",
+        "新增 `--sampler class_aware` 训练入口：按 foreground 类别稀有度给 window 加权，默认 random 保持旧实验兼容；三个服务器 sbatch 脚本已支持通过 SAMPLER 环境变量透传。",
+        "完成 1% seed0304 class-aware sampler exposure audit：一轮仍采 88 个 window，但 replacement 后 unique window 为 46；rare token share 从 8.48% 到 8.82%，wall share 从 28.04% 小降到 27.70%。",
+        "本机 CPU 20-step class-aware+weighted sanity 可正常输出 validation summary，但 macro F1 只有 0.0024；它只证明入口可运行，不能作为效果提升证据。"
       ],
       "metrics": [
         {
@@ -121,6 +128,18 @@
         {
           "label": "best smoke foreground macro F1",
           "value": "0.0209"
+        },
+        {
+          "label": "class-aware unique windows",
+          "value": "46 / 88"
+        },
+        {
+          "label": "rare token share audit",
+          "value": "8.48% → 8.82%"
+        },
+        {
+          "label": "wall token share audit",
+          "value": "28.04% → 27.70%"
         }
       ],
       "comparison": {
@@ -176,12 +195,13 @@
         "items": [
           "把 SVG primitive 直接作为 DrawingPT v0 token，统一记录 type、semanticId、instanceId、bbox、长度 proxy、面积 proxy 和弱样式特征。",
           "把自监督预训练和低标注语义微调接到同一个 Dataset/manifest 上，后续可以做 scratch vs pretrained 的 label-efficiency curve。",
-          "把诊断结果结构化记录：background shortcut、checkpoint 安全加载兼容性、weighted loss 对宏平均和前景准确率的 trade-off 都留下了 evidence。"
+          "把诊断结果结构化记录：background shortcut、checkpoint 安全加载兼容性、weighted loss 对宏平均和前景准确率的 trade-off 都留下了 evidence。",
+          "把长尾问题从口头判断落成 class-aware sampler、sampler exposure audit 和服务器可复现实验开关。"
         ],
         "boundary": "当前创新点是实验链路和表示设计层面的 v0 prototype；SOTA 比较放到低标注曲线稳定后再做。"
       },
-      "boundary": "所有 semantic 数字只来自 1% seed0304、100 step、128 个 validation window 的 smoke；当前只支持训练闭环和失败模式判断，预训练有效性要等低标注曲线验证。",
-      "next": "实现 class-aware window sampling 或 focal loss，在同一 1% seed0304 下重跑 scratch vs pretrained；若 foreground macro F1 明显高于 0.0209 且不再塌到 wall/window/sink，再扩到 5%、10% 和多个 seed。",
+      "boundary": "所有 semantic 数字只来自 1% seed0304、100 step、128 个 validation window 的 smoke；class-aware audit 是采样暴露检查，不是模型性能结果；本机 CPU 20-step sanity 也不与服务器 100-step smoke 横向比较。",
+      "next": "在服务器用 `SAMPLER=class_aware` 重跑同一 1% seed0304 scratch vs pretrained；若 foreground macro F1 明显高于 0.0209 且 rare-class support 可解释，再扩到 5%、10% 和多个 seed。",
       "evidence": [
         {
           "path": "../next_steps_2026-09-01/floorplancad_token_manifest_by_file.csv",
@@ -215,8 +235,48 @@
         },
         {
           "path": "../../scripts/train_semantic_primitive.py",
-          "sha256": "8482224ae8d41f405a740082ad55c60d3536873c9456fd5c4e6b65c66f57a6b2",
-          "note": "语义分类、foreground-only loss、class weighting 实现"
+          "sha256": "994c665a0e8fc25c09483458f50fd3fbaa145665518a964a215d0b44d6a1f2fd",
+          "note": "语义分类、foreground-only loss、class weighting 与 class-aware sampler 实现"
+        },
+        {
+          "path": "../../scripts/train_masked_primitive.py",
+          "sha256": "b9004146270e240deaea0a136e3995e535db555d617448c0b2fb91831725772f",
+          "note": "masked primitive pretrain 与 Transformer nested tensor 兼容补丁"
+        },
+        {
+          "path": "../../scripts/audit_class_aware_sampler.py",
+          "sha256": "f8fe59cfbb66983c8e6e30169150f5ea2a012c8d835ff5c87913ec448d4cce7b",
+          "note": "class-aware sampler 暴露审计脚本"
+        },
+        {
+          "path": "../next_steps_2026-09-01/drawingpt_v0_classaware_sampler_audit.json",
+          "sha256": "5723c50453666aaf90d735ac28a91f119eb7322849d7ef84dfbe59a25485787f",
+          "note": "1% seed0304 class-aware sampler 暴露审计 JSON"
+        },
+        {
+          "path": "../next_steps_2026-09-01/drawingpt_v0_classaware_sampler_audit.md",
+          "sha256": "efb95848fe939cc006c01d2c56f1ca075905b7fa489cdb2dae015cf0fdbe2988",
+          "note": "1% seed0304 class-aware sampler 暴露审计可读版"
+        },
+        {
+          "path": "../next_steps_2026-09-01/drawingpt_v0_semantic_classaware_weighted_cpu20_summary.json",
+          "sha256": "7dbbb877a4a4f9cda72ddc831c9420e47a0da5978e20f3efd392212f1866dbb9",
+          "note": "本机 CPU 20-step class-aware+weighted sanity summary"
+        },
+        {
+          "path": "../../scripts/server/drawingpt_v0_semantic_scratch_smoke.sbatch",
+          "sha256": "d12c66842e23e10f548ab61c47c80c664d0114569af827bba94992c56e84bfb9",
+          "note": "scratch semantic smoke 服务器脚本，支持 SAMPLER 透传"
+        },
+        {
+          "path": "../../scripts/server/drawingpt_v0_semantic_pretrained_smoke.sbatch",
+          "sha256": "51b9c04204d268825bebf0925b480b7b9d97c1abaf17cca503b7b0c4a2c54527",
+          "note": "pretrained semantic smoke 服务器脚本，支持 SAMPLER 透传"
+        },
+        {
+          "path": "../../scripts/server/drawingpt_v0_semantic_weighted_smoke.sbatch",
+          "sha256": "c00dbee06adf5a5111606f64a9a9031ee2af6cb249269fd5e579c0ef97ba8d1c",
+          "note": "weighted semantic smoke 服务器脚本，支持 SAMPLER 透传"
         }
       ]
     },
@@ -681,6 +741,11 @@
       "date": "2026-09-01",
       "project": "DrawingPT v0",
       "event": "完成 semantic scratch/pretrained/weighted smoke，识别 background shortcut 与 wall/window/sink 高频类塌缩。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "DrawingPT v0",
+      "event": "实现 class-aware sampler，完成 1% seed0304 exposure audit 和本机 CPU 20-step sanity，为服务器重跑 scratch/pretrained 准备好入口。"
     }
   ],
   "generation": {

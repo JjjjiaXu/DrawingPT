@@ -29,6 +29,8 @@ LAYERS="${LAYERS:-2}"
 HEADS="${HEADS:-4}"
 SEED="${SEED:-304}"
 LR="${LR:-0.001}"
+SAMPLER="${SAMPLER:-random}"
+MAX_WINDOW_SAMPLE_WEIGHT="${MAX_WINDOW_SAMPLE_WEIGHT:-8.0}"
 
 mkdir -p "$PROJECT_ROOT/logs/slurm" "$PROJECT_ROOT/outputs/reports" "$PROJECT_ROOT/outputs/checkpoints"
 cd "$PROJECT_ROOT"
@@ -70,7 +72,7 @@ echo "VENV_DIR=$VENV_DIR"
 echo "RUN_NAME=$RUN_NAME"
 echo "PRETRAINED_CHECKPOINT=$PRETRAINED_CHECKPOINT"
 echo "WINDOW_SIZE=$WINDOW_SIZE LIMIT_WINDOWS=$LIMIT_WINDOWS VAL_LIMIT_WINDOWS=$VAL_LIMIT_WINDOWS"
-echo "BATCH_SIZE=$BATCH_SIZE EVAL_BATCH_SIZE=$EVAL_BATCH_SIZE STEPS=$STEPS"
+echo "BATCH_SIZE=$BATCH_SIZE EVAL_BATCH_SIZE=$EVAL_BATCH_SIZE STEPS=$STEPS SAMPLER=$SAMPLER"
 
 "$VENV_DIR/bin/python" scripts/train_semantic_primitive.py \
   --root "$DATA_ROOT" \
@@ -89,6 +91,8 @@ echo "BATCH_SIZE=$BATCH_SIZE EVAL_BATCH_SIZE=$EVAL_BATCH_SIZE STEPS=$STEPS"
   --heads "$HEADS" \
   --lr "$LR" \
   --seed "$SEED" \
+  --sampler "$SAMPLER" \
+  --max-window-sample-weight "$MAX_WINDOW_SAMPLE_WEIGHT" \
   --log-every 20 \
   --summary-out "outputs/reports/${RUN_NAME}_summary.json" \
   --checkpoint-out "outputs/checkpoints/${RUN_NAME}.pt"

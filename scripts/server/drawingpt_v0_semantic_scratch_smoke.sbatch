@@ -37,6 +37,8 @@ LAYERS="${LAYERS:-2}"
 HEADS="${HEADS:-4}"
 SEED="${SEED:-304}"
 LR="${LR:-0.001}"
+SAMPLER="${SAMPLER:-random}"
+MAX_WINDOW_SAMPLE_WEIGHT="${MAX_WINDOW_SAMPLE_WEIGHT:-8.0}"
 
 mkdir -p "$PROJECT_ROOT/logs/slurm" "$PROJECT_ROOT/outputs/reports" "$PROJECT_ROOT/outputs/checkpoints"
 
@@ -50,7 +52,7 @@ echo "[drawingpt-v0-semantic] host=$(hostname)"
 echo "[drawingpt-v0-semantic] date=$(date)"
 echo "[drawingpt-v0-semantic] CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
 echo "[drawingpt-v0-semantic] data=$DATA_ROOT"
-echo "[drawingpt-v0-semantic] run=$RUN_NAME window=$WINDOW_SIZE batch=$BATCH_SIZE steps=$STEPS limit_windows=$LIMIT_WINDOWS val_limit=$VAL_LIMIT_WINDOWS"
+echo "[drawingpt-v0-semantic] run=$RUN_NAME window=$WINDOW_SIZE batch=$BATCH_SIZE steps=$STEPS limit_windows=$LIMIT_WINDOWS val_limit=$VAL_LIMIT_WINDOWS sampler=$SAMPLER"
 nvidia-smi
 python - <<'PY'
 import torch
@@ -75,6 +77,8 @@ python scripts/train_semantic_primitive.py \
   --heads "$HEADS" \
   --seed "$SEED" \
   --lr "$LR" \
+  --sampler "$SAMPLER" \
+  --max-window-sample-weight "$MAX_WINDOW_SAMPLE_WEIGHT" \
   --device auto \
   --summary-out "outputs/reports/${RUN_NAME}_summary.json" \
   --checkpoint-out "outputs/checkpoints/${RUN_NAME}.pt"

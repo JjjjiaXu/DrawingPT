@@ -1,0 +1,572 @@
+{
+  "generated_at": "2026-09-01",
+  "task": "class-aware sampler exposure audit",
+  "split": "train",
+  "label_list": "configs\\label_fractions\\floorplancad_train_seed0304_001pct.txt",
+  "label_list_sha256": "ac455839041c993ff7e4cfab19b938063f774dfd5641dea893c4f72e29d67000",
+  "manifest": "reports\\next_steps_2026-09-01\\floorplancad_token_manifest_by_file.csv",
+  "manifest_sha256": "b6dd60a4976a3e5791eb8fc786a9cfbb24f1a9a466a5bb97d9aafd40b7412370",
+  "window_size": 2048,
+  "dataset_windows": 88,
+  "seed": 304,
+  "rare_classes": [
+    5,
+    6,
+    8,
+    9,
+    10,
+    15,
+    21,
+    23,
+    26,
+    30,
+    31,
+    34,
+    35
+  ],
+  "random_epoch": {
+    "sampled_windows": 88,
+    "unique_windows": 88,
+    "foreground_tokens": 28800,
+    "classes_with_support": 32,
+    "rare_classes_with_support": 11,
+    "rare_token_share": 0.0848263888888889,
+    "wall_token_share": 0.28041666666666665,
+    "top10_classes": [
+      {
+        "class_id": 33,
+        "class_name": "wall",
+        "tokens": 8076,
+        "share": 0.28041666666666665
+      },
+      {
+        "class_id": 27,
+        "class_name": "toilet",
+        "tokens": 2011,
+        "share": 0.06982638888888888
+      },
+      {
+        "class_id": 32,
+        "class_name": "parking spot",
+        "tokens": 1726,
+        "share": 0.059930555555555556
+      },
+      {
+        "class_id": 16,
+        "class_name": "Wardrobe",
+        "tokens": 1704,
+        "share": 0.059166666666666666
+      },
+      {
+        "class_id": 2,
+        "class_name": "double door",
+        "tokens": 1674,
+        "share": 0.058125
+      },
+      {
+        "class_id": 7,
+        "class_name": "window",
+        "tokens": 1325,
+        "share": 0.04600694444444445
+      },
+      {
+        "class_id": 19,
+        "class_name": "sink",
+        "tokens": 1300,
+        "share": 0.04513888888888889
+      },
+      {
+        "class_id": 12,
+        "class_name": "bed",
+        "tokens": 1152,
+        "share": 0.04
+      },
+      {
+        "class_id": 28,
+        "class_name": "stairs",
+        "tokens": 1095,
+        "share": 0.03802083333333333
+      },
+      {
+        "class_id": 17,
+        "class_name": "cabinet",
+        "tokens": 832,
+        "share": 0.028888888888888888
+      }
+    ]
+  },
+  "class_aware_epoch": {
+    "sampled_windows": 88,
+    "unique_windows": 46,
+    "foreground_tokens": 37811,
+    "classes_with_support": 32,
+    "rare_classes_with_support": 11,
+    "rare_token_share": 0.0882018460236439,
+    "wall_token_share": 0.27703578323768213,
+    "top10_classes": [
+      {
+        "class_id": 33,
+        "class_name": "wall",
+        "tokens": 10475,
+        "share": 0.27703578323768213
+      },
+      {
+        "class_id": 27,
+        "class_name": "toilet",
+        "tokens": 3932,
+        "share": 0.10399090211843115
+      },
+      {
+        "class_id": 12,
+        "class_name": "bed",
+        "tokens": 2954,
+        "share": 0.07812541323953347
+      },
+      {
+        "class_id": 2,
+        "class_name": "double door",
+        "tokens": 2419,
+        "share": 0.06397609161355161
+      },
+      {
+        "class_id": 19,
+        "class_name": "sink",
+        "tokens": 2178,
+        "share": 0.05760228504932427
+      },
+      {
+        "class_id": 16,
+        "class_name": "Wardrobe",
+        "tokens": 1912,
+        "share": 0.05056729523154638
+      },
+      {
+        "class_id": 7,
+        "class_name": "window",
+        "tokens": 1724,
+        "share": 0.04559519716484621
+      },
+      {
+        "class_id": 1,
+        "class_name": "single door",
+        "tokens": 1306,
+        "share": 0.03454021316548094
+      },
+      {
+        "class_id": 25,
+        "class_name": "squat toilet",
+        "tokens": 1056,
+        "share": 0.027928380629975404
+      },
+      {
+        "class_id": 28,
+        "class_name": "stairs",
+        "tokens": 1010,
+        "share": 0.026711803443442386
+      }
+    ]
+  },
+  "sampler": {
+    "method": "class_aware",
+    "num_windows": 88,
+    "num_samples_per_epoch": 88,
+    "replacement": true,
+    "max_window_sample_weight": 8.0,
+    "zero_supervised_windows": 4,
+    "weight_summary": {
+      "min": 0.05,
+      "median": 0.691330981751283,
+      "mean": 0.789194069806391,
+      "max": 1.8177765309810638
+    },
+    "top_weighted_windows": [
+      {
+        "file": "0561-0003.svg",
+        "window_index": 0,
+        "weight": 1.8177765309810638,
+        "classes": [
+          {
+            "class_id": 10,
+            "class_name": "opening symbol"
+          },
+          {
+            "class_id": 33,
+            "class_name": "wall"
+          }
+        ]
+      },
+      {
+        "file": "0595-0022.svg",
+        "window_index": 2,
+        "weight": 1.615662290652593,
+        "classes": [
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 10,
+            "class_name": "opening symbol"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          },
+          {
+            "class_id": 17,
+            "class_name": "cabinet"
+          },
+          {
+            "class_id": 18,
+            "class_name": "gas stove"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 20,
+            "class_name": "refrigerator"
+          }
+        ]
+      },
+      {
+        "file": "0232-0007.svg",
+        "window_index": 0,
+        "weight": 1.569330700419166,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 10,
+            "class_name": "opening symbol"
+          },
+          {
+            "class_id": 18,
+            "class_name": "gas stove"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 22,
+            "class_name": "bath"
+          },
+          {
+            "class_id": 24,
+            "class_name": "washing machine"
+          },
+          {
+            "class_id": 27,
+            "class_name": "toilet"
+          }
+        ]
+      },
+      {
+        "file": "1062-0024.svg",
+        "window_index": 0,
+        "weight": 1.561782582175164,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 8,
+            "class_name": "bay window"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          }
+        ]
+      },
+      {
+        "file": "0118-0023.svg",
+        "window_index": 0,
+        "weight": 1.5185228176414967,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 25,
+            "class_name": "squat toilet"
+          },
+          {
+            "class_id": 26,
+            "class_name": "urinal"
+          },
+          {
+            "class_id": 27,
+            "class_name": "toilet"
+          },
+          {
+            "class_id": 33,
+            "class_name": "wall"
+          }
+        ]
+      },
+      {
+        "file": "0925-0027.svg",
+        "window_index": 0,
+        "weight": 1.4948200105052245,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          },
+          {
+            "class_id": 17,
+            "class_name": "cabinet"
+          }
+        ]
+      },
+      {
+        "file": "0186-0011.svg",
+        "window_index": 0,
+        "weight": 1.493084899016789,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 8,
+            "class_name": "bay window"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 27,
+            "class_name": "toilet"
+          },
+          {
+            "class_id": 33,
+            "class_name": "wall"
+          }
+        ]
+      },
+      {
+        "file": "0595-0022.svg",
+        "window_index": 1,
+        "weight": 1.4820045232772827,
+        "classes": [
+          {
+            "class_id": 35,
+            "class_name": "railing"
+          }
+        ]
+      },
+      {
+        "file": "0561-0003.svg",
+        "window_index": 2,
+        "weight": 1.44738261614527,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          },
+          {
+            "class_id": 17,
+            "class_name": "cabinet"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 22,
+            "class_name": "bath"
+          }
+        ]
+      },
+      {
+        "file": "0595-0022.svg",
+        "window_index": 0,
+        "weight": 1.226396986416408,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 9,
+            "class_name": "blind window"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          }
+        ]
+      }
+    ]
+  },
+  "caveats": [
+    "This is a sampler exposure audit, not a model-quality result.",
+    "Class-aware sampling cannot create supervision for classes absent from the low-label list.",
+    "Replacement sampling may reduce unique-window coverage and must be validated with macro/rare F1."
+  ]
+}

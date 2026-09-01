@@ -7,7 +7,7 @@ import json
 import random
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -29,16 +29,16 @@ def require_torch():
         import torch
         import torch.nn as nn
         import torch.nn.functional as F
-        from torch.utils.data import DataLoader
+        from torch.utils.data import DataLoader, WeightedRandomSampler
     except Exception as exc:  # pragma: no cover
         raise SystemExit(
             "PyTorch is required for semantic fine-tuning. Activate the server torch environment "
             "or use a local Python with torch installed. Original error: " + repr(exc)
         )
-    return torch, nn, F, DataLoader
+    return torch, nn, F, DataLoader, WeightedRandomSampler
 
 
-torch, nn, F, DataLoader = require_torch()
+torch, nn, F, DataLoader, WeightedRandomSampler = require_torch()
 
 
 class SemanticPrimitiveModel(nn.Module):
@@ -65,7 +65,10 @@ class SemanticPrimitiveModel(nn.Module):
             activation="gelu",
             batch_first=True,
         )
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers)
+        try:
+            self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers, enable_nested_tensor=False)
+        except TypeError:  # Older PyTorch versions do not expose this keyword.
+            self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers)
         self.norm = nn.LayerNorm(hidden_dim)
         self.semantic_head = nn.Linear(hidden_dim, num_classes)
 
@@ -180,6 +183,103 @@ def compact_class_stats(counts: np.ndarray, weights) -> List[Dict[str, object]]:
             }
         )
     return stats
+
+
+def describe_float(values: List[float]) -> Dict[str, float]:
+    if not values:
+        return {"min": 0.0, "median": 0.0, "mean": 0.0, "max": 0.0}
+    ordered = sorted(float(v) for v in values)
+    mid = len(ordered) // 2
+    if len(ordered) % 2:
+        median = ordered[mid]
+    else:
+        median = (ordered[mid - 1] + ordered[mid]) / 2.0
+    return {
+        "min": float(ordered[0]),
+        "median": float(median),
+        "mean": float(sum(ordered) / len(ordered)),
+        "max": float(ordered[-1]),
+    }
+
+
+def build_class_aware_sample_weights(
+    dataset,
+    class_counts: np.ndarray,
+    include_background_in_loss: bool,
+    max_window_sample_weight: float,
+) -> Tuple[torch.Tensor, Dict[str, object]]:
+    start_class = 0 if include_background_in_loss else 1
+    class_ids = np.arange(start_class, NUM_SEMANTIC_CLASSES)
+    positive = class_ids[class_counts[class_ids] > 0]
+    if positive.size == 0:
+        weights = torch.ones((len(dataset),), dtype=torch.double)
+        return weights, {
+            "method": "class_aware",
+            "fallback": "uniform_no_positive_supervised_classes",
+            "num_windows": len(dataset),
+        }
+
+    class_importance = np.zeros((NUM_SEMANTIC_CLASSES,), dtype=np.float32)
+    positive_counts = class_counts[positive].astype(np.float32)
+    class_importance[positive] = 1.0 / np.sqrt(positive_counts)
+    class_importance[positive] /= max(float(class_importance[positive].mean()), 1e-12)
+
+    window_weights: List[float] = []
+    window_classes: List[List[int]] = []
+    zero_supervised_windows = 0
+    for index in range(len(dataset)):
+        labels = dataset[index]["semantic_labels"]
+        valid = labels >= 0
+        supervised = valid if include_background_in_loss else valid & (labels > 0)
+        values = labels[supervised]
+        if values.size == 0:
+            zero_supervised_windows += 1
+            window_weights.append(0.05)
+            window_classes.append([])
+            continue
+        unique_classes = sorted(int(x) for x in np.unique(values) if int(x) >= start_class)
+        importances = [float(class_importance[x]) for x in unique_classes if class_importance[x] > 0]
+        if not importances:
+            weight = 0.05
+        else:
+            # Use unique-class rarity rather than token-frequency rarity so a
+            # wall-heavy window that merely contains many wall tokens is not
+            # rewarded for density alone.
+            weight = 0.5 * float(np.mean(importances)) + 0.5 * float(np.max(importances))
+        if max_window_sample_weight > 0:
+            weight = min(weight, float(max_window_sample_weight))
+        window_weights.append(max(float(weight), 1e-6))
+        window_classes.append(unique_classes)
+
+    ranked = sorted(range(len(window_weights)), key=lambda idx: window_weights[idx], reverse=True)[:10]
+    top_windows = []
+    for index in ranked:
+        record = dataset.records[index]
+        top_windows.append(
+            {
+                "file": record.file,
+                "window_index": record.window_index,
+                "weight": window_weights[index],
+                "classes": [
+                    {
+                        "class_id": class_id,
+                        "class_name": CLASS_NAMES.get(class_id, "<unknown>"),
+                    }
+                    for class_id in window_classes[index][:10]
+                ],
+            }
+        )
+
+    return torch.as_tensor(window_weights, dtype=torch.double), {
+        "method": "class_aware",
+        "num_windows": len(dataset),
+        "num_samples_per_epoch": len(dataset),
+        "replacement": True,
+        "max_window_sample_weight": max_window_sample_weight,
+        "zero_supervised_windows": zero_supervised_windows,
+        "weight_summary": describe_float(window_weights),
+        "top_weighted_windows": top_windows,
+    }
 
 
 def load_checkpoint(path: Path, trust_checkpoint: bool) -> Dict[str, object]:
@@ -393,10 +493,31 @@ def train(args) -> Dict[str, object]:
     if len(train_dataset) == 0:
         raise SystemExit("Train dataset contains 0 windows. Check root, manifest, label-list, and window size.")
 
+    class_counts = (
+        compute_supervised_class_counts(train_dataset, args.include_background_in_loss)
+        if args.class_weighting != "none" or args.sampler == "class_aware"
+        else np.zeros((NUM_SEMANTIC_CLASSES,), dtype=np.int64)
+    )
+    sampler = None
+    sampler_report: Dict[str, object] = {"method": args.sampler}
+    if args.sampler == "class_aware":
+        sample_weights, sampler_report = build_class_aware_sample_weights(
+            train_dataset,
+            class_counts,
+            args.include_background_in_loss,
+            args.max_window_sample_weight,
+        )
+        sampler = WeightedRandomSampler(
+            sample_weights,
+            num_samples=len(train_dataset),
+            replacement=True,
+        )
+
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
-        shuffle=True,
+        shuffle=sampler is None,
+        sampler=sampler,
         num_workers=args.num_workers,
         collate_fn=collate_batch,
         drop_last=False,
@@ -421,11 +542,6 @@ def train(args) -> Dict[str, object]:
         dropout=args.dropout,
     ).to(device)
     pretrain_report = load_pretrained_encoder(model, args.pretrained_checkpoint, args.trust_pretrained_checkpoint)
-    class_counts = (
-        compute_supervised_class_counts(train_dataset, args.include_background_in_loss)
-        if args.class_weighting != "none"
-        else np.zeros((NUM_SEMANTIC_CLASSES,), dtype=np.int64)
-    )
     class_weights_cpu = build_class_weights(
         class_counts,
         args.class_weighting,
@@ -540,6 +656,7 @@ def train(args) -> Dict[str, object]:
         "loss_target": "all_valid_tokens_including_background"
         if args.include_background_in_loss
         else "foreground_semantic_ids_1_to_35",
+        "sampler": sampler_report,
         "class_weighting": args.class_weighting,
         "max_class_weight": args.max_class_weight,
         "supervised_class_stats": compact_class_stats(class_counts, class_weights_cpu)
@@ -590,6 +707,18 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--grad-clip", type=float, default=1.0)
+    parser.add_argument(
+        "--sampler",
+        choices=["random", "class_aware"],
+        default="random",
+        help="Training window sampler. class_aware upweights windows containing rarer foreground semantic classes.",
+    )
+    parser.add_argument(
+        "--max-window-sample-weight",
+        type=float,
+        default=8.0,
+        help="Clip class-aware window sampling weights; <=0 disables clipping.",
+    )
     parser.add_argument(
         "--class-weighting",
         choices=["none", "inverse", "inverse_sqrt", "median_frequency"],

@@ -41,11 +41,38 @@
 - `docs/drawingpt_v0_training_smoke.md`
   - SHA-256：`9579fe83e7b55777428216db1026e516fb33299ebc1b555fb4406945d2fc5244`
   - 说明：训练闭环解释、关键 job 和指标边界。
+- `scripts/train_semantic_primitive.py`
+  - SHA-256：`994c665a0e8fc25c09483458f50fd3fbaa145665518a964a215d0b44d6a1f2fd`
+  - 说明：语义分类、foreground-only loss、class weighting 与 class-aware sampler 实现。
+- `scripts/train_masked_primitive.py`
+  - SHA-256：`b9004146270e240deaea0a136e3995e535db555d617448c0b2fb91831725772f`
+  - 说明：masked primitive pretrain 与 Transformer nested tensor 兼容补丁。
+- `scripts/audit_class_aware_sampler.py`
+  - SHA-256：`f8fe59cfbb66983c8e6e30169150f5ea2a012c8d835ff5c87913ec448d4cce7b`
+  - 说明：class-aware sampler 暴露审计脚本。
+- `reports/next_steps_2026-09-01/drawingpt_v0_classaware_sampler_audit.json`
+  - SHA-256：`5723c50453666aaf90d735ac28a91f119eb7322849d7ef84dfbe59a25485787f`
+  - 说明：1% seed0304 class-aware sampler exposure audit。
+- `reports/next_steps_2026-09-01/drawingpt_v0_classaware_sampler_audit.md`
+  - SHA-256：`efb95848fe939cc006c01d2c56f1ca075905b7fa489cdb2dae015cf0fdbe2988`
+  - 说明：class-aware sampler exposure audit 可读版。
+- `reports/next_steps_2026-09-01/drawingpt_v0_semantic_classaware_weighted_cpu20_summary.json`
+  - SHA-256：`7dbbb877a4a4f9cda72ddc831c9420e47a0da5978e20f3efd392212f1866dbb9`
+  - 说明：本机 CPU 20-step class-aware+weighted sanity summary。
+- `scripts/server/drawingpt_v0_semantic_scratch_smoke.sbatch`
+  - SHA-256：`d12c66842e23e10f548ab61c47c80c664d0114569af827bba94992c56e84bfb9`
+  - 说明：scratch semantic smoke 服务器脚本，支持 `SAMPLER` 透传。
+- `scripts/server/drawingpt_v0_semantic_pretrained_smoke.sbatch`
+  - SHA-256：`51b9c04204d268825bebf0925b480b7b9d97c1abaf17cca503b7b0c4a2c54527`
+  - 说明：pretrained semantic smoke 服务器脚本，支持 `SAMPLER` 透传。
+- `scripts/server/drawingpt_v0_semantic_weighted_smoke.sbatch`
+  - SHA-256：`c00dbee06adf5a5111606f64a9a9031ee2af6cb249269fd5e579c0ef97ba8d1c`
+  - 说明：weighted semantic smoke 服务器脚本，支持 `SAMPLER` 透传。
 
 本周报收录判断：
 
-- 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果。
-- 阶段边界：本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
+- 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果、class-aware sampler 实现、sampler exposure audit 和本机 CPU sanity。
+- 阶段边界：sampler exposure audit 不是模型效果；本机 CPU 20-step sanity 不与服务器 100-step smoke 横向比较；本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
 
 ### 2.3 FloorPlanCAD 数据画像与长尾风险证据
 
@@ -158,8 +185,9 @@
 4. 文献调研支持方法定位、baseline 选择和 novelty 边界，不替代实验结果。
 5. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
 6. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
-7. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
-8. GitHub 远端同步状态不进入组会正文。
+7. class-aware sampler 已经实现并完成 exposure audit，但它只证明采样分布被调整；模型效果仍需服务器 100-step scratch/pretrained 对照。
+8. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
+9. GitHub 远端同步状态不进入组会正文。
 
 ## 4. 报告结构选择
 

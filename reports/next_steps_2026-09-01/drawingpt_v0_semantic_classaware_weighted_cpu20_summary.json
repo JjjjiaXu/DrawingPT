@@ -1,0 +1,1289 @@
+{
+  "generated_at": "2026-09-01",
+  "task": "semantic primitive classification smoke",
+  "mode": "scratch",
+  "split": "train",
+  "label_list": "configs\\label_fractions\\floorplancad_train_seed0304_001pct.txt",
+  "train_dataset_windows": 88,
+  "val_dataset_windows": 128,
+  "window_size": 2048,
+  "batch_size": 2,
+  "eval_batch_size": 2,
+  "steps": 20,
+  "hidden_dim": 128,
+  "layers": 2,
+  "heads": 4,
+  "device": "cpu",
+  "torch_version": "1.13.1+cpu",
+  "loss_target": "foreground_semantic_ids_1_to_35",
+  "sampler": {
+    "method": "class_aware",
+    "num_windows": 88,
+    "num_samples_per_epoch": 88,
+    "replacement": true,
+    "max_window_sample_weight": 8.0,
+    "zero_supervised_windows": 4,
+    "weight_summary": {
+      "min": 0.05,
+      "median": 0.691330981751283,
+      "mean": 0.789194069806391,
+      "max": 1.8177765309810638
+    },
+    "top_weighted_windows": [
+      {
+        "file": "0561-0003.svg",
+        "window_index": 0,
+        "weight": 1.8177765309810638,
+        "classes": [
+          {
+            "class_id": 10,
+            "class_name": "opening symbol"
+          },
+          {
+            "class_id": 33,
+            "class_name": "wall"
+          }
+        ]
+      },
+      {
+        "file": "0595-0022.svg",
+        "window_index": 2,
+        "weight": 1.615662290652593,
+        "classes": [
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 10,
+            "class_name": "opening symbol"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          },
+          {
+            "class_id": 17,
+            "class_name": "cabinet"
+          },
+          {
+            "class_id": 18,
+            "class_name": "gas stove"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 20,
+            "class_name": "refrigerator"
+          }
+        ]
+      },
+      {
+        "file": "0232-0007.svg",
+        "window_index": 0,
+        "weight": 1.569330700419166,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 10,
+            "class_name": "opening symbol"
+          },
+          {
+            "class_id": 18,
+            "class_name": "gas stove"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 22,
+            "class_name": "bath"
+          },
+          {
+            "class_id": 24,
+            "class_name": "washing machine"
+          },
+          {
+            "class_id": 27,
+            "class_name": "toilet"
+          }
+        ]
+      },
+      {
+        "file": "1062-0024.svg",
+        "window_index": 0,
+        "weight": 1.561782582175164,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 8,
+            "class_name": "bay window"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          }
+        ]
+      },
+      {
+        "file": "0118-0023.svg",
+        "window_index": 0,
+        "weight": 1.5185228176414967,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 25,
+            "class_name": "squat toilet"
+          },
+          {
+            "class_id": 26,
+            "class_name": "urinal"
+          },
+          {
+            "class_id": 27,
+            "class_name": "toilet"
+          },
+          {
+            "class_id": 33,
+            "class_name": "wall"
+          }
+        ]
+      },
+      {
+        "file": "0925-0027.svg",
+        "window_index": 0,
+        "weight": 1.4948200105052245,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          },
+          {
+            "class_id": 17,
+            "class_name": "cabinet"
+          }
+        ]
+      },
+      {
+        "file": "0186-0011.svg",
+        "window_index": 0,
+        "weight": 1.493084899016789,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 8,
+            "class_name": "bay window"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 27,
+            "class_name": "toilet"
+          },
+          {
+            "class_id": 33,
+            "class_name": "wall"
+          }
+        ]
+      },
+      {
+        "file": "0595-0022.svg",
+        "window_index": 1,
+        "weight": 1.4820045232772827,
+        "classes": [
+          {
+            "class_id": 35,
+            "class_name": "railing"
+          }
+        ]
+      },
+      {
+        "file": "0561-0003.svg",
+        "window_index": 2,
+        "weight": 1.44738261614527,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 2,
+            "class_name": "double door"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          },
+          {
+            "class_id": 17,
+            "class_name": "cabinet"
+          },
+          {
+            "class_id": 19,
+            "class_name": "sink"
+          },
+          {
+            "class_id": 22,
+            "class_name": "bath"
+          }
+        ]
+      },
+      {
+        "file": "0595-0022.svg",
+        "window_index": 0,
+        "weight": 1.226396986416408,
+        "classes": [
+          {
+            "class_id": 1,
+            "class_name": "single door"
+          },
+          {
+            "class_id": 3,
+            "class_name": "sliding door"
+          },
+          {
+            "class_id": 7,
+            "class_name": "window"
+          },
+          {
+            "class_id": 9,
+            "class_name": "blind window"
+          },
+          {
+            "class_id": 11,
+            "class_name": "sofa"
+          },
+          {
+            "class_id": 12,
+            "class_name": "bed"
+          },
+          {
+            "class_id": 13,
+            "class_name": "chair"
+          },
+          {
+            "class_id": 14,
+            "class_name": "table"
+          },
+          {
+            "class_id": 15,
+            "class_name": "TV cabinet"
+          },
+          {
+            "class_id": 16,
+            "class_name": "Wardrobe"
+          }
+        ]
+      }
+    ]
+  },
+  "class_weighting": "inverse_sqrt",
+  "max_class_weight": 8.0,
+  "supervised_class_stats": [
+    {
+      "class_id": 1,
+      "class_name": "single door",
+      "count": 800,
+      "weight": 0.6606981754302979
+    },
+    {
+      "class_id": 2,
+      "class_name": "double door",
+      "count": 1674,
+      "weight": 0.4567413628101349
+    },
+    {
+      "class_id": 3,
+      "class_name": "sliding door",
+      "count": 694,
+      "weight": 0.7093627452850342
+    },
+    {
+      "class_id": 7,
+      "class_name": "window",
+      "count": 1325,
+      "weight": 0.5133814215660095
+    },
+    {
+      "class_id": 8,
+      "class_name": "bay window",
+      "count": 68,
+      "weight": 2.266176223754883
+    },
+    {
+      "class_id": 9,
+      "class_name": "blind window",
+      "count": 150,
+      "weight": 1.5258169174194336
+    },
+    {
+      "class_id": 10,
+      "class_name": "opening symbol",
+      "count": 63,
+      "weight": 2.354386806488037
+    },
+    {
+      "class_id": 11,
+      "class_name": "sofa",
+      "count": 408,
+      "weight": 0.9251625537872314
+    },
+    {
+      "class_id": 12,
+      "class_name": "bed",
+      "count": 1152,
+      "weight": 0.5505818128585815
+    },
+    {
+      "class_id": 13,
+      "class_name": "chair",
+      "count": 709,
+      "weight": 0.7018187642097473
+    },
+    {
+      "class_id": 14,
+      "class_name": "table",
+      "count": 206,
+      "weight": 1.302010416984558
+    },
+    {
+      "class_id": 15,
+      "class_name": "TV cabinet",
+      "count": 138,
+      "weight": 1.5907742977142334
+    },
+    {
+      "class_id": 16,
+      "class_name": "Wardrobe",
+      "count": 1704,
+      "weight": 0.45270293951034546
+    },
+    {
+      "class_id": 17,
+      "class_name": "cabinet",
+      "count": 832,
+      "weight": 0.6478678584098816
+    },
+    {
+      "class_id": 18,
+      "class_name": "gas stove",
+      "count": 438,
+      "weight": 0.8929168581962585
+    },
+    {
+      "class_id": 19,
+      "class_name": "sink",
+      "count": 1300,
+      "weight": 0.5182943344116211
+    },
+    {
+      "class_id": 20,
+      "class_name": "refrigerator",
+      "count": 206,
+      "weight": 1.302010416984558
+    },
+    {
+      "class_id": 21,
+      "class_name": "airconditioner",
+      "count": 300,
+      "weight": 1.0789154767990112
+    },
+    {
+      "class_id": 22,
+      "class_name": "bath",
+      "count": 414,
+      "weight": 0.9184339046478271
+    },
+    {
+      "class_id": 23,
+      "class_name": "bath tub",
+      "count": 79,
+      "weight": 2.1024930477142334
+    },
+    {
+      "class_id": 24,
+      "class_name": "washing machine",
+      "count": 365,
+      "weight": 0.9781414270401001
+    },
+    {
+      "class_id": 25,
+      "class_name": "squat toilet",
+      "count": 519,
+      "weight": 0.8202843070030212
+    },
+    {
+      "class_id": 26,
+      "class_name": "urinal",
+      "count": 66,
+      "weight": 2.30025577545166
+    },
+    {
+      "class_id": 27,
+      "class_name": "toilet",
+      "count": 2011,
+      "weight": 0.4167177975177765
+    },
+    {
+      "class_id": 28,
+      "class_name": "stairs",
+      "count": 1095,
+      "weight": 0.564730167388916
+    },
+    {
+      "class_id": 29,
+      "class_name": "elevator",
+      "count": 703,
+      "weight": 0.7048073410987854
+    },
+    {
+      "class_id": 30,
+      "class_name": "escalator",
+      "count": 452,
+      "weight": 0.8789798021316528
+    },
+    {
+      "class_id": 31,
+      "class_name": "row chairs",
+      "count": 386,
+      "weight": 0.9511619210243225
+    },
+    {
+      "class_id": 32,
+      "class_name": "parking spot",
+      "count": 1726,
+      "weight": 0.4498085677623749
+    },
+    {
+      "class_id": 33,
+      "class_name": "wall",
+      "count": 8076,
+      "weight": 0.20794570446014404
+    },
+    {
+      "class_id": 34,
+      "class_name": "curtain wall",
+      "count": 582,
+      "weight": 0.7746163010597229
+    },
+    {
+      "class_id": 35,
+      "class_name": "railing",
+      "count": 159,
+      "weight": 1.4820045232772827
+    }
+  ],
+  "runtime_seconds": 42.312,
+  "first_train_loss": 4.298685550689697,
+  "last_train_loss": 3.9423255920410156,
+  "train_loss_history": [
+    {
+      "step": 1.0,
+      "loss": 4.298685550689697,
+      "tokens": 311.0,
+      "valid_tokens": 2302.0,
+      "foreground_tokens": 311.0
+    },
+    {
+      "step": 2.0,
+      "loss": 3.7957372665405273,
+      "tokens": 2024.0,
+      "valid_tokens": 4020.0,
+      "foreground_tokens": 2024.0
+    },
+    {
+      "step": 3.0,
+      "loss": 3.8009095191955566,
+      "tokens": 160.0,
+      "valid_tokens": 2230.0,
+      "foreground_tokens": 160.0
+    },
+    {
+      "step": 4.0,
+      "loss": 4.014565944671631,
+      "tokens": 806.0,
+      "valid_tokens": 2292.0,
+      "foreground_tokens": 806.0
+    },
+    {
+      "step": 5.0,
+      "loss": 3.62896728515625,
+      "tokens": 1548.0,
+      "valid_tokens": 2917.0,
+      "foreground_tokens": 1548.0
+    },
+    {
+      "step": 6.0,
+      "loss": 3.722496747970581,
+      "tokens": 309.0,
+      "valid_tokens": 2264.0,
+      "foreground_tokens": 309.0
+    },
+    {
+      "step": 7.0,
+      "loss": 3.4859466552734375,
+      "tokens": 364.0,
+      "valid_tokens": 668.0,
+      "foreground_tokens": 364.0
+    },
+    {
+      "step": 8.0,
+      "loss": 2.9515388011932373,
+      "tokens": 347.0,
+      "valid_tokens": 1065.0,
+      "foreground_tokens": 347.0
+    },
+    {
+      "step": 9.0,
+      "loss": 3.9380943775177,
+      "tokens": 750.0,
+      "valid_tokens": 1329.0,
+      "foreground_tokens": 750.0
+    },
+    {
+      "step": 10.0,
+      "loss": 3.3774054050445557,
+      "tokens": 326.0,
+      "valid_tokens": 2580.0,
+      "foreground_tokens": 326.0
+    },
+    {
+      "step": 11.0,
+      "loss": 2.922126054763794,
+      "tokens": 436.0,
+      "valid_tokens": 998.0,
+      "foreground_tokens": 436.0
+    },
+    {
+      "step": 12.0,
+      "loss": 2.81072998046875,
+      "tokens": 182.0,
+      "valid_tokens": 322.0,
+      "foreground_tokens": 182.0
+    },
+    {
+      "step": 13.0,
+      "loss": 3.7909884452819824,
+      "tokens": 128.0,
+      "valid_tokens": 4096.0,
+      "foreground_tokens": 128.0
+    },
+    {
+      "step": 14.0,
+      "loss": 3.600276470184326,
+      "tokens": 1902.0,
+      "valid_tokens": 4020.0,
+      "foreground_tokens": 1902.0
+    },
+    {
+      "step": 15.0,
+      "loss": 3.2721424102783203,
+      "tokens": 237.0,
+      "valid_tokens": 2183.0,
+      "foreground_tokens": 237.0
+    },
+    {
+      "step": 16.0,
+      "loss": 3.3258471488952637,
+      "tokens": 916.0,
+      "valid_tokens": 3255.0,
+      "foreground_tokens": 916.0
+    },
+    {
+      "step": 17.0,
+      "loss": 3.6778345108032227,
+      "tokens": 434.0,
+      "valid_tokens": 942.0,
+      "foreground_tokens": 434.0
+    },
+    {
+      "step": 18.0,
+      "loss": 2.9732110500335693,
+      "tokens": 127.0,
+      "valid_tokens": 398.0,
+      "foreground_tokens": 127.0
+    },
+    {
+      "step": 19.0,
+      "loss": 4.729188919067383,
+      "tokens": 2008.0,
+      "valid_tokens": 2747.0,
+      "foreground_tokens": 2008.0
+    },
+    {
+      "step": 20.0,
+      "loss": 3.9423255920410156,
+      "tokens": 407.0,
+      "valid_tokens": 486.0,
+      "foreground_tokens": 407.0
+    }
+  ],
+  "initial_val": {
+    "loss": 3.9715346693992615,
+    "token_count_all": 22217,
+    "token_count_fg": 10626,
+    "accuracy_all": 0.0008101903947427645,
+    "accuracy_fg": 0.0016939582156973462,
+    "macro_f1_fg": 0.0008048896933492121,
+    "rare_macro_f1": 0.0,
+    "rare_classes": [
+      5,
+      6,
+      8,
+      9,
+      10,
+      15,
+      21,
+      23,
+      26,
+      30,
+      31,
+      34,
+      35
+    ],
+    "per_class": [
+      {
+        "class_id": 1,
+        "class_name": "single door",
+        "support": 523,
+        "pred_count": 82,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 2,
+        "class_name": "double door",
+        "support": 501,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 3,
+        "class_name": "sliding door",
+        "support": 221,
+        "pred_count": 23,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 6,
+        "class_name": "rolling door",
+        "support": 0,
+        "pred_count": 806,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 7,
+        "class_name": "window",
+        "support": 263,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 9,
+        "class_name": "blind window",
+        "support": 236,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 10,
+        "class_name": "opening symbol",
+        "support": 8,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 11,
+        "class_name": "sofa",
+        "support": 0,
+        "pred_count": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 12,
+        "class_name": "bed",
+        "support": 302,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 13,
+        "class_name": "chair",
+        "support": 562,
+        "pred_count": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 14,
+        "class_name": "table",
+        "support": 11,
+        "pred_count": 20449,
+        "precision": 0.00034231502762971296,
+        "recall": 0.6363636363636364,
+        "f1": 0.0006842619745845552
+      },
+      {
+        "class_id": 15,
+        "class_name": "TV cabinet",
+        "support": 156,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 16,
+        "class_name": "Wardrobe",
+        "support": 149,
+        "pred_count": 8,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 17,
+        "class_name": "cabinet",
+        "support": 92,
+        "pred_count": 5,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 19,
+        "class_name": "sink",
+        "support": 1263,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 20,
+        "class_name": "refrigerator",
+        "support": 5,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 21,
+        "class_name": "airconditioner",
+        "support": 0,
+        "pred_count": 21,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 22,
+        "class_name": "bath",
+        "support": 91,
+        "pred_count": 6,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 25,
+        "class_name": "squat toilet",
+        "support": 303,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 26,
+        "class_name": "urinal",
+        "support": 370,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 27,
+        "class_name": "toilet",
+        "support": 942,
+        "pred_count": 292,
+        "precision": 0.03767123287671233,
+        "recall": 0.01167728237791932,
+        "f1": 0.017828200972447323
+      },
+      {
+        "class_id": 28,
+        "class_name": "stairs",
+        "support": 406,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 29,
+        "class_name": "elevator",
+        "support": 565,
+        "pred_count": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 30,
+        "class_name": "escalator",
+        "support": 0,
+        "pred_count": 51,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 32,
+        "class_name": "parking spot",
+        "support": 0,
+        "pred_count": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 33,
+        "class_name": "wall",
+        "support": 3520,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 34,
+        "class_name": "curtain wall",
+        "support": 131,
+        "pred_count": 76,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 35,
+        "class_name": "railing",
+        "support": 6,
+        "pred_count": 387,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    ]
+  },
+  "final_val": {
+    "loss": 3.253680929541588,
+    "token_count_all": 22217,
+    "token_count_fg": 10626,
+    "accuracy_all": 0.023720574334968717,
+    "accuracy_fg": 0.049595332204027856,
+    "macro_f1_fg": 0.0024272959720636924,
+    "rare_macro_f1": 0.0,
+    "rare_classes": [
+      5,
+      6,
+      8,
+      9,
+      10,
+      15,
+      21,
+      23,
+      26,
+      30,
+      31,
+      34,
+      35
+    ],
+    "per_class": [
+      {
+        "class_id": 1,
+        "class_name": "single door",
+        "support": 523,
+        "pred_count": 22044,
+        "precision": 0.02367991290146979,
+        "recall": 0.9980879541108987,
+        "f1": 0.046262241325829755
+      },
+      {
+        "class_id": 2,
+        "class_name": "double door",
+        "support": 501,
+        "pred_count": 104,
+        "precision": 0.009615384615384616,
+        "recall": 0.001996007984031936,
+        "f1": 0.003305785123966942
+      },
+      {
+        "class_id": 3,
+        "class_name": "sliding door",
+        "support": 221,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 7,
+        "class_name": "window",
+        "support": 263,
+        "pred_count": 21,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 9,
+        "class_name": "blind window",
+        "support": 236,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 10,
+        "class_name": "opening symbol",
+        "support": 8,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 12,
+        "class_name": "bed",
+        "support": 302,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 13,
+        "class_name": "chair",
+        "support": 562,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 14,
+        "class_name": "table",
+        "support": 11,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 15,
+        "class_name": "TV cabinet",
+        "support": 156,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 16,
+        "class_name": "Wardrobe",
+        "support": 149,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 17,
+        "class_name": "cabinet",
+        "support": 92,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 19,
+        "class_name": "sink",
+        "support": 1263,
+        "pred_count": 15,
+        "precision": 0.26666666666666666,
+        "recall": 0.003167062549485352,
+        "f1": 0.006259780907668231
+      },
+      {
+        "class_id": 20,
+        "class_name": "refrigerator",
+        "support": 5,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 21,
+        "class_name": "airconditioner",
+        "support": 0,
+        "pred_count": 29,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 22,
+        "class_name": "bath",
+        "support": 91,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 25,
+        "class_name": "squat toilet",
+        "support": 303,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 26,
+        "class_name": "urinal",
+        "support": 370,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 27,
+        "class_name": "toilet",
+        "support": 942,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 28,
+        "class_name": "stairs",
+        "support": 406,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 29,
+        "class_name": "elevator",
+        "support": 565,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 33,
+        "class_name": "wall",
+        "support": 3520,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 34,
+        "class_name": "curtain wall",
+        "support": 131,
+        "pred_count": 4,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 35,
+        "class_name": "railing",
+        "support": 6,
+        "pred_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    ]
+  },
+  "pretrained_encoder": {
+    "enabled": false
+  },
+  "checkpoint_out": "outputs\\checkpoints\\drawingpt_v0_semantic_classaware_weighted_cpu20.pt",
+  "checkpoint_sha256": "370f7f9e03aff5a746271569a322eb8f64a71e868048de700b3a9288abade93c",
+  "caveats": [
+    "This is a semantic fine-tuning smoke/baseline, not a paper-quality result.",
+    "The classifier predicts 0=background/unlabeled plus FloorPlanCAD semantic IDs 1..35.",
+    "By default the training loss ignores class 0 to avoid a trivial background-only shortcut.",
+    "Macro/rare F1 are only meaningful when the validation window subset has enough class support."
+  ]
+}

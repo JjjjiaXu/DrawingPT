@@ -62,7 +62,10 @@ class MaskedPrimitiveModel(nn.Module):
             activation="gelu",
             batch_first=True,
         )
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers)
+        try:
+            self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers, enable_nested_tensor=False)
+        except TypeError:  # Older PyTorch versions do not expose this keyword.
+            self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers)
         self.norm = nn.LayerNorm(hidden_dim)
         self.type_head = nn.Linear(hidden_dim, predict_type_vocab_size)
         self.feature_head = nn.Linear(hidden_dim, feature_dim)
