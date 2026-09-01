@@ -14,9 +14,9 @@
 ### 2.1 本地 Git 与工作区
 
 - `git log --since=2026-08-19` 显示本期新增提交覆盖工程造价调研、DrawingPT v0 设计/资产冻结、训练 smoke、语义分类和 weighted loss 诊断。
-- 本地最新提交：`8a91962 Document weighted semantic smoke results`。
-- 服务器隔离工作副本已同步到 `8a91962`。
-- GitHub 远端同步状态不进入组会正文；本周报以本地 evidence 文件和 SHA-256 为核验依据。
+- 本期核心代码与证据提交以 `8a91962 Document weighted semantic smoke results` 为界；后续提交主要是周报组织与表达调整。
+- 服务器隔离工作副本同步状态不进入组会正文；本周报以本地 evidence 文件和 SHA-256 为核验依据。
+- GitHub 远端同步状态只在交付说明中报告，不作为组会正文证据。
 - 工作区唯一未跟踪文件是 `reports/group_meeting_2026-08-18/talk_script_cn.md`，它是既有讲稿草稿，本周报不收录为证据。
 
 ### 2.2 DrawingPT v0 数据与训练证据
@@ -47,7 +47,44 @@
 - 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果。
 - 阶段边界：本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
 
-### 2.3 工程造价与 pseudo-BoQ 证据
+### 2.3 CAD/平面图文献调研与方法定位证据
+
+可核验证据：
+
+- `notes/literature/FloorPlanCAD_10_lines.md`
+  - SHA-256：`e42bdc31d4027a0b16627319b703f2b7011c1330b23f41508edcd3c1edf4419e`
+  - 说明：FloorPlanCAD benchmark、SVG 标注结构、split 和数据边界。
+- `notes/literature/CADSpotting_10_lines.md`
+  - SHA-256：`3e5d3a95483b5ac27fbef0b098ac91628e725ec912393afb87146acf1b86ea14`
+  - 说明：监督 CAD panoptic symbol spotting baseline 参考。
+- `notes/literature/Brep2Shape_10_lines.md`
+  - SHA-256：`21c843af54989b10af78b908ae6f2fb212930814191416c54cc8dcd93e2e03e1`
+  - 说明：几何自监督预训练、token/拓扑建模和 label-efficiency 参考。
+- `notes/literature/GeoPT_10_lines.md`
+  - SHA-256：`ed2aa281ebdc5b2cc3bcb68f3bea3dbd1309d65170965f87f9e10c59d1bf772f`
+  - 说明：预训练规模、低标注比例和消融设计参考。
+- `notes/literature/ArchPlanVQA_10_lines.md`
+  - SHA-256：`f45a4a290c6912ddbff72dcfe19eeb1f4aa8bc1edeaf9b142d3dd076cbd3a076`
+  - 说明：VLM/VQA 图纸理解对照任务参考。
+- `notes/literature/HouseMind_10_lines.md`
+  - SHA-256：`0876ebaa93667e1be381bbb2888469383702596f1635eb8232617789c52b337c`
+  - 说明：MLLM/floor-plan tokenization 与 room/layout-level 边界。
+- `notes/literature/TextEnhancedCAD_10_lines.md`
+  - SHA-256：`c1f2c72c1bbac3c4a27e0a1f080ef6feff6d020211e91a9556dbc6ea77017d15`
+  - 说明：文本增强 CAD spotting novelty 风险与 optional text stream 边界。
+- `docs/drawingpt_v0_design_draft.md`
+  - SHA-256：`87e2d5639e67d6865b7819c7eef1a40ff0f5bf86452e844dc6cab4073cf3bb3d`
+  - 说明：DrawingPT v0 token 化、自监督目标和预训练语料估计草案。
+- `docs/baseline_reproduction_plan.md`
+  - SHA-256：`36c71e278facaca74f24b7e62f214ce3b3de9dd5e6a0fb00e1bfb50e25bd1715`
+  - 说明：baseline 复现优先级与比较口径。
+
+本周报收录判断：
+
+- 收录：7 篇文献笔记如何转化为 DrawingPT 的 benchmark、baseline、自监督预训练、低标注曲线和 VLM/text 对照边界。
+- 阶段边界：文献调研支持研究定位和实验设计，不作为模型性能已经提升的证据。
+
+### 2.4 工程造价与 pseudo-BoQ 证据
 
 可核验证据：
 
@@ -69,7 +106,7 @@
 - 收录：造价方向成熟度判断、DrawingPT 作为图纸理解前端的定位、pseudo-BoQ 中间层资产。
 - 阶段边界：真实工程造价模型、真实单价或定额结果、BIM/CAD 私有项目数据属于后续资源需求。
 
-### 2.4 CADTransformer 评估门禁证据
+### 2.5 CADTransformer 评估门禁证据
 
 可核验证据：
 
@@ -92,10 +129,11 @@
 
 1. 服务器登录信息、密码、SSH key、服务器地址和用户个人绝对路径不进入周报。
 2. `1408` 作为 PyTorch checkpoint 加载兼容性诊断记录，不作为完成实验。
-3. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
-4. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
-5. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
-6. GitHub 远端同步状态不进入组会正文；需要网络恢复后再做最终 push。
+3. 文献调研支持方法定位、baseline 选择和 novelty 边界，不替代实验结果。
+4. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
+5. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
+6. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
+7. GitHub 远端同步状态不进入组会正文。
 
 ## 4. 报告结构选择
 

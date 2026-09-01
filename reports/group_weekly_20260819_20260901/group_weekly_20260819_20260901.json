@@ -1,7 +1,7 @@
 {
   "schema": "work-summary-v1",
   "title": "DrawingPT 组会周报：从资产冻结到训练闭环诊断",
-  "tagline": "本期重点是三件可核验增量：资产冻结、训练闭环诊断、下一步可实现门禁。",
+  "tagline": "本期重点是四件可核验增量：文献定位、资产冻结、训练闭环诊断、下一步可实现门禁。",
   "report_type": "group_weekly",
   "baseline": "上一期参考 reports/group_meeting_2026-08-18/report.html；本期只收录 2026-08-19 至 2026-09-01 新增且有证据的进展。",
   "period": {
@@ -10,6 +10,7 @@
     "timezone": "Asia/Shanghai"
   },
   "scope": [
+    "CAD/floor-plan literature positioning for vector-native self-supervised pretraining",
     "DrawingPT v0 primitive tokenization, low-label splits, masked pretraining and semantic smoke",
     "FloorPlanCAD pseudo-BoQ / engineering quantity proxy",
     "engineering cost estimation literature positioning",
@@ -29,6 +30,10 @@
       "value": "7"
     },
     {
+      "label": "literature notes audited",
+      "value": "7"
+    },
+    {
       "label": "best smoke macro F1",
       "value": "0.0209"
     }
@@ -42,6 +47,13 @@
         "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并用低标注语义任务检验预训练价值。",
         "boundary": "当前都是 smoke/诊断，不是论文级结果；semantic 仍向 wall/window/sink 高频类塌缩。",
         "next": "做 class-aware window sampling，要求 1% seed0304 foreground macro F1 明显高于当前 best smoke 0.0209。"
+      },
+      {
+        "project": "CAD/图纸理解文献调研",
+        "completed": "整理 7 篇 CAD/平面图/VLM/几何预训练相关文献笔记，明确 DrawingPT 的差异化定位：矢量原生自监督预训练 + 低标注曲线。",
+        "innovation": "把 CADSpotting/CADTransformer 作为监督基线，把 Brep2Shape/GeoPT 作为预训练与 label-efficiency 设计参考，把 ArchPlanVQA/HouseMind/TextEnhancedCAD 作为 VLM/text novelty 边界。",
+        "boundary": "这些文献是方法定位与实验设计依据，不作为 DrawingPT 已有效的实验证据。",
+        "next": "组会上确认 DrawingPT v0 是否先坚持 SVG primitive，还是尽早加入 text/layer/block；同时确认是否要做 VLM prompt baseline。"
       },
       {
         "project": "工程造价方向",
@@ -193,6 +205,131 @@
           "path": "../../scripts/train_semantic_primitive.py",
           "sha256": "8482224ae8d41f405a740082ad55c60d3536873c9456fd5c4e6b65c66f57a6b2",
           "note": "语义分类、foreground-only loss、class weighting 实现"
+        }
+      ]
+    },
+    {
+      "id": "literature-positioning",
+      "name": "CAD/平面图文献调研与方法定位",
+      "status": "文献脉络已整理，转化为实验设计约束",
+      "headline": "本期文献调研把 DrawingPT 的创新点收窄到“矢量原生自监督预训练 + 低标注验证”，并明确 VLM、文本增强和监督 spotting baseline 的对照边界。",
+      "progress": [
+        "整理 7 篇 10-line 文献笔记：FloorPlanCAD、CADSpotting、Brep2Shape、GeoPT、ArchPlanVQA、HouseMind、TextEnhancedCAD。",
+        "确定 FloorPlanCAD 是主 benchmark；任务是 panoptic symbol spotting，SVG 可读 semanticId、instanceId、path/circle/ellipse 等 primitive，但类别长尾、DWG 原生结构会部分丢失。",
+        "确定 CADSpotting、CADTransformer、SymPoint、GAT-CADNet 属于监督 baseline 或复现参考；DrawingPT 要避免只做另一个强监督检测器。",
+        "从 Brep2Shape 和 GeoPT 提取预训练叙事：几何 token、自监督目标、label-efficiency curve、预训练数据量/模型规模消融。",
+        "从 ArchPlanVQA、HouseMind、TextEnhancedCAD 提取边界：VLM 对照要冻结 prompt/渲染/评分；文本增强 CAD spotting 已构成 novelty 风险，DrawingPT 不能声称首次使用 CAD 文本。"
+      ],
+      "metrics": [
+        {
+          "label": "10-line literature notes",
+          "value": "7"
+        },
+        {
+          "label": "FloorPlanCAD split",
+          "value": "6965 / 810 / 3827"
+        },
+        {
+          "label": "low-label ratios",
+          "value": "1 / 5 / 10 / 25 / 50 / 100%"
+        },
+        {
+          "label": "v0 primary token types",
+          "value": "path / circle / ellipse"
+        }
+      ],
+      "comparison": {
+        "title": "文献如何转成 DrawingPT 实验设计",
+        "note": "这部分不是泛泛 related work，而是把每篇文献映射为 baseline、评测或 novelty 约束。",
+        "columns": [
+          "文献/方向",
+          "给 DrawingPT 的作用",
+          "转化为本期动作"
+        ],
+        "rows": [
+          [
+            "FloorPlanCAD",
+            "主 benchmark 与 semantic/instance 标注来源",
+            "冻结 11,602 SVG token manifest 与 split"
+          ],
+          [
+            "CADSpotting / CADTransformer",
+            "监督 spotting baseline 与 PQ/SQ/RQ 口径参考",
+            "保留 CADTransformer semantic baseline，单列 PQ 门禁"
+          ],
+          [
+            "Brep2Shape / GeoPT",
+            "几何自监督与 label-efficiency 叙事参考",
+            "设计 masked primitive pretrain 和低标注比例"
+          ],
+          [
+            "ArchPlanVQA / HouseMind",
+            "VLM/MLLM 图纸理解对照参考",
+            "后续可做冻结 prompt 的计数、测量、空间关系 stress test"
+          ],
+          [
+            "TextEnhancedCAD",
+            "文本增强 CAD spotting novelty 风险",
+            "DrawingPT 表述收窄为 vector-native SSL + optional text stream"
+          ]
+        ]
+      },
+      "innovation": {
+        "title": "文献调研带来的收束",
+        "items": [
+          "创新点不再写成泛泛“CAD 图纸理解”，而是收窄到 vector-native primitive token + self-supervised pretraining。",
+          "评估不追单个大数，改为 low-label scratch vs pretrained 曲线。",
+          "VLM/text 相关文献提前设为对照与风险边界，避免组会上被问到时临时补解释。"
+        ],
+        "boundary": "文献调研只支持方法定位和实验设计，不能替代实验证据。"
+      },
+      "boundary": "这些文献笔记是本期研究定位证据：它们说明 DrawingPT 应该怎么设计、怎么比较、怎么避免 novelty 过度表述；它们不证明当前模型已经有效。",
+      "next": "把文献结论落实为两个实验门禁：class-aware sampling 的低标注曲线，以及一个小型 VLM prompt baseline。",
+      "evidence": [
+        {
+          "path": "../../notes/literature/ArchPlanVQA_10_lines.md",
+          "sha256": "f45a4a290c6912ddbff72dcfe19eeb1f4aa8bc1edeaf9b142d3dd076cbd3a076",
+          "note": "ArchPlanVQA 10-line 文献笔记"
+        },
+        {
+          "path": "../../notes/literature/Brep2Shape_10_lines.md",
+          "sha256": "21c843af54989b10af78b908ae6f2fb212930814191416c54cc8dcd93e2e03e1",
+          "note": "Brep2Shape 10-line 文献笔记"
+        },
+        {
+          "path": "../../notes/literature/CADSpotting_10_lines.md",
+          "sha256": "3e5d3a95483b5ac27fbef0b098ac91628e725ec912393afb87146acf1b86ea14",
+          "note": "CADSpotting 10-line 文献笔记"
+        },
+        {
+          "path": "../../notes/literature/FloorPlanCAD_10_lines.md",
+          "sha256": "e42bdc31d4027a0b16627319b703f2b7011c1330b23f41508edcd3c1edf4419e",
+          "note": "FloorPlanCAD 10-line 文献笔记"
+        },
+        {
+          "path": "../../notes/literature/GeoPT_10_lines.md",
+          "sha256": "ed2aa281ebdc5b2cc3bcb68f3bea3dbd1309d65170965f87f9e10c59d1bf772f",
+          "note": "GeoPT 10-line 文献笔记"
+        },
+        {
+          "path": "../../notes/literature/HouseMind_10_lines.md",
+          "sha256": "0876ebaa93667e1be381bbb2888469383702596f1635eb8232617789c52b337c",
+          "note": "HouseMind 10-line 文献笔记"
+        },
+        {
+          "path": "../../notes/literature/TextEnhancedCAD_10_lines.md",
+          "sha256": "c1f2c72c1bbac3c4a27e0a1f080ef6feff6d020211e91a9556dbc6ea77017d15",
+          "note": "TextEnhancedCAD 10-line 文献笔记"
+        },
+        {
+          "path": "../../docs/drawingpt_v0_design_draft.md",
+          "sha256": "87e2d5639e67d6865b7819c7eef1a40ff0f5bf86452e844dc6cab4073cf3bb3d",
+          "note": "DrawingPT v0 设计草案"
+        },
+        {
+          "path": "../../docs/baseline_reproduction_plan.md",
+          "sha256": "36c71e278facaca74f24b7e62f214ce3b3de9dd5e6a0fb00e1bfb50e25bd1715",
+          "note": "baseline 复现与比较计划"
         }
       ]
     },
@@ -394,6 +531,11 @@
       "date": "2026-08-23",
       "project": "工程造价方向",
       "event": "完成工程造价自动估算调研，确认 DrawingPT 更适合作为图纸理解和工程量中间层，而非直接输出黑箱总价。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "CAD/图纸理解文献调研",
+      "event": "整理 7 篇 CAD/平面图/VLM/几何预训练文献笔记，并转化为 DrawingPT v0 的创新点、baseline 和评测门禁。"
     },
     {
       "date": "2026-09-01",
