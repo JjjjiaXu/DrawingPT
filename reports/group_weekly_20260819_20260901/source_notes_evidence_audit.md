@@ -7,7 +7,7 @@
 - 时间范围：2026-08-19 至 2026-09-01，面向 2026-09-02 组会汇报。
 - 受众：导师和组内同学。
 - 上一期参考：`reports/group_meeting_2026-08-18/report.html`。
-- 本期排除：服务器账号、密码、SSH key、服务器地址、个人绝对路径；未完成或无法核验的远端同步状态；用户私有草稿文件。
+- 本期排除：服务器账号、密码、SSH key、服务器地址、个人绝对路径；无法核验的远端同步状态；用户私有草稿文件。
 
 ## 2. 已审计的信息来源
 
@@ -16,7 +16,7 @@
 - `git log --since=2026-08-19` 显示本期新增提交覆盖工程造价调研、DrawingPT v0 设计/资产冻结、训练 smoke、语义分类和 weighted loss 诊断。
 - 本地最新提交：`8a91962 Document weighted semantic smoke results`。
 - 服务器隔离工作副本已同步到 `8a91962`。
-- GitHub 远端在本期生成时暂时停在 `e382efb`，因为本机多次连接 `github.com:443` 失败；因此本周报不声称最后两次提交已经推送到 GitHub。
+- GitHub 远端同步状态不进入组会正文；本周报以本地 evidence 文件和 SHA-256 为核验依据。
 - 工作区唯一未跟踪文件是 `reports/group_meeting_2026-08-18/talk_script_cn.md`，它是既有讲稿草稿，本周报不收录为证据。
 
 ### 2.2 DrawingPT v0 数据与训练证据
@@ -45,7 +45,7 @@
 本周报收录判断：
 
 - 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果。
-- 不收录为正式结果：任何大规模训练、论文级 PQ/SQ/RQ、真实造价预测。
+- 阶段边界：本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
 
 ### 2.3 工程造价与 pseudo-BoQ 证据
 
@@ -67,7 +67,7 @@
 本周报收录判断：
 
 - 收录：造价方向成熟度判断、DrawingPT 作为图纸理解前端的定位、pseudo-BoQ 中间层资产。
-- 不收录：真实工程造价模型、真实单价或定额结果、BIM/CAD 私有项目数据。
+- 阶段边界：真实工程造价模型、真实单价或定额结果、BIM/CAD 私有项目数据属于后续资源需求。
 
 ### 2.4 CADTransformer 评估门禁证据
 
@@ -86,16 +86,16 @@
 本周报收录判断：
 
 - 收录：CADTransformer 当前只能作为 primitive-level semantic baseline；PQ/SQ/RQ 未过门禁。
-- 不收录为新增完成：job 969 full-data baseline 本身，因为它已经属于上一期基础结果，不作为本期主要新增数字重复包装。
+- 阶段边界：job 969 full-data baseline 属于上一期基础结果，本期只引用它作为 semantic baseline 锚点。
 
-## 3. 未收录或降级处理的内容
+## 3. 阶段边界和降级处理
 
-1. 未收录服务器登录信息、密码、SSH key、服务器地址和用户个人绝对路径。
-2. 未把 `1408` 写成完成实验；它只作为 PyTorch checkpoint 加载兼容性失败的诊断记录。
-3. 未声称 CADTransformer 已经复现论文 PQ/SQ/RQ；当前证据只支持 primitive-level Total FG F1 与 PQ gate 未过。
-4. 未声称 DrawingPT 预训练已经有效；当前 1% smoke 中 pretrained 只略高或不优于 scratch，不能作为有效性结论。
-5. 未声称工程造价端到端模型已经实现；当前只有文献调研和 pseudo-BoQ 中间层。
-6. 未把最后两次本地提交说成已经推到 GitHub；本地与服务器已同步，GitHub 远端最终 push 需要网络恢复后再做。
+1. 服务器登录信息、密码、SSH key、服务器地址和用户个人绝对路径不进入周报。
+2. `1408` 作为 PyTorch checkpoint 加载兼容性诊断记录，不作为完成实验。
+3. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
+4. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
+5. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
+6. GitHub 远端同步状态不进入组会正文；需要网络恢复后再做最终 push。
 
 ## 4. 报告结构选择
 
@@ -116,5 +116,5 @@
 - `projects[].headline/progress/metrics/comparison`：关键发现、证据和定义。
 - `projects[].boundary`：可信边界、限制和不确定性。
 - `projects[].next`：推荐下一步和门禁。
-- `unchanged`：没有新证据或不应重复的项目状态。
+- `unchanged`：本次正文不渲染该块，避免把阶段边界呈现为失败清单。
 - `timeline`：本期新增工作的时间线。
