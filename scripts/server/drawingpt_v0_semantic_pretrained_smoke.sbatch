@@ -77,6 +77,7 @@ echo "BATCH_SIZE=$BATCH_SIZE EVAL_BATCH_SIZE=$EVAL_BATCH_SIZE STEPS=$STEPS"
   --manifest "$MANIFEST" \
   --label-list "$LABEL_LIST" \
   --pretrained-checkpoint "$PRETRAINED_CHECKPOINT" \
+  --trust-pretrained-checkpoint \
   --window-size "$WINDOW_SIZE" \
   --limit-windows "$LIMIT_WINDOWS" \
   --val-limit-windows "$VAL_LIMIT_WINDOWS" \
