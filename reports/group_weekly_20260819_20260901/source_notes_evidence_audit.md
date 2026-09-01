@@ -47,7 +47,32 @@
 - 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果。
 - 阶段边界：本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
 
-### 2.3 CAD/平面图文献调研与方法定位证据
+### 2.3 FloorPlanCAD 数据画像与长尾风险证据
+
+可核验证据：
+
+- `docs/floorplancad_distribution_report.md`
+  - SHA-256：`6d00254388e664c2804330e1158920392672ad1fdd936ad92f5dee2652258ee0`
+  - 说明：FloorPlanCAD 图元类型、每图图元数量桶、35 类语义标注分布和 CADTransformer 指标口径检查。
+- `docs/floorplancad_data_report.md`
+  - SHA-256：`3b8903e1c7f46112f92afda393a020f58bc4e09b388e4945066b5e6e7bda02c8`
+  - 说明：FloorPlanCAD 数据版本、文件结构、SVG 标注字段和核心统计说明。
+- `reports/group_meeting_2026-08-18/floorplancad_tag_distribution.csv`
+  - SHA-256：`bc839f21f8f22d3da42dc31bcdcca8b2d84444a04b32c9ac8db5fb7974a27f63`
+  - 说明：path、circle、ellipse 的 raw SVG primitive tag 分布。
+- `reports/group_meeting_2026-08-18/floorplancad_primitive_count_bins.csv`
+  - SHA-256：`ad0bb0f7e7e097358a86c1c407e7e06073930c30c8709d384d6310904c08265d`
+  - 说明：每张图 raw primitive 数量分桶。
+- `reports/group_meeting_2026-08-18/floorplancad_semantic_distribution.csv`
+  - SHA-256：`d7f38ec0fa3bde8a81e4c9a0ba1fb179402b04b3845b758d6cb05dbac65452eb`
+  - 说明：FloorPlanCAD 35 类 semanticId 元素分布。
+
+本周报收录判断：
+
+- 收录：raw primitive 类型分布、单图规模长尾、semantic 类别长尾、val 稀有类缺失，以及这些统计如何支撑 class-aware sampling 和 rare-class F1 门禁。
+- 阶段边界：这些统计解释数据与评估风险，不作为模型性能提升证据。
+
+### 2.4 CAD/平面图文献调研与方法定位证据
 
 可核验证据：
 
@@ -84,7 +109,7 @@
 - 收录：7 篇文献笔记如何转化为 DrawingPT 的 benchmark、baseline、自监督预训练、低标注曲线和 VLM/text 对照边界。
 - 阶段边界：文献调研支持研究定位和实验设计，不作为模型性能已经提升的证据。
 
-### 2.4 工程造价与 pseudo-BoQ 证据
+### 2.5 工程造价与 pseudo-BoQ 证据
 
 可核验证据：
 
@@ -106,7 +131,7 @@
 - 收录：造价方向成熟度判断、DrawingPT 作为图纸理解前端的定位、pseudo-BoQ 中间层资产。
 - 阶段边界：真实工程造价模型、真实单价或定额结果、BIM/CAD 私有项目数据属于后续资源需求。
 
-### 2.5 CADTransformer 评估门禁证据
+### 2.6 CADTransformer 评估门禁证据
 
 可核验证据：
 
@@ -129,11 +154,12 @@
 
 1. 服务器登录信息、密码、SSH key、服务器地址和用户个人绝对路径不进入周报。
 2. `1408` 作为 PyTorch checkpoint 加载兼容性诊断记录，不作为完成实验。
-3. 文献调研支持方法定位、baseline 选择和 novelty 边界，不替代实验结果。
-4. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
-5. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
-6. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
-7. GitHub 远端同步状态不进入组会正文。
+3. FloorPlanCAD 数据画像解释采样和评估风险，不替代模型效果证据。
+4. 文献调研支持方法定位、baseline 选择和 novelty 边界，不替代实验结果。
+5. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
+6. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
+7. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
+8. GitHub 远端同步状态不进入组会正文。
 
 ## 4. 报告结构选择
 

@@ -1,6 +1,6 @@
 {
   "schema": "work-summary-v1",
-  "title": "DrawingPT 组会周报：从资产冻结到训练闭环诊断",
+  "title": "DrawingPT 组会周报：从文献定位到数据资产与训练闭环诊断",
   "tagline": "本期重点是四件可核验增量：文献定位、资产冻结、训练闭环诊断、下一步可实现门禁。",
   "report_type": "group_weekly",
   "baseline": "上一期参考 reports/group_meeting_2026-08-18/report.html；本期只收录 2026-08-19 至 2026-09-01 新增且有证据的进展。",
@@ -11,6 +11,7 @@
   },
   "scope": [
     "CAD/floor-plan literature positioning for vector-native self-supervised pretraining",
+    "FloorPlanCAD primitive/semantic distribution and long-tail risk audit",
     "DrawingPT v0 primitive tokenization, low-label splits, masked pretraining and semantic smoke",
     "FloorPlanCAD pseudo-BoQ / engineering quantity proxy",
     "engineering cost estimation literature positioning",
@@ -24,6 +25,10 @@
     {
       "label": "2048-token windows",
       "value": "14,117"
+    },
+    {
+      "label": "path primitive share",
+      "value": "98.68%"
     },
     {
       "label": "server GPU jobs audited",
@@ -47,6 +52,13 @@
         "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并用低标注语义任务检验预训练价值。",
         "boundary": "当前都是 smoke/诊断，不是论文级结果；semantic 仍向 wall/window/sink 高频类塌缩。",
         "next": "做 class-aware window sampling，要求 1% seed0304 foreground macro F1 明显高于当前 best smoke 0.0209。"
+      },
+      {
+        "project": "FloorPlanCAD 数据画像",
+        "completed": "补齐图元类型、单图规模桶和 35 类 semantic long-tail：全量 12,621,288 个 raw primitive，其中 path 占 98.68%；带 semanticId 元素 5,828,994 个，wall 占 23.37%，rolling door 只有 98 个。",
+        "innovation": "把数据画像转成实验设计约束：窗口化是必要条件，class-aware sampling 和 rare-class F1 不是锦上添花，而是低标注实验的可信门槛。",
+        "boundary": "统计口径是公开 11,602 张 SVG baseline 版本；它描述的是 SVG primitive/semantic element 分布，不等同于 DWG 原生结构或真实工程量。",
+        "next": "把采样门禁写成可执行检查：每个 low-label split 至少覆盖关键稀有类窗口，并在 smoke 报告里同时给 foreground macro F1、rare-class F1 和 per-class support。"
       },
       {
         "project": "CAD/图纸理解文献调研",
@@ -205,6 +217,114 @@
           "path": "../../scripts/train_semantic_primitive.py",
           "sha256": "8482224ae8d41f405a740082ad55c60d3536873c9456fd5c4e6b65c66f57a6b2",
           "note": "语义分类、foreground-only loss、class weighting 实现"
+        }
+      ]
+    },
+    {
+      "id": "floorplancad-data-profile",
+      "name": "FloorPlanCAD 数据画像与长尾风险",
+      "status": "分布统计已补齐，转化为采样与评估门禁",
+      "headline": "FloorPlanCAD 的核心风险不是数据量小，而是图元形态和语义类别都高度长尾：这直接解释了为什么 1% smoke 会被 wall/window/sink 主导。",
+      "progress": [
+        "补齐全量 11,602 张 SVG 的 raw primitive、semantic element、instance 和 split 级统计，用于回答“数据到底长什么样”。",
+        "raw SVG primitive 共 12,621,288 个，其中 path 12,454,181 个，占 98.68%；circle 157,009 个，占 1.24%；ellipse 10,098 个，占 0.08%。",
+        "单图 primitive 数中位数为 544、均值为 1,087.85、p95 为 3,541、最大值为 53,919；另有 79 张图超过 10,000 个 primitive，说明按整图训练会被长尾大图拖住。",
+        "带 semanticId 的元素共 5,828,994 个，35 类全量均出现；最大类 wall 有 1,362,387 个，占 23.37%，而 rolling door 只有 98 个，占 0.0017%。",
+        "val split 只覆盖 33/35 类，缺少 revolving door 和 rolling door；因此 rare-class 指标不能只看单个小验证集，需要记录 per-class support 和多 seed。"
+      ],
+      "metrics": [
+        {
+          "label": "raw SVG primitives",
+          "value": "12,621,288"
+        },
+        {
+          "label": "path share",
+          "value": "98.68%"
+        },
+        {
+          "label": "semanticId elements",
+          "value": "5,828,994"
+        },
+        {
+          "label": "wall semantic share",
+          "value": "23.37%"
+        },
+        {
+          "label": "rolling door elements",
+          "value": "98"
+        },
+        {
+          "label": "drawings with 10k+ primitives",
+          "value": "79"
+        }
+      ],
+      "comparison": {
+        "title": "数据画像如何影响实验设计",
+        "note": "这些统计把“为什么要窗口化、为什么要 class-aware、为什么不能只看 overall F1”变成可解释的实验约束。",
+        "columns": [
+          "观察",
+          "关键数字",
+          "对实验的含义"
+        ],
+        "rows": [
+          [
+            "图元形态单一",
+            "path 占 98.68%",
+            "v0 先把 path 几何编码做稳，比过早追求复杂 DWG 结构更实际"
+          ],
+          [
+            "单图规模长尾",
+            "中位数 544，最大值 53,919",
+            "需要 2048-token window 和大图切窗策略，不能假设每张图复杂度接近"
+          ],
+          [
+            "语义类别长尾",
+            "wall 23.37%，rolling door 0.0017%",
+            "low-label 实验必须报告 macro/rare F1，且采样要主动覆盖稀有类"
+          ],
+          [
+            "验证集稀有类缺失",
+            "val 覆盖 33/35 类",
+            "rare-class 结论要结合 per-class support 和多 seed，避免把验证集缺类误读为模型能力"
+          ]
+        ]
+      },
+      "innovation": {
+        "title": "数据画像带来的方法收束",
+        "items": [
+          "把 DrawingPT v0 的第一阶段重点明确为 primitive-level 表示学习，而不是直接追完整 CAD/DWG 语义层级。",
+          "把 class-aware sampling 从“可选优化”提升为下一轮实验门禁，因为当前类别分布会天然奖励高频类预测。",
+          "把 evaluation 从单一 foreground accuracy 改成 foreground macro F1、rare-class F1、per-class support 三件套。"
+        ],
+        "boundary": "这是数据与评估设计证据，不是模型效果证据；它解释实验风险和下一步设计合理性。"
+      },
+      "boundary": "统计基于公开 11,602 张 SVG baseline split；FloorPlanCAD 官网后续提到的 15,663 张版本不在本轮 baseline 内。SVG primitive 统计不恢复 DWG block/layer/topology，length proxy 也不是米或平方米。",
+      "next": "在下轮 semantic smoke 中加入 class-aware window sampler 的覆盖审计：每个低标注比例输出训练窗口数、覆盖类别数、rare-class support，并与当前 1% seed0304 smoke 对齐比较。",
+      "evidence": [
+        {
+          "path": "../../docs/floorplancad_distribution_report.md",
+          "sha256": "6d00254388e664c2804330e1158920392672ad1fdd936ad92f5dee2652258ee0",
+          "note": "FloorPlanCAD 图元分布与 CADTransformer 指标差距检查"
+        },
+        {
+          "path": "../../docs/floorplancad_data_report.md",
+          "sha256": "3b8903e1c7f46112f92afda393a020f58bc4e09b388e4945066b5e6e7bda02c8",
+          "note": "FloorPlanCAD 数据版本、结构和核心统计说明"
+        },
+        {
+          "path": "../group_meeting_2026-08-18/floorplancad_tag_distribution.csv",
+          "sha256": "bc839f21f8f22d3da42dc31bcdcca8b2d84444a04b32c9ac8db5fb7974a27f63",
+          "note": "SVG primitive tag 分布"
+        },
+        {
+          "path": "../group_meeting_2026-08-18/floorplancad_primitive_count_bins.csv",
+          "sha256": "ad0bb0f7e7e097358a86c1c407e7e06073930c30c8709d384d6310904c08265d",
+          "note": "单图 raw primitive 数量桶"
+        },
+        {
+          "path": "../group_meeting_2026-08-18/floorplancad_semantic_distribution.csv",
+          "sha256": "d7f38ec0fa3bde8a81e4c9a0ba1fb179402b04b3845b758d6cb05dbac65452eb",
+          "note": "35 类 semanticId 元素分布"
         }
       ]
     },
@@ -453,11 +573,11 @@
         },
         {
           "label": "paper-faithful PQ",
-          "value": "待补 official/proxy"
+          "value": "official/proxy 门禁"
         },
         {
           "label": "prediction export",
-          "value": "待补导出脚本"
+          "value": "导出脚本门禁"
         }
       ],
       "comparison": {
@@ -473,19 +593,19 @@
           [
             "PQ",
             "0.6732",
-            "待补评估链路",
+            "评估链路门禁",
             "追官方脚本或实现透明 proxy"
           ],
           [
             "SQ",
             "0.8754",
-            "待补评估链路",
+            "评估链路门禁",
             "与 PQ 同链路补齐"
           ],
           [
             "RQ",
             "0.7226",
-            "待补评估链路",
+            "评估链路门禁",
             "与 PQ 同链路补齐"
           ],
           [
@@ -531,6 +651,11 @@
       "date": "2026-08-23",
       "project": "工程造价方向",
       "event": "完成工程造价自动估算调研，确认 DrawingPT 更适合作为图纸理解和工程量中间层，而非直接输出黑箱总价。"
+    },
+    {
+      "date": "2026-08-23",
+      "project": "FloorPlanCAD 数据画像",
+      "event": "补齐 raw primitive 类型、单图 primitive 数量桶和 35 类 semantic long-tail 统计，并转化为 class-aware sampling 与 rare-class F1 门禁依据。"
     },
     {
       "date": "2026-09-01",
