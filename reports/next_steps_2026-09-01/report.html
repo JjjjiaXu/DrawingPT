@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DrawingPT 下一阶段三件事推进记录</title>
+  <style>
+:root {
+  color-scheme: light;
+  --fg: #142033;
+  --muted: #607086;
+  --line: #dfe6f0;
+  --soft: #f5f8fc;
+  --blue: #1f5eff;
+  --cyan: #007f9f;
+  --green: #0e8a62;
+  --orange: #b76700;
+  --red: #b42318;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 30px 18px 56px;
+  background:
+    radial-gradient(circle at top left, rgba(31, 94, 255, .13), transparent 32rem),
+    linear-gradient(180deg, #eef3f9, #e8eef7);
+  color: var(--fg);
+  font: 16px/1.78 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+}
+main {
+  max-width: 1160px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 20px 55px rgba(20, 32, 51, .12);
+  overflow: hidden;
+}
+.hero {
+  padding: 34px 42px 28px;
+  background:
+    linear-gradient(135deg, rgba(12, 25, 58, .96), rgba(24, 80, 204, .92)),
+    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, .25), transparent 15rem);
+  color: white;
+}
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 31px;
+  line-height: 1.24;
+  letter-spacing: .01em;
+}
+.hero p {
+  max-width: 780px;
+  margin: 0;
+  opacity: .88;
+}
+.badge {
+  display: inline-block;
+  margin: 0 8px 12px 0;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, .22);
+  font-size: 13px;
+  font-weight: 700;
+}
+.content {
+  padding: 28px 42px 44px;
+}
+h2 {
+  margin: 34px 0 14px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  font-size: 23px;
+}
+h3 {
+  margin: 26px 0 10px;
+  font-size: 18px;
+}
+p { margin: 10px 0; }
+a {
+  color: #1e55d6;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(30, 85, 214, .28);
+}
+a:hover { border-bottom-color: currentColor; }
+blockquote {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 4px solid var(--blue);
+  background: #f2f6ff;
+  border-radius: 10px;
+}
+code {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #f0f4f8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .92em;
+}
+pre {
+  margin: 14px 0 20px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border: 1px solid #d9e3ef;
+  border-radius: 12px;
+  background: #0f1a2a;
+  color: #e8eef7;
+  font: 14px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 22px;
+  font-size: 14px;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 9px 11px;
+  vertical-align: top;
+}
+th {
+  background: #f2f6fb;
+  text-align: left;
+  font-weight: 750;
+}
+tr:nth-child(even) td { background: #fbfcfe; }
+ul, ol { padding-left: 24px; }
+li { margin: 5px 0; }
+.lead-card {
+  margin: 8px 0 24px;
+  padding: 16px 18px;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(180deg, #eff6ff, #f8fbff);
+  border-radius: 14px;
+}
+.lead-card p {
+  margin: 6px 0;
+}
+@media (max-width: 760px) {
+  body { padding: 12px; }
+  .hero, .content { padding-left: 20px; padding-right: 20px; }
+  table { display: block; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="badge">DrawingPT</span>
+      <span class="badge">下一阶段</span>
+      <span class="badge">三件事推进</span>
+      <h1>DrawingPT 下一阶段三件事推进记录</h1>
+      <p>把 CADTransformer 评估门禁、DrawingPT v0 prereg 和 FloorPlanCAD 工程量 proxy 收束成下次组会可讲的材料。</p>
+    </section>
+    <section class="content">
+      <p>生成日期：2026-09-01</p>
+<h2>1. 本轮推进了什么</h2>
+<p>本轮把下一阶段最关键的三件事推进到了可汇报状态：</p>
+<ol>
+<li><strong>CADTransformer PQ/SQ/RQ 门禁</strong>：确认当前不是训练失败，而是公开 release 缺少完整 PQ 评估链路。</li>
+<li><strong>DrawingPT v0 prereg</strong>：把低标注自监督预训练实验写成正式协议草案。</li>
+<li><strong>FloorPlanCAD 工程量 proxy</strong>：从 11,602 张 SVG 真实统计出门窗、墙体、楼梯、车位、厨卫设备等 proxy 表。</li>
+</ol>
+<h2>2. CADTransformer PQ/SQ/RQ：当前是“门禁未过”，不是“结果为 0”</h2>
+<p>CADTransformer 当前保守 full-data baseline 已经完成，job 969 的 best validation Total FG F1 是 <code>0.827501</code>。但这仍然不能当成论文 Table 1 的 PQ。</p>
+<p>原因：</p>
+<ul>
+<li>官方 README 提到 <code>scripts/evaluate_pq.py</code>；</li>
+<li>当前 release 的 <code>scripts/</code> 目录里没有这个文件；</li>
+<li><code>train_cad_ddp.py --val_only/--test_only</code> 只输出 primitive-level F1；</li>
+<li>服务器只读检查没有发现 <code>npy_pred</code> 或 <code>svg_pred</code> 预测目录；</li>
+<li>当前模型入口只返回 semantic logits，没有完整接出 panoptic instance prediction。</li>
+</ul>
+<p>因此下次组会最稳的说法是：</p>
+<blockquote><p>CADTransformer 训练链路已经跑通，但 PQ/SQ/RQ 评估门禁未过。原因是 release 缺少 README 所述的 PQ 评估脚本和预测导出链路，目前只有 primitive-level Total FG F1，不能和论文 PQ/SQ/RQ 直接比较。</p></blockquote>
+<p>后续建议：并行推进 DrawingPT v0，同时继续追官方 PQ evaluation/export 代码；不要让缺失脚本卡住主线。</p>
+<h2>3. DrawingPT v0：正式 prereg 已经补齐</h2>
+<p>v0 的研究问题被收束为：</p>
+<blockquote><p>2D CAD/SVG/DXF 的矢量 primitive 自监督预训练，能否在 FloorPlanCAD 少标注 fine-tuning 场景下带来稳定收益？</p></blockquote>
+<p>冻结设置：</p>
+<table>
+<tr><th>项目</th><th>设置</th></tr>
+<tr><td>预训练数据</td><td>FloorPlanCAD train split</td></tr>
+<tr><td>下游数据</td><td>FloorPlanCAD train/val/test</td></tr>
+<tr><td>token</td><td><code>path</code> / <code>circle</code> / <code>ellipse</code> primitive</td></tr>
+<tr><td>主自监督目标</td><td>masked primitive modeling</td></tr>
+<tr><td>标注比例</td><td>1%、5%、10%、25%、50%、100%</td></tr>
+<tr><td>seed</td><td>304、1004、2026</td></tr>
+<tr><td>主要指标</td><td>micro F1、macro F1、rare-class F1；PQ/SQ/RQ 取决于评估链路</td></tr>
+<tr><td>成功门槛</td><td>低标注区间绝对提升 ≥ 0.02 或 relative improvement ≥ 5%</td></tr>
+</table>
+<p>这让 DrawingPT v0 不再只是“想法”，而是一个能真正执行和失败诊断的实验协议。</p>
+<h2>4. 工程量 proxy：已经从 FloorPlanCAD 统计出第一版表</h2>
+<p>本轮脚本从 FloorPlanCAD 公开 11,602 张 SVG 中统计了工程量相关 proxy。</p>
+<p>全局数字：</p>
+<table>
+<tr><th>指标</th><th>数值</th></tr>
+<tr><td>SVG 文件数</td><td>11,602</td></tr>
+<tr><td>train / val / test</td><td>6,965 / 810 / 3,827</td></tr>
+<tr><td>每图核心语义元素中位数</td><td>186</td></tr>
+<tr><td>每图核心非负实例数中位数</td><td>7</td></tr>
+<tr><td>每图核心近似 SVG 长度中位数</td><td>1,812</td></tr>
+</table>
+<p>训练集里最重要的工程量 proxy：</p>
+<table>
+<tr><th>角色</th><th>语义元素数</th><th>非负实例数</th><th>覆盖文件比例</th><th>近似 SVG 长度</th></tr>
+<tr><td>墙体/围护</td><td>991,664</td><td>0</td><td>96.50%</td><td>9,814,343</td></tr>
+<tr><td>开口/门窗</td><td>421,488</td><td>50,996</td><td>77.59%</td><td>2,520,288</td></tr>
+<tr><td>垂直交通</td><td>212,847</td><td>7,904</td><td>47.75%</td><td>2,439,014</td></tr>
+<tr><td>厨卫/设备点位</td><td>720,068</td><td>20,940</td><td>33.93%</td><td>0</td></tr>
+<tr><td>柜体/固定家具</td><td>187,546</td><td>7,278</td><td>12.42%</td><td>0</td></tr>
+<tr><td>车位</td><td>148,711</td><td>0</td><td>9.15%</td><td>992,790</td></tr>
+</table>
+<p>解释：</p>
+<ul>
+<li>门窗适合做 instance count；</li>
+<li>墙体/幕墙/栏杆适合做长度 proxy；</li>
+<li>厨卫设备适合做点位清单 proxy；</li>
+<li>车位适合做平面布置/数量 proxy，但 <code>instanceId</code> 不可靠；</li>
+<li>这些还不是米、平方米或元，只是面向工程量的图纸中间层。</li>
+</ul>
+<h2>5. 下次组会建议讲法</h2>
+<p>可以这样讲：</p>
+<blockquote><p>我把后续路线拆成三件可验证的事。第一，CADTransformer 的训练链路已经通，但 PQ/SQ/RQ 评估门禁还没过，主要原因是 release 缺少 README 提到的评估脚本和预测导出链路。第二，DrawingPT v0 已经写成正式 prereg，主问题是 primitive 自监督预训练能否提升 FloorPlanCAD 低标注 fine-tuning。第三，为了回应工程造价方向，我没有直接做总价黑箱预测，而是先从 FloorPlanCAD 统计门窗、墙体、楼梯、车位和厨卫设备的工程量 proxy。下一步可以用 CADTransformer/DrawingPT 的预测结果生成同样的 proxy 表，比较工程量误差。</p></blockquote>
+<h2>6. 下周真正要过的门禁</h2>
+<table>
+<tr><th>门禁</th><th>通过标准</th></tr>
+<tr><td>CADTransformer PQ 门禁</td><td>找回官方 evaluation/export，或明确采用非官方 proxy PQ</td></tr>
+<tr><td>DrawingPT v0 数据门禁</td><td>token dataset 能从 train split 生成固定窗口，输出文件列表 hash</td></tr>
+<tr><td>低标注采样门禁</td><td>1/5/10/25/50/100% train 文件列表固定，记录 seed 和 hash</td></tr>
+<tr><td>工程量 proxy 门禁</td><td>能从 GT 和模型预测两边生成同口径 proxy 表</td></tr>
+<tr><td>资源门禁</td><td>GPU 只用于必要训练/评估，不用时不占卡</td></tr>
+</table>
+    </section>
+  </main>
+</body>
+</html>

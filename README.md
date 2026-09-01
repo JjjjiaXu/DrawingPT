@@ -72,3 +72,11 @@ python scripts/inspect_dxf.py --input path\to\drawing.dxf
 目前已补齐 FloorPlanCAD 图元类型/数量分布：11,602 张 SVG 共 12,621,288 个 raw primitive，其中 `path` 占 98.68%。也已补齐论文指标 vs 复现指标 vs runtime 对照：CADTransformer 原论文主指标是 PQ/SQ/RQ，本次 job 969 只产出 Total FG F1，因此不能直接相减；下一门禁是跑出 paper-faithful PQ/SQ/RQ。
 
 面向项目推进和组会的记录默认使用中文；只有论文标题、API/config 名、指标名和命令保留英文。
+
+## 下一阶段三件事
+
+2026-09-01 已把下一阶段推进材料整理到 `reports/next_steps_2026-09-01/report.html`：
+
+1. CADTransformer PQ/SQ/RQ 评估门禁：当前 release 缺少 README 所述 `scripts/evaluate_pq.py` 和 prediction export 链路，因此 PQ/SQ/RQ 尚未产出；详见 `docs/cadtransformer_pq_gate.md`。
+2. DrawingPT v0 prereg：已冻结低标注自监督预训练协议草案；详见 `docs/drawingpt_v0_prereg.md`。
+3. FloorPlanCAD 工程量 proxy：已从 11,602 张 SVG 统计出门窗、墙体、楼梯、车位、厨卫设备等 proxy 表；详见 `docs/floorplancad_quantity_proxy_report.md`。

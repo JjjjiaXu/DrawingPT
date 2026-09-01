@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-09-01",
+  "source_root": "data\\raw\\FloorPlanCAD",
+  "scope": "FloorPlanCAD public 11,602 SVG baseline split",
+  "split_file_counts": {
+    "train": 6965,
+    "val": 810,
+    "test": 3827
+  },
+  "length_unit_warning": "approx_svg_length_units is a geometry proxy in SVG coordinate units. It is not meters, square meters, or a priced quantity.",
+  "file_level_core_semantic_elements": {
+    "min": 0,
+    "median": 186.0,
+    "mean": 373.07,
+    "p90": 982,
+    "max": 7327
+  },
+  "file_level_core_instance_count_nonnegative": {
+    "min": 0,
+    "median": 7.0,
+    "mean": 12.37,
+    "p90": 34,
+    "max": 175
+  },
+  "file_level_core_approx_svg_length_units": {
+    "min": 0,
+    "median": 1812.0,
+    "mean": 2158.85,
+    "p90": 4368,
+    "max": 25380
+  }
+}
