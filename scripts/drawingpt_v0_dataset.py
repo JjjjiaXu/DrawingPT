@@ -146,7 +146,15 @@ def float_attr(attrs: Dict[str, str], name: str) -> Optional[float]:
 
 
 def split_svg_root(root: Path, split: str) -> Path:
-    return root / split / split / "svg_gt"
+    candidates = [
+        root / split / split / "svg_gt",  # Local raw FloorPlanCAD layout.
+        root / "svg" / split,  # Server processed CADTransformer layout.
+        root / split,  # Direct split layout.
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
 
 
 def parse_viewbox(root: ET.Element) -> Tuple[float, float, float, float]:

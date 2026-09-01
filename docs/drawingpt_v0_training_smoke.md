@@ -16,6 +16,11 @@ DrawingPT v0 已经从“数据资产冻结”推进到“最小训练闭环跑�
 | `scripts/train_masked_primitive.py` | 最小 Transformer encoder，自监督预测被 mask 的 primitive type 和 geometry feature |
 | `scripts/server/drawingpt_v0_masked_smoke.sbatch` | 服务器低资源 GPU smoke 提交脚本，默认 1 GPU、30 分钟 |
 
+Dataset 同时兼容两种 FloorPlanCAD SVG 布局：
+
+- 本地 raw：`FloorPlanCAD/train/train/svg_gt/*.svg`
+- 服务器 processed：`FloorPlanCAD/svg/train/*.svg`
+
 ## Dataset smoke
 
 命令：

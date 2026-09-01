@@ -20,6 +20,9 @@ DATA_ROOT="${DATA_ROOT:-$PROJECT_ROOT/data/raw/FloorPlanCAD}"
 if [[ ! -d "$DATA_ROOT/train/train/svg_gt" && -d "$SCRATCH_ROOT/raw/FloorPlanCAD/train/train/svg_gt" ]]; then
   DATA_ROOT="$SCRATCH_ROOT/raw/FloorPlanCAD"
 fi
+if [[ ! -d "$DATA_ROOT/train/train/svg_gt" && ! -d "$DATA_ROOT/svg/train" && -d "$SCRATCH_ROOT/processed/FloorPlanCAD/svg/train" ]]; then
+  DATA_ROOT="$SCRATCH_ROOT/processed/FloorPlanCAD"
+fi
 
 mkdir -p "$PROJECT_ROOT/logs/slurm" "$PROJECT_ROOT/outputs/reports" "$PROJECT_ROOT/outputs/checkpoints"
 
