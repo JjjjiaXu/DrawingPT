@@ -132,7 +132,11 @@ scripts/floorplancad_quantity_proxy.py
 
 - `scripts/drawingpt_v0_dataset.py`
 - `scripts/train_masked_primitive.py`
+- `scripts/train_semantic_primitive.py`
 - `scripts/server/drawingpt_v0_masked_smoke.sbatch`
+- `scripts/server/drawingpt_v0_pretrain_short.sbatch`
+- `scripts/server/drawingpt_v0_semantic_scratch_smoke.sbatch`
+- `scripts/server/drawingpt_v0_semantic_pretrained_smoke.sbatch`
 
 本地 CPU smoke 结果见 `docs/drawingpt_v0_training_smoke.md`。
 
@@ -160,15 +164,23 @@ scripts/floorplancad_quantity_proxy.py
 | loss | 2.643315 → 0.103848 |
 | checkpoint SHA256 | `10adabe1b4f23f160d1488360bd406e9cd35d8074f1f9fe24ad7a50008077a62` |
 
+进一步的 2048-token 和语义分类短跑也已完成：
+
+| 实验 | job | 关键结果 |
+|---|---:|---|
+| 2048-token masked pretrain | 1405 | loss 1.642630 → 0.107217，checkpoint SHA256 `ceb52ad65ae94c69a9b0409fb2404b875f33a2de6975d5190862efb09d50317e` |
+| semantic scratch，class 0 参与 loss | 1406 | all accuracy 0.521718，但 foreground accuracy/F1 为 0；诊断为 background shortcut |
+| semantic scratch，foreground-only loss | 1407 | foreground accuracy 0.339074，macro F1 0.016764；不再全猜 background，但偏 wall/sink |
+| semantic pretrained，foreground-only loss | 1409 | foreground accuracy 0.341238，macro F1 0.017662；加载 30 个 encoder key，略高于 scratch 但还不能宣称有效 |
+
 ## 5. 下一步代码门禁
 
-真正开始训练前，建议按下面顺序过门禁：
+下一步不建议直接开大训练，应该先过下面门禁：
 
-1. 改成 2048-token window，跑 train 1% 的 short epoch。
-2. 增加 semantic fine-tuning head，先做 1% seed0304 scratch baseline。
-3. 用同一模型加载 pretrain checkpoint，再跑 1% fine-tune。
-4. 在 1%、5%、10% 三个低标注比例先跑 smoke，再扩到 25%、50%、100%。
-5. 把 semantic prediction 也转成 pseudo-BoQ，与 GT pseudo-BoQ 比较 count MAE / length relative error。
+1. 类别均衡门禁：给 semantic fine-tuning 加 class-aware sampling / class weights / focal loss，避免 wall/sink 高频类塌缩。
+2. 1% 对照门禁：同一 seed0304 下重新跑 scratch vs pretrained，要求 foreground macro F1 明显高于当前 0.0168/0.0177。
+3. 低标注曲线门禁：1%、5%、10% 至少各跑一个 seed，记录 runtime/checkpoint/hash。
+4. pseudo-BoQ 预测门禁：把 semantic prediction 转成同字段 BoQ proxy，并和 GT 表算 count MAE / length error。
 
 ## 6. 组会可讲口径
 
@@ -176,4 +188,4 @@ scripts/floorplancad_quantity_proxy.py
 
 如果要加一句最新进展：
 
-> 另外，DrawingPT v0 的最小训练闭环也已经跑通：Dataset 能输出 primitive window，masked primitive modeling 的 5-step CPU smoke 可以正常降 loss 并保存 checkpoint；服务器 100-step GPU smoke 也已完成。下一步是 2048-token window short epoch 和 1% 低标注 fine-tuning 对照。
+> 另外，DrawingPT v0 的最小训练闭环也已经跑通：Dataset 能输出 primitive window，masked primitive modeling 和 semantic classification 都能保存 checkpoint；服务器 2048-token pretrain 与 1% scratch/pretrained semantic smoke 已完成。当前发现的问题是短跑语义分类会向 wall/sink 高频类塌缩，所以下一步先做类别均衡门禁，再扩低标注曲线。

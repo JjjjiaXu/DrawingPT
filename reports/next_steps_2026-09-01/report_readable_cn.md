@@ -144,6 +144,7 @@ CADTransformer 当前 full-data conservative baseline 已经跑通，job 969 的
 ```text
 scripts/drawingpt_v0_dataset.py
 scripts/train_masked_primitive.py
+scripts/train_semantic_primitive.py
 ```
 
 Dataset smoke：
@@ -171,6 +172,9 @@ Masked primitive modeling smoke：
 
 ```text
 scripts/server/drawingpt_v0_masked_smoke.sbatch
+scripts/server/drawingpt_v0_pretrain_short.sbatch
+scripts/server/drawingpt_v0_semantic_scratch_smoke.sbatch
+scripts/server/drawingpt_v0_semantic_pretrained_smoke.sbatch
 ```
 
 结果：
@@ -189,12 +193,24 @@ scripts/server/drawingpt_v0_masked_smoke.sbatch
 
 默认申请 1 张 GPU、30 分钟；本次实际约 58 秒完成，没有长期占卡。
 
+继续做了 2048-token window 和 1% 语义分类短跑：
+
+| 实验 | job | 关键数字 | 判断 |
+|---|---:|---|---|
+| 2048-token masked pretrain | 1405 | loss 1.642630 → 0.107217；runtime 11.141 秒；checkpoint SHA256 `ceb52ad65ae94c69a9b0409fb2404b875f33a2de6975d5190862efb09d50317e` | 2048-token 训练入口已通 |
+| semantic scratch：background 参与 loss | 1406 | all accuracy 0.521718；foreground accuracy 0；macro F1 0 | 这是坏结果：模型走了 background shortcut |
+| semantic scratch：foreground-only loss | 1407 | foreground accuracy 0.339074；macro F1 0.016764 | 背景捷径被修正，但短跑偏向 wall/sink |
+| semantic pretrained：foreground-only loss | 1409 | foreground accuracy 0.341238；macro F1 0.017662；加载 30 个 encoder 参数键 | 比 scratch 略高，但差距太小，不能说预训练有效 |
+
+这组结果可以在组会上诚实地讲成：
+
+> 现在链路已经不是“想法能不能实现”的问题，而是进入了“训练目标和数据分布会不会把模型带偏”的问题。class 0 放进 loss 会造成 overall accuracy 虚高，但前景 F1 为 0；改成 foreground-only loss 后，模型开始命中前景，但 100 step / 1% 标注下主要猜 wall 和 sink。所以下一步要先做类别均衡，再扩大 label-efficiency 实验。
+
 ## 8. 下周真正要过的门禁
 
 | 门禁 | 通过标准 |
 |---|---|
-| 2048 window 门禁 | 使用 prereg 的 2048-token window 跑通 train 1% short epoch |
-| fine-tuning 门禁 | 增加 semantic head，先跑 1% seed0304 scratch baseline |
+| 类别均衡门禁 | semantic fine-tuning 加 class-aware sampling / class weights / focal loss，foreground macro F1 明显高于当前 0.0168/0.0177 |
 | 低标注门禁 | 1%、5%、10% 至少各跑一个 seed，记录 runtime/checkpoint/hash |
 | pseudo-BoQ 预测门禁 | 模型 prediction 能转成同字段 BoQ proxy，并和 GT 表算 count MAE / length error |
 | CADTransformer PQ 门禁 | 找回官方 evaluation/export，或明确采用非官方 proxy PQ |
@@ -202,4 +218,4 @@ scripts/server/drawingpt_v0_masked_smoke.sbatch
 
 ## 9. 组会 1 分钟讲法
 
-> 我这周没有直接跳到大训练，而是先把 DrawingPT v0 的实验资产冻结了。第一，FloorPlanCAD primitive token manifest 已生成，全数据 1262 万 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些中间工程量拿出来。最新进展是，Dataset 和 masked primitive modeling 的最小训练闭环已经跑通，服务器 100-step GPU smoke 也已经完成，约 58 秒跑完并保存 checkpoint。下一步进入 2048-token window short epoch 和 1%/5% 低标注 fine-tuning 对照；造价方向暂时不做黑箱总价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。
+> 我这周没有直接跳到大训练，而是先把 DrawingPT v0 的实验资产冻结了。第一，FloorPlanCAD primitive token manifest 已生成，全数据 1262 万 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些中间工程量拿出来。最新进展是，Dataset、masked primitive pretrain 和 semantic fine-tuning 的最小训练闭环都已经跑通，服务器上完成了 2048-token pretrain 和 1% scratch/pretrained semantic smoke。关键发现是：如果 background 参与 loss，会出现前景 F1 为 0 的虚高结果；改成 foreground-only loss 后，foreground accuracy 到约 34%，但 macro F1 仍只有 0.017 左右，主要塌到 wall/sink。所以下一步不是开大训练，而是先做类别均衡门禁；造价方向暂时不做黑箱总价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。

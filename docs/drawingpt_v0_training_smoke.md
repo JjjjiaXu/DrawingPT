@@ -4,9 +4,9 @@
 
 ## 一句话结论
 
-DrawingPT v0 已经从“数据资产冻结”推进到“最小训练闭环跑通”：Dataset 可以读取 FloorPlanCAD token manifest 和低标注清单，masked primitive modeling 的 5-step CPU smoke 能正常前向、反向、更新并保存 checkpoint。
+DrawingPT v0 已经从“数据资产冻结”推进到“最小训练闭环跑通”：Dataset 可以读取 FloorPlanCAD token manifest 和低标注清单，masked primitive modeling 与 semantic primitive classification 都能正常前向、反向、更新并保存 checkpoint。
 
-这不是正式实验结果，只是证明训练链路已经通了。
+这不是正式实验结果，只是证明训练链路已经通了；同时它暴露了一个后续必须解决的问题：语义分类短跑会偏向高频类别，尤其是 background/wall/sink。
 
 ## 新增代码
 
@@ -14,7 +14,11 @@ DrawingPT v0 已经从“数据资产冻结”推进到“最小训练闭环跑�
 |---|---|
 | `scripts/drawingpt_v0_dataset.py` | 读取 FloorPlanCAD SVG、token manifest、label fraction 清单，输出 fixed-size primitive window |
 | `scripts/train_masked_primitive.py` | 最小 Transformer encoder，自监督预测被 mask 的 primitive type 和 geometry feature |
+| `scripts/train_semantic_primitive.py` | 最小 semantic head，做 0/1..35 primitive 语义分类 smoke，默认只在前景语义类上计算 loss |
 | `scripts/server/drawingpt_v0_masked_smoke.sbatch` | 服务器低资源 GPU smoke 提交脚本，默认 1 GPU、30 分钟 |
+| `scripts/server/drawingpt_v0_pretrain_short.sbatch` | 2048-token masked pretrain 短跑脚本 |
+| `scripts/server/drawingpt_v0_semantic_scratch_smoke.sbatch` | 1% 标注 semantic scratch smoke 脚本 |
+| `scripts/server/drawingpt_v0_semantic_pretrained_smoke.sbatch` | 加载自监督 checkpoint 后的 1% 标注 semantic fine-tune smoke 脚本 |
 
 Dataset 同时兼容两种 FloorPlanCAD SVG 布局：
 
@@ -122,6 +126,42 @@ python scripts\train_masked_primitive.py `
 
 这一步证明：服务器 Slurm、CUDA、processed SVG 布局、Dataset、mask、Transformer forward/backward、optimizer 和 checkpoint 保存都能跑通。
 
+## 2048-token pretrain short
+
+服务器上新增完成 2048-token window 的 masked primitive pretrain 短跑。
+
+| 项目 | 数值 |
+|---|---|
+| job id | 1405 |
+| device | CUDA |
+| torch | 2.11.0+cu128 |
+| window size | 2048 |
+| batch size | 2 |
+| steps | 100 |
+| runtime | 11.141 秒 |
+| loss | 1.642630 → 0.107217 |
+| checkpoint SHA256 | `ceb52ad65ae94c69a9b0409fb2404b875f33a2de6975d5190862efb09d50317e` |
+
+这一步把 prereg 里设想的 2048-token window 训练入口跑通了，说明不是只能在小 window 上 smoke。
+
+## 语义分类 smoke：发现并修正 background shortcut
+
+第一个语义 scratch 诊断把 `0=background/unlabeled` 也纳入 loss，结果出现误导性现象：
+
+| job | loss target | all accuracy | foreground accuracy | macro F1 foreground | 结论 |
+|---:|---|---:|---:|---:|---|
+| 1406 | all valid tokens including background | 0.521718 | 0.000000 | 0.000000 | 模型学成了 background shortcut，不能当有效结果 |
+| 1407 | foreground semantic IDs 1..35 | 0.162173 | 0.339074 | 0.016764 | 不再全猜 background，但短跑偏向 wall/sink |
+| 1409 | pretrained + foreground semantic IDs 1..35 | 0.163208 | 0.341238 | 0.017662 | pretrained 略高于 scratch，但差异太小，不能宣称有效 |
+
+pretrained job 加载了自监督 checkpoint 中 30 个 encoder 参数键，跳过 4 个 pretrain head 参数键，并重新初始化 semantic head。
+
+这组结果的真正价值不是“模型已经好了”，而是把下一步问题钉清楚了：
+
+- 如果 class 0 参与 loss，overall accuracy 会虚高，但 foreground 完全没学到；
+- 改成 foreground-only loss 后，模型能开始预测前景，但 100 step / 1% 标注下主要塌到高频 `wall` 和少量 `sink`；
+- 下一个技术门禁应是 class-aware sampling、class-weighted loss 或 focal loss，再谈 1%/5%/10% label-efficiency curve。
+
 ## 当前模型定义
 
 最小模型：
@@ -143,13 +183,13 @@ python scripts\train_masked_primitive.py `
 
 ## 下一道门禁
 
-建议接下来不要马上大规模跑，而是按下面顺序推进：
+建议接下来不要马上大规模跑，而是先过类别均衡门禁：
 
-1. 改成 2048-token window，跑 train 1% 的 short epoch；
-2. 增加 semantic fine-tuning head，先做 1% seed0304 scratch baseline；
-3. 用同一模型加载 smoke pretrain checkpoint，再跑 1% fine-tune；
-4. 如果 1% 能出可比数字，再扩到 5%、10% 和 3 个 seed。
+1. 在 semantic loader 或 loss 中加入 class-aware sampling / class weights；
+2. 对同一 1% seed0304 跑 scratch vs pretrained，检查 foreground macro F1 是否明显高于当前 0.0168/0.0177；
+3. 如果 1% 不再塌到 wall/sink，再扩到 5%、10% 和 3 个 seed；
+4. semantic prediction 稳定后，再把预测结果转成 pseudo-BoQ，计算 count MAE / length relative error。
 
 组会口径：
 
-> DrawingPT v0 已经跑通最小训练闭环。现在不是只有设计草案了，Dataset 能读取低标注清单和 primitive window，masked primitive modeling 可以正常前向/反向/保存 checkpoint。服务器 100-step GPU smoke 也已经完成，下一步是 2048-token window short epoch 和 1% 低标注 fine-tuning 对照。
+> DrawingPT v0 已经跑通最小训练闭环。现在不是只有设计草案了，Dataset 能读取低标注清单和 primitive window，masked primitive modeling 与 semantic classification 都可以正常前向/反向/保存 checkpoint。服务器上 2048-token pretrain 和 1% semantic scratch/pretrained smoke 都已完成；目前发现的主要问题不是能不能跑，而是语义短跑会偏向 wall/sink，高频类塌缩需要用采样或加权 loss 解决。
