@@ -14,8 +14,7 @@
     "FloorPlanCAD primitive/semantic distribution and long-tail risk audit",
     "DrawingPT v0 primitive tokenization, low-label splits, masked pretraining and semantic smoke",
     "FloorPlanCAD pseudo-BoQ / engineering quantity proxy",
-    "engineering cost estimation literature positioning",
-    "CADTransformer PQ/SQ/RQ evaluation gate audit"
+    "engineering cost estimation literature positioning"
   ],
   "hero_metrics": [
     {
@@ -71,7 +70,7 @@
       {
         "project": "CAD/图纸理解文献调研",
         "completed": "整理 7 篇 CAD/平面图/VLM/几何预训练相关文献笔记，明确 DrawingPT 的差异化定位：矢量原生自监督预训练 + 低标注曲线。",
-        "innovation": "把 CADSpotting/CADTransformer 作为监督基线，把 Brep2Shape/GeoPT 作为预训练与 label-efficiency 设计参考，把 ArchPlanVQA/HouseMind/TextEnhancedCAD 作为 VLM/text novelty 边界。",
+        "innovation": "把现有监督 spotting 方法作为基线参照，把 Brep2Shape/GeoPT 作为预训练与 label-efficiency 设计参考，把 ArchPlanVQA/HouseMind/TextEnhancedCAD 作为 VLM/text novelty 边界。",
         "boundary": "这些文献是方法定位与实验设计依据，不作为 DrawingPT 已有效的实验证据。",
         "next": "组会上确认 DrawingPT v0 是否先坚持 SVG primitive，还是尽早加入 text/layer/block；同时确认是否要做 VLM prompt baseline。"
       },
@@ -81,13 +80,6 @@
         "innovation": "不直接承诺黑箱总价，而是把 DrawingPT 定位为 quantity takeoff / BoQ 前端图纸理解模块。",
         "boundary": "当前定位为工程量中间层；真实总价还需要比例尺、材料做法、定额、单价和 BoQ/造价标签。",
         "next": "等 semantic prediction 稳定后，用同口径生成预测侧 pseudo-BoQ，计算 count MAE 与 length relative error。"
-      },
-      {
-        "project": "CADTransformer baseline",
-        "completed": "完成 PQ/SQ/RQ 门禁审计，明确当前条件下可先用 semantic baseline 推进；paper-faithful PQ 需要补官方或自实现评估链路。",
-        "innovation": "把复现实验从“跑出一个 F1”拆成 paper-faithful PQ 门禁和 semantic baseline 两条线，避免指标混用。",
-        "boundary": "当前 0.827501 定位为 primitive-level Total FG F1；PQ/SQ/RQ 作为下一步评估链路门禁。",
-        "next": "组会上确认优先级：追官方 PQ/export，还是先把 CADTransformer 定位为 semantic baseline 推进 DrawingPT。"
       }
     ]
   },
@@ -408,7 +400,7 @@
         {
           "path": "../../docs/floorplancad_distribution_report.md",
           "sha256": "6d00254388e664c2804330e1158920392672ad1fdd936ad92f5dee2652258ee0",
-          "note": "FloorPlanCAD 图元分布与 CADTransformer 指标差距检查"
+          "note": "FloorPlanCAD 图元类型、数量分布和语义长尾统计"
         },
         {
           "path": "../../docs/floorplancad_data_report.md",
@@ -440,7 +432,7 @@
       "progress": [
         "整理 7 篇 10-line 文献笔记：FloorPlanCAD、CADSpotting、Brep2Shape、GeoPT、ArchPlanVQA、HouseMind、TextEnhancedCAD。",
         "确定 FloorPlanCAD 是主 benchmark；任务是 panoptic symbol spotting，SVG 可读 semanticId、instanceId、path/circle/ellipse 等 primitive，但类别长尾、DWG 原生结构会部分丢失。",
-        "确定 CADSpotting、CADTransformer、SymPoint、GAT-CADNet 属于监督 baseline 或复现参考；DrawingPT 要避免只做另一个强监督检测器。",
+        "确定 CADSpotting、SymPoint、GAT-CADNet 等属于监督 baseline 或复现参考；DrawingPT 要避免只做另一个强监督检测器。",
         "从 Brep2Shape 和 GeoPT 提取预训练叙事：几何 token、自监督目标、label-efficiency curve、预训练数据量/模型规模消融。",
         "从 ArchPlanVQA、HouseMind、TextEnhancedCAD 提取边界：VLM 对照要冻结 prompt/渲染/评分；文本增强 CAD spotting 已构成 novelty 风险，DrawingPT 不能声称首次使用 CAD 文本。"
       ],
@@ -477,9 +469,9 @@
             "冻结 11,602 SVG token manifest 与 split"
           ],
           [
-            "CADSpotting / CADTransformer",
-            "监督 spotting baseline 与 PQ/SQ/RQ 口径参考",
-            "保留 CADTransformer semantic baseline，单列 PQ 门禁"
+            "CADSpotting / SymPoint / GAT-CADNet",
+            "监督 spotting baseline 与指标口径参考",
+            "作为后续监督检测/识别对照，不单列旧复现门禁"
           ],
           [
             "Brep2Shape / GeoPT",
@@ -654,99 +646,6 @@
           "note": "工程量 proxy 汇总"
         }
       ]
-    },
-    {
-      "id": "cadtransformer-pq-gate",
-      "name": "CADTransformer PQ/SQ/RQ 评估门禁",
-      "status": "门禁审计完成，下一步路线可选",
-      "headline": "CADTransformer 已可作为 semantic baseline；PQ/SQ/RQ 进入 official/proxy 评估链路补齐阶段。",
-      "progress": [
-        "审计 CADTransformer 当前 release：README 提到的 scripts/evaluate_pq.py 需要另行找回或重建。",
-        "确认当前 train_cad_ddp.py 的 val/test 入口输出 primitive-level Total FG Precision/Recall/F1；prediction export 需要单独补脚本。",
-        "确认当前模型入口主要返回 semantic logits；panoptic instance prediction/export/evaluation 需要作为独立评估链路补接。",
-        "因此保留 job 969 的 Total FG F1=0.827501 作为 semantic primitive baseline 锚点，但不把它与论文 PQ/SQ/RQ 直接相减。"
-      ],
-      "metrics": [
-        {
-          "label": "job 969 Total FG F1",
-          "value": "0.827501"
-        },
-        {
-          "label": "processed split",
-          "value": "6965 / 810 / 3827"
-        },
-        {
-          "label": "paper-faithful PQ",
-          "value": "official/proxy 门禁"
-        },
-        {
-          "label": "prediction export",
-          "value": "导出脚本门禁"
-        }
-      ],
-      "comparison": {
-        "title": "论文指标与当前可用指标的处理方式",
-        "note": "CADTransformer 论文主指标是 panoptic symbol spotting PQ/SQ/RQ；当前 job 969 只有 primitive-level Total FG F1。",
-        "columns": [
-          "指标",
-          "论文 CADTransformer",
-          "当前 job 969",
-          "处理方式"
-        ],
-        "rows": [
-          [
-            "PQ",
-            "0.6732",
-            "评估链路门禁",
-            "追官方脚本或实现透明 proxy"
-          ],
-          [
-            "SQ",
-            "0.8754",
-            "评估链路门禁",
-            "与 PQ 同链路补齐"
-          ],
-          [
-            "RQ",
-            "0.7226",
-            "评估链路门禁",
-            "与 PQ 同链路补齐"
-          ],
-          [
-            "Total FG F1",
-            "论文主表口径外",
-            "0.827501",
-            "作为 semantic baseline 使用"
-          ]
-        ]
-      },
-      "innovation": {
-        "title": "本期方法创新点",
-        "items": [
-          "把“复现成功”拆成训练链路、checkpoint、prediction export、PQ/SQ/RQ evaluation 四个门禁，避免只因有 F1 就误报论文复现。",
-          "为 DrawingPT 后续比较保留两条路线：严格 paper-faithful PQ 复现，或先用 semantic primitive baseline 推进低标注曲线。"
-        ],
-        "boundary": "这是评估链路审计；它的作用是明确后续比较口径。"
-      },
-      "boundary": "当前 CADTransformer 在本周报中定位为 semantic baseline；paper-faithful 主指标需要 official evaluation/export 或透明 proxy 口径后再汇报。",
-      "next": "组会上需要决策：是否必须优先追官方 PQ/export。如果必须，下一步找历史 commit、issue 或联系作者；如果可以并行推进，则先把 CADTransformer 作为 semantic baseline，用 DrawingPT v0 跑 label-efficiency curve。",
-      "evidence": [
-        {
-          "path": "../../docs/cadtransformer_pq_gate.md",
-          "sha256": "d83faf136d84090faf1f97289e522088661dfb6834f63fb1cfbd2d730a6297be",
-          "note": "PQ/SQ/RQ 门禁审计"
-        },
-        {
-          "path": "../group_meeting_2026-08-18/report.html",
-          "sha256": "47293168f3be3cc042a7459fae9b03dee50b8da1cbb57718e4ccfce8f173db8b",
-          "note": "上一期报告，用于区分本期新增与旧结果"
-        },
-        {
-          "path": "../next_steps_2026-09-01/report_readable_cn.md",
-          "sha256": "38c7539956d5a4fdeb7d24355d99d4fbe1f037fe28b6af34d6d89d20b4486581",
-          "note": "下一阶段综合报告"
-        }
-      ]
     }
   ],
   "unchanged": [],
@@ -765,11 +664,6 @@
       "date": "2026-09-01",
       "project": "CAD/图纸理解文献调研",
       "event": "整理 7 篇 CAD/平面图/VLM/几何预训练文献笔记，并转化为 DrawingPT v0 的创新点、baseline 和评测门禁。"
-    },
-    {
-      "date": "2026-09-01",
-      "project": "CADTransformer baseline",
-      "event": "完成 PQ/SQ/RQ 评估门禁审计，明确 official/proxy 两条可推进路线。"
     },
     {
       "date": "2026-09-01",

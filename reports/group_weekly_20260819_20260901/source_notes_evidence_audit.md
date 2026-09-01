@@ -90,7 +90,7 @@
 本周报收录判断：
 
 - 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果、class-aware sampler 实现、sampler exposure audit、本机 CPU sanity、1000-step controlled run 计划/脚本和服务器完成的 1% scratch/pretrained 结果。
-- 阶段边界：sampler exposure audit 不是模型效果；本机 CPU 20-step sanity 不与服务器结果横向比较；1000-step controlled run 是 1% 单 seed 的 v0 结果，可以汇报为正式受控实验完成，但不能写成论文级充分结论；本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
+- 阶段边界：sampler exposure audit 不是模型效果；本机 CPU 20-step sanity 不与服务器结果横向比较；1000-step controlled run 是 1% 单 seed 的 v0 结果，可以汇报为正式受控实验完成，但不能写成论文级充分结论；本期只把大规模训练、论文级完整评测、真实造价预测列为后续门禁，不作为已完成成果。
 
 ### 2.3 FloorPlanCAD 数据画像与长尾风险证据
 
@@ -98,7 +98,7 @@
 
 - `docs/floorplancad_distribution_report.md`
   - SHA-256：`6d00254388e664c2804330e1158920392672ad1fdd936ad92f5dee2652258ee0`
-  - 说明：FloorPlanCAD 图元类型、每图图元数量桶、35 类语义标注分布和 CADTransformer 指标口径检查。
+  - 说明：FloorPlanCAD 图元类型、每图图元数量桶和 35 类语义标注分布。
 - `docs/floorplancad_data_report.md`
   - SHA-256：`3b8903e1c7f46112f92afda393a020f58bc4e09b388e4945066b5e6e7bda02c8`
   - 说明：FloorPlanCAD 数据版本、文件结构、SVG 标注字段和核心统计说明。
@@ -176,37 +176,17 @@
 - 收录：造价方向成熟度判断、DrawingPT 作为图纸理解前端的定位、pseudo-BoQ 中间层资产。
 - 阶段边界：真实工程造价模型、真实单价或定额结果、BIM/CAD 私有项目数据属于后续资源需求。
 
-### 2.6 CADTransformer 评估门禁证据
-
-可核验证据：
-
-- `docs/cadtransformer_pq_gate.md`
-  - SHA-256：`d83faf136d84090faf1f97289e522088661dfb6834f63fb1cfbd2d730a6297be`
-  - 说明：PQ/SQ/RQ 评估门禁审计。
-- `reports/group_meeting_2026-08-18/report.html`
-  - SHA-256：`47293168f3be3cc042a7459fae9b03dee50b8da1cbb57718e4ccfce8f173db8b`
-  - 说明：上一期可读报告，用于避免重复旧结果。
-- `reports/next_steps_2026-09-01/report_readable_cn.md`
-  - SHA-256：`38c7539956d5a4fdeb7d24355d99d4fbe1f037fe28b6af34d6d89d20b4486581`
-  - 说明：当前下一阶段综合报告。
-
-本周报收录判断：
-
-- 收录：CADTransformer 当前只能作为 primitive-level semantic baseline；PQ/SQ/RQ 未过门禁。
-- 阶段边界：job 969 full-data baseline 属于上一期基础结果，本期只引用它作为 semantic baseline 锚点。
-
 ## 3. 阶段边界和降级处理
 
 1. 服务器登录信息、密码、SSH key、服务器地址和用户个人绝对路径不进入周报。
 2. `1408` 作为 PyTorch checkpoint 加载兼容性诊断记录，不作为完成实验。
 3. FloorPlanCAD 数据画像解释采样和评估风险，不替代模型效果证据。
 4. 文献调研支持方法定位、baseline 选择和 novelty 边界，不替代实验结果。
-5. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
-6. DrawingPT 预训练在 1% seed0304 的 1000-step controlled run 中小幅优于 scratch，但有效性仍需 5%/10% 与多 seed 低标注曲线验证。
-7. class-aware sampler 已经实现并完成 exposure audit；模型效果证据来自服务器 1000-step scratch/pretrained controlled run summary，而不是来自 sampler audit 本身。
-8. 1000-step controlled run 可表述为已完成正式受控实验；但由于它仍是 v0 小模型、1% 单 seed，不能表述为论文级最终性能。
-9. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
-10. GitHub 远端同步状态不进入组会正文。
+5. DrawingPT 预训练在 1% seed0304 的 1000-step controlled run 中小幅优于 scratch，但有效性仍需 5%/10% 与多 seed 低标注曲线验证。
+6. class-aware sampler 已经实现并完成 exposure audit；模型效果证据来自服务器 1000-step scratch/pretrained controlled run summary，而不是来自 sampler audit 本身。
+7. 1000-step controlled run 可表述为已完成正式受控实验；但由于它仍是 v0 小模型、1% 单 seed，不能表述为论文级最终性能。
+8. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
+9. GitHub 远端同步状态不进入组会正文。
 
 ## 4. 报告结构选择
 

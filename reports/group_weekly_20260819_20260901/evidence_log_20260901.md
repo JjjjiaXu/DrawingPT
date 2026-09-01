@@ -20,7 +20,6 @@
 | 实现 class-aware sampler 和 exposure audit | Done | 1% seed0304 下 class-aware 采样一轮覆盖 46/88 个 unique windows，rare token share 从 8.48% 到 8.82% |
 | 完成 1% seed0304 正式 controlled run | Done | scratch job 1440 与 pretrained job 1441 均 COMPLETED/ExitCode 0:0；pretrained macro F1=0.0320，高于 scratch 的 0.0270 |
 | 调研工程造价方向并构造 pseudo-BoQ 中间层 | Done | 生成 11,602 行 pseudo-BoQ 表，包含门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备等字段 |
-| 审计 CADTransformer PQ/SQ/RQ 复现门禁 | Done | 当前可用结果定位为 primitive-level semantic baseline；paper-faithful PQ/SQ/RQ 仍需补 evaluation/export 链路 |
 
 2.
 
@@ -30,7 +29,6 @@
 | :--- | :--- | :--- |
 | 当前 DrawingPT v0 仍是 1% 单 seed 小模型结果 | 可以汇报为正式受控实验完成，但不能作为论文级充分结论 | 是否立刻扩展到 1%/5%/10% × scratch/pretrained × 多 seed |
 | semantic macro F1 绝对值仍低 | pretrained 相比 scratch 有正向信号，但模型仍受 wall、toilet、double door、window 等高频类影响 | 是否优先尝试 focal loss、更强 class-aware sampler、longer schedule 或更大模型 |
-| CADTransformer PQ/SQ/RQ 链路未完全打通 | 目前不能把 job 969 的 Total FG F1 与论文 PQ/SQ/RQ 直接比较 | 是否必须追 official PQ/export；若没有官方脚本，是否接受透明 proxy evaluation |
 | FloorPlanCAD baseline 是 SVG/semantic proxy，不是完整 DWG/BIM 工程数据 | 当前结果能支持图纸语义理解和工程量 proxy，不能直接支持真实工程造价 | 是否能获得真实 BoQ、单价、材料、比例尺或 BIM/CAD 工程项目数据 |
 | pseudo-BoQ 目前是研究中间层 | 可用于验证 quantity takeoff 思路，但不能说成真实造价估算结果 | 下一步是否做预测侧 pseudo-BoQ，并用 count MAE、relative error、length proxy error 评估 |
 
@@ -38,19 +36,18 @@
 
 ##### Decisions / Learnings
 
-1. **DrawingPT 的核心定位应收窄为 vector-native primitive token + self-supervised pretraining。** 这样能避开“又一个强监督 CAD 检测器”的风险，也能与 CADTransformer/CADSpotting 形成清楚分工。
+1. **DrawingPT 的核心定位应收窄为 vector-native primitive token + self-supervised pretraining。** 这样能避开“又一个强监督 CAD 检测器”的风险，也能与现有监督 spotting 方法形成清楚分工。
 2. **低标注曲线比单个高分更适合作为近期主线。** 当前已经冻结 1%、5%、10%、25%、50%、100% 清单，下一步应围绕 scratch vs pretrained 的 label-efficiency curve 展开。
 3. **background/unlabeled 不能直接参与 semantic loss。** 早期 smoke 已证明这会造成表面 accuracy 虚高、foreground F1 为 0 的 shortcut，因此后续语义实验必须坚持 foreground-only 或显式控制 background。
 4. **class-aware sampler 是必要的，但不是充分条件。** 它能改变窗口暴露分布；真正效果仍要看 full-val macro F1、rare F1、per-class support 和 dominant predictions。
 5. **正式 1000-step controlled run 给出了正向但有限的预训练信号。** pretrained 在 foreground accuracy、macro F1、rare macro F1 和 val loss 上均优于 scratch，但幅度还小，必须通过多比例、多 seed 才能形成可信结论。
 6. **工程造价方向不应直接承诺端到端总价。** 更稳的研究链路是“图纸理解 → 构件/符号/工程量 proxy → pseudo-BoQ → 真实 BoQ/造价”，当前成果适合定位为工程量中间层。
-7. **CADTransformer 当前应作为 semantic baseline，而不是直接当作 PQ/SQ/RQ 复现完成。** 论文主指标需要 prediction export 和 panoptic evaluation 链路补齐后再比较。
 
 4)
 
 ##### Next Meeting's Actions
 
-建议下一轮以 **DrawingPT 低标注预训练收益曲线** 作为主线，同时保留 **CADTransformer PQ 门禁** 和 **pseudo-BoQ 应用验证** 两条支线。
+建议下一轮以 **DrawingPT 低标注预训练收益曲线** 作为主线，同时保留 **pseudo-BoQ 应用验证** 和 **小型 VLM prompt baseline** 两条支线。
 
 | **Priority** | **Action** | **Expected Output** |
 | :--- | :--- | :--- |
@@ -58,5 +55,4 @@
 | P0 | 扩展 1%/5%/10% × scratch/pretrained × 多 seed controlled run | 输出 label-efficiency curve，至少包含 foreground accuracy、macro F1、rare F1、per-class support 和 runtime |
 | P1 | 针对高频类塌缩做损失函数和采样消融 | 比较 class-aware sampler、focal loss、inverse-sqrt weighting、longer schedule 对 rare F1 的影响 |
 | P1 | 把 semantic prediction 转成预测侧 pseudo-BoQ | 用 GT pseudo-BoQ 计算 count MAE、count relative error 和 length proxy error |
-| P1 | 决定 CADTransformer PQ/SQ/RQ 路线 | 明确追 official evaluation/export，还是先用 transparent proxy evaluation 辅助比较 |
 | P2 | 设计一个小型 VLM prompt baseline | 固定渲染、prompt 和评分规则，测试计数、测量、空间关系等图纸理解任务 |
