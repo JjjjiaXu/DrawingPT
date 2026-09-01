@@ -75,7 +75,7 @@
   - SHA-256：`4bea342b654199d7c95b3363216894423a050fa0640c0128a123cbf6d55032b7`
   - 说明：正式 semantic controlled run 单作业 Slurm 脚本。
 - `scripts/server/submit_drawingpt_v0_classaware_controlled_pair.sh`
-  - SHA-256：`491264018da829415ffc6cfffe5079533224d432eace3651de5bbcb5e99afb31`
+  - SHA-256：`82acc46110f30a4fc364461fbda74342b715a6593599ea35e7f3ac19376b42c7`
   - 说明：scratch→pretrained 串行 controlled pair 提交脚本。
 - `scripts/summarize_semantic_controlled_results.py`
   - SHA-256：`877b5211fab2a15d8e76c53c75e7143d3d3d8ccc31e89fe7ee9cf938cbaf0eeb`

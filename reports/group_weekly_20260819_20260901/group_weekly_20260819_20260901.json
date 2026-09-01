@@ -303,7 +303,7 @@
         },
         {
           "path": "../../scripts/server/submit_drawingpt_v0_classaware_controlled_pair.sh",
-          "sha256": "491264018da829415ffc6cfffe5079533224d432eace3651de5bbcb5e99afb31",
+          "sha256": "82acc46110f30a4fc364461fbda74342b715a6593599ea35e7f3ac19376b42c7",
           "note": "scratch→pretrained 串行 controlled pair 提交脚本"
         },
         {
