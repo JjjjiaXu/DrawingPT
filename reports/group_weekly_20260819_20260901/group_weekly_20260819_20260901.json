@@ -1,0 +1,442 @@
+{
+  "schema": "work-summary-v1",
+  "title": "DrawingPT 组会周报：从资产冻结到训练闭环诊断",
+  "tagline": "本期重点不是宣称模型有效，而是把 DrawingPT v0 的数据、训练和工程量中间层变成可核验资产，并明确下一道技术门禁。",
+  "report_type": "group_weekly",
+  "baseline": "上一期参考 reports/group_meeting_2026-08-18/report.html；本期只收录 2026-08-19 至 2026-09-01 新增且有证据的进展。",
+  "period": {
+    "start": "2026-08-19",
+    "end": "2026-09-01",
+    "timezone": "Asia/Shanghai"
+  },
+  "scope": [
+    "DrawingPT v0 primitive tokenization, low-label splits, masked pretraining and semantic smoke",
+    "FloorPlanCAD pseudo-BoQ / engineering quantity proxy",
+    "engineering cost estimation literature positioning",
+    "CADTransformer PQ/SQ/RQ evaluation gate audit"
+  ],
+  "hero_metrics": [
+    {
+      "label": "FloorPlanCAD primitive tokens",
+      "value": "12,621,288"
+    },
+    {
+      "label": "2048-token windows",
+      "value": "14,117"
+    },
+    {
+      "label": "server GPU jobs audited",
+      "value": "7"
+    },
+    {
+      "label": "best smoke macro F1",
+      "value": "0.0209"
+    }
+  ],
+  "meeting_summary": {
+    "as_of": "2026-09-01",
+    "project_snapshots": [
+      {
+        "project": "DrawingPT v0",
+        "completed": "冻结 1262 万 primitive token、14,117 个 2048-token window、18 组低标注清单；服务器已跑通 2048-token pretrain 和 1% semantic smoke。",
+        "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并用低标注语义任务检验预训练价值。",
+        "boundary": "当前都是 smoke/诊断，不是论文级结果；semantic 仍向 wall/window/sink 高频类塌缩。",
+        "next": "做 class-aware window sampling，要求 1% seed0304 foreground macro F1 明显高于当前 best smoke 0.0209。"
+      },
+      {
+        "project": "工程造价方向",
+        "completed": "完成造价文献定位，并生成 11,602 行 pseudo-BoQ 表，把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备转成每图中间层。",
+        "innovation": "不直接承诺黑箱总价，而是把 DrawingPT 定位为 quantity takeoff / BoQ 前端图纸理解模块。",
+        "boundary": "缺少真实比例尺、材料做法、地区定额、单价和真实 BoQ/造价标签，不能称为真实造价模型。",
+        "next": "等 semantic prediction 稳定后，用同口径生成预测侧 pseudo-BoQ，计算 count MAE 与 length relative error。"
+      },
+      {
+        "project": "CADTransformer baseline",
+        "completed": "完成 PQ/SQ/RQ 门禁审计，确认当前 release 缺少 README 所述 evaluate_pq.py 和 prediction export 链路。",
+        "innovation": "把复现实验从“跑出一个 F1”拆成 paper-faithful PQ 门禁和 semantic baseline 两条线，避免指标混用。",
+        "boundary": "当前 0.827501 是 primitive-level Total FG F1，不是论文 Table 1 的 PQ/SQ/RQ。",
+        "next": "组会上确认优先级：追官方 PQ/export，还是先把 CADTransformer 定位为 semantic baseline 推进 DrawingPT。"
+      }
+    ]
+  },
+  "projects": [
+    {
+      "id": "drawingpt-v0",
+      "name": "DrawingPT v0 数据资产与训练闭环",
+      "status": "smoke 完成，进入类别均衡诊断",
+      "headline": "DrawingPT v0 已从设计草案推进到服务器 GPU 可运行闭环，但 1% semantic smoke 暴露出高频类塌缩。",
+      "progress": [
+        "生成并冻结 FloorPlanCAD primitive token manifest：11,602 张 SVG，共 12,621,288 个 primitive token；按 2048 token/window 得到 14,117 个 window。",
+        "固定 1%、5%、10%、25%、50%、100% train 低标注清单，seed 为 304、1004、2026；同一 seed 下小比例是大比例前缀，便于后续 label-efficiency curve 对比。",
+        "补齐 Dataset、masked primitive pretrain、semantic primitive classification 三个最小训练入口；服务器 processed SVG 布局也已兼容。",
+        "服务器完成 2048-token masked pretrain short：100 step，loss 1.642630 降到 0.107217，生成 checkpoint SHA-256 ceb52ad65ae94c69a9b0409fb2404b875f33a2de6975d5190862efb09d50317e。",
+        "semantic scratch 诊断证明 class 0=background/unlabeled 参与 loss 会导致 all accuracy 虚高但 foreground F1 为 0；之后改成 foreground-only loss。",
+        "foreground-only scratch/pretrained/weighted smoke 都已跑通；weighted scratch 将 foreground macro F1 从 0.0168 小幅提高到 0.0209，但还没有解决 wall/window/sink 高频类主导的问题。"
+      ],
+      "metrics": [
+        {
+          "label": "SVG files",
+          "value": "11,602"
+        },
+        {
+          "label": "primitive tokens",
+          "value": "12,621,288"
+        },
+        {
+          "label": "2048-token windows",
+          "value": "14,117"
+        },
+        {
+          "label": "1% train files",
+          "value": "70"
+        },
+        {
+          "label": "2048 pretrain loss",
+          "value": "1.6426 → 0.1072"
+        },
+        {
+          "label": "best smoke foreground macro F1",
+          "value": "0.0209"
+        }
+      ],
+      "comparison": {
+        "title": "1% semantic smoke 对比",
+        "note": "同一 1% seed0304、2048-token window、100 step；这些是训练链路和失败模式诊断，不是正式精度。",
+        "columns": [
+          "job",
+          "设置",
+          "foreground accuracy",
+          "foreground macro F1",
+          "判断"
+        ],
+        "rows": [
+          [
+            "1406",
+            "background 参与 loss",
+            "0.0000",
+            "0.0000",
+            "坏结果：background shortcut"
+          ],
+          [
+            "1407",
+            "foreground-only scratch",
+            "0.3391",
+            "0.0168",
+            "开始命中前景，但偏 wall/sink"
+          ],
+          [
+            "1409",
+            "foreground-only pretrained",
+            "0.3412",
+            "0.0177",
+            "略高于 scratch，但差距太小"
+          ],
+          [
+            "1411",
+            "inverse-sqrt weighted scratch",
+            "0.2512",
+            "0.0209",
+            "macro F1 略升，准确率下降"
+          ],
+          [
+            "1412",
+            "inverse-sqrt weighted pretrained",
+            "0.2931",
+            "0.0141",
+            "没有优于 weighted scratch"
+          ]
+        ]
+      },
+      "innovation": {
+        "title": "本期方法创新点",
+        "items": [
+          "把 SVG primitive 直接作为 DrawingPT v0 token，统一记录 type、semanticId、instanceId、bbox、长度 proxy、面积 proxy 和弱样式特征。",
+          "把自监督预训练和低标注语义微调接到同一个 Dataset/manifest 上，后续可以做 scratch vs pretrained 的 label-efficiency curve。",
+          "把负结果结构化记录：background shortcut、checkpoint 安全加载兼容性、weighted loss 对宏平均和前景准确率的 trade-off 都留下了 evidence。"
+        ],
+        "boundary": "当前创新点是实验链路和表示设计层面的 v0 prototype，还不是新的 SOTA 模型。"
+      },
+      "boundary": "所有 semantic 数字只来自 1% seed0304、100 step、128 个 validation window 的 smoke；不能说明 DrawingPT 预训练已经有效，也不能和 CADTransformer 论文指标直接比较。",
+      "next": "实现 class-aware window sampling 或 focal loss，在同一 1% seed0304 下重跑 scratch vs pretrained；若 foreground macro F1 明显高于 0.0209 且不再塌到 wall/window/sink，再扩到 5%、10% 和多个 seed。",
+      "evidence": [
+        {
+          "path": "../next_steps_2026-09-01/floorplancad_token_manifest_by_file.csv",
+          "sha256": "b6dd60a4976a3e5791eb8fc786a9cfbb24f1a9a466a5bb97d9aafd40b7412370",
+          "note": "FloorPlanCAD 文件级 token/window manifest"
+        },
+        {
+          "path": "../next_steps_2026-09-01/floorplancad_token_summary.json",
+          "sha256": "358b22e4e86797caf4d9927920a33e4dfce921824b838b262906c6b1f142bd65",
+          "note": "全局 primitive token 统计"
+        },
+        {
+          "path": "../next_steps_2026-09-01/label_fraction_manifest.csv",
+          "sha256": "7c9e55fdf58d06d9eaf6eb8af51e92e15d9d417920083231ba1e152ec273f603",
+          "note": "低标注比例清单索引"
+        },
+        {
+          "path": "../next_steps_2026-09-01/drawingpt_v0_server_gpu_smoke_job1404_summary.json",
+          "sha256": "015411eedcc5f5fbbbff845652d89d5483a0070a08c6fd4d1ca9234c8895ea18",
+          "note": "512-token masked pretrain GPU smoke"
+        },
+        {
+          "path": "../next_steps_2026-09-01/drawingpt_v0_server_gpu_semantic_smoke_20260901_summary.json",
+          "sha256": "8152c6a01f7de324f7583d510ba15e1948b400a12c7b0ff2de01fdd456951663",
+          "note": "2048-token pretrain 与 semantic smoke 汇总"
+        },
+        {
+          "path": "../../docs/drawingpt_v0_training_smoke.md",
+          "sha256": "9579fe83e7b55777428216db1026e516fb33299ebc1b555fb4406945d2fc5244",
+          "note": "训练闭环与失败模式说明"
+        },
+        {
+          "path": "../../scripts/train_semantic_primitive.py",
+          "sha256": "8482224ae8d41f405a740082ad55c60d3536873c9456fd5c4e6b65c66f57a6b2",
+          "note": "语义分类、foreground-only loss、class weighting 实现"
+        }
+      ]
+    },
+    {
+      "id": "cost-pseudo-boq",
+      "name": "工程造价方向与 pseudo-BoQ 中间层",
+      "status": "调研完成，工程量 proxy 已冻结",
+      "headline": "造价方向被收束为“图纸理解 → 工程量 proxy → BoQ/造价”的可解释链路，而不是直接黑箱预测总价。",
+      "progress": [
+        "完成工程造价自动估算调研：成熟路线主要是 BIM/结构化工程量到造价，或历史项目特征到造价预测；2D CAD 原始图元直接到完整造价的成熟学术路线还少。",
+        "明确 DrawingPT 的短期定位：作为图纸理解和表示学习前端，先抽取构件、符号、尺寸/数量关系，再服务 quantity takeoff、BoQ/BoM 和造价模型。",
+        "生成 FloorPlanCAD pseudo-BoQ 每图表，共 11,602 行；字段包括门窗数量、墙体/幕墙/栏杆长度 proxy、楼梯/电梯/扶梯数量、车位和厨卫设备等。",
+        "训练集汇总可讲数字包括：门 instance 34,704，窗 instance 15,376，墙体长度 proxy 8,836,841.492，楼梯 instance 4,345，电梯 instance 3,206，厨卫设备 instance 16,722。"
+      ],
+      "metrics": [
+        {
+          "label": "pseudo-BoQ rows",
+          "value": "11,602"
+        },
+        {
+          "label": "train door instances",
+          "value": "34,704"
+        },
+        {
+          "label": "train window instances",
+          "value": "15,376"
+        },
+        {
+          "label": "train wall length proxy",
+          "value": "8,836,841.492"
+        },
+        {
+          "label": "train sanitary fixture instances",
+          "value": "16,722"
+        }
+      ],
+      "comparison": {
+        "title": "造价相关路线成熟度判断",
+        "note": "该比较来自本期文献调研和 FloorPlanCAD 数据资产审计。",
+        "columns": [
+          "路线",
+          "成熟度",
+          "对 DrawingPT 的含义"
+        ],
+        "rows": [
+          [
+            "BIM / 结构化工程量 → 造价",
+            "较高",
+            "可作为后端流程和评价口径参考"
+          ],
+          [
+            "项目特征 / 历史数据 → 总造价",
+            "中高",
+            "适合早期估算，但不验证图纸表示学习"
+          ],
+          [
+            "2D 图纸 → 符号 / 构件 / BoM / QTO",
+            "中等",
+            "与 DrawingPT 最相关，适合作为近期研究任务"
+          ],
+          [
+            "2D CAD 原始图元 → 完整真实造价",
+            "低到中",
+            "有创新空间，但需要真实 BoQ/单价/成本标签"
+          ]
+        ]
+      },
+      "innovation": {
+        "title": "本期方法创新点",
+        "items": [
+          "把造价目标拆成可验证中间层：先用图纸语义预测生成 pseudo-BoQ，再讨论造价映射。",
+          "每个工程量 proxy 都能追溯到 FloorPlanCAD 的 semanticId、instanceId 和几何长度 proxy，避免端到端黑箱总价不可解释。",
+          "为后续模型评估准备了比 F1 更接近应用的误差口径：count MAE、relative error、length proxy error。"
+        ],
+        "boundary": "pseudo-BoQ 是研究 proxy，不是工程结算量；它没有真实单位、材料做法和价格信息。"
+      },
+      "boundary": "当前没有真实比例尺、墙高/厚度、材料、楼层、地区定额、单价和项目造价标签；因此只能讲工程量中间层，不能讲真实工程造价自动估算完成。",
+      "next": "等 semantic prediction 稳定后，把预测结果转成同字段 pseudo-BoQ，与 GT pseudo-BoQ 计算 count MAE、count relative error 和 length relative error；如需要演示造价链路，可先做合成单价 demo，并明确它不是真实造价。",
+      "evidence": [
+        {
+          "path": "../engineering_cost_research_2026-08-23/report_readable_cn.md",
+          "sha256": "3c08cc30d4819c6843c05e23ad0a254320a5cdd24d2378cb821bf20ff9c276ed",
+          "note": "工程造价自动估算调研汇报"
+        },
+        {
+          "path": "../../docs/floorplancad_quantity_proxy_report.md",
+          "sha256": "8b4d11e7ba992c0505b82118107d78e0859ceff772722dc1e59ad304e23abe26",
+          "note": "FloorPlanCAD 工程量 proxy 口径"
+        },
+        {
+          "path": "../next_steps_2026-09-01/floorplancad_pseudo_boq_by_file.csv",
+          "sha256": "0060106a229f87606d49f6b4e220ed3eee86bc9ec0f2e406cda945f52e014679",
+          "note": "每图 pseudo-BoQ 表"
+        },
+        {
+          "path": "../next_steps_2026-09-01/floorplancad_quantity_proxy_summary.json",
+          "sha256": "4861553816d22a7d2a7f97c8206bdb09f958f7ea9f03bb845af40ad7d3471d6c",
+          "note": "工程量 proxy 汇总"
+        }
+      ]
+    },
+    {
+      "id": "cadtransformer-pq-gate",
+      "name": "CADTransformer PQ/SQ/RQ 评估门禁",
+      "status": "门禁审计完成，paper-faithful PQ 未完成",
+      "headline": "CADTransformer 训练链路可用，但当前公开 release 不能直接产出论文 Table 1 的 PQ/SQ/RQ。",
+      "progress": [
+        "审计 CADTransformer 当前 release：README 提到的 scripts/evaluate_pq.py 不在本地/服务器代码路径中。",
+        "确认当前 train_cad_ddp.py 的 val/test 入口只输出 primitive-level Total FG Precision/Recall/F1，不保存 npy_pred 或 svg_pred。",
+        "确认当前模型入口主要返回 semantic logits；虽然有 instance helper，但完整 panoptic instance prediction/export 链路没有接到训练入口。",
+        "因此保留 job 969 的 Total FG F1=0.827501 作为 semantic primitive baseline 锚点，但不把它与论文 PQ/SQ/RQ 直接相减。"
+      ],
+      "metrics": [
+        {
+          "label": "job 969 Total FG F1",
+          "value": "0.827501"
+        },
+        {
+          "label": "processed split",
+          "value": "6965 / 810 / 3827"
+        },
+        {
+          "label": "paper-faithful PQ",
+          "value": "未产出"
+        },
+        {
+          "label": "prediction export",
+          "value": "未找到"
+        }
+      ],
+      "comparison": {
+        "title": "论文指标与当前复现指标不是同口径",
+        "note": "CADTransformer 论文主指标是 panoptic symbol spotting PQ/SQ/RQ；当前 job 969 只有 primitive-level Total FG F1。",
+        "columns": [
+          "指标",
+          "论文 CADTransformer",
+          "当前 job 969",
+          "是否可直接比较"
+        ],
+        "rows": [
+          [
+            "PQ",
+            "0.6732",
+            "未产出",
+            "不可比"
+          ],
+          [
+            "SQ",
+            "0.8754",
+            "未产出",
+            "不可比"
+          ],
+          [
+            "RQ",
+            "0.7226",
+            "未产出",
+            "不可比"
+          ],
+          [
+            "Total FG F1",
+            "论文未报告",
+            "0.827501",
+            "只能作 semantic baseline"
+          ]
+        ]
+      },
+      "innovation": {
+        "title": "本期方法创新点",
+        "items": [
+          "把“复现成功”拆成训练链路、checkpoint、prediction export、PQ/SQ/RQ evaluation 四个门禁，避免只因有 F1 就误报论文复现。",
+          "为 DrawingPT 后续比较保留两条路线：严格 paper-faithful PQ 复现，或先用 semantic primitive baseline 推进低标注曲线。"
+        ],
+        "boundary": "这是评估门禁审计，不是新的模型训练结果。"
+      },
+      "boundary": "当前不能声称 CADTransformer 论文主指标已复现；任何与论文 Table 1 的比较都必须等官方 evaluation/export 找回，或明确标注为非官方 proxy。",
+      "next": "组会上需要决策：是否必须优先追官方 PQ/export。如果必须，下一步找历史 commit、issue 或联系作者；如果可以并行推进，则先把 CADTransformer 作为 semantic baseline，用 DrawingPT v0 跑 label-efficiency curve。",
+      "evidence": [
+        {
+          "path": "../../docs/cadtransformer_pq_gate.md",
+          "sha256": "d83faf136d84090faf1f97289e522088661dfb6834f63fb1cfbd2d730a6297be",
+          "note": "PQ/SQ/RQ 门禁审计"
+        },
+        {
+          "path": "../group_meeting_2026-08-18/report.html",
+          "sha256": "47293168f3be3cc042a7459fae9b03dee50b8da1cbb57718e4ccfce8f173db8b",
+          "note": "上一期报告，用于区分本期新增与旧结果"
+        },
+        {
+          "path": "../next_steps_2026-09-01/report_readable_cn.md",
+          "sha256": "38c7539956d5a4fdeb7d24355d99d4fbe1f037fe28b6af34d6d89d20b4486581",
+          "note": "下一阶段综合报告"
+        }
+      ]
+    }
+  ],
+  "unchanged": [
+    {
+      "project": "CADTransformer full-data conservative baseline",
+      "status": "本期没有重跑；job 969 的 Total FG F1=0.827501 仅作为上一阶段 semantic baseline 锚点。"
+    },
+    {
+      "project": "真实工程造价端到端模型",
+      "status": "本期没有真实 BoQ/单价/造价标签，因此未训练也未汇报真实造价模型。"
+    },
+    {
+      "project": "长时正式训练",
+      "status": "按资源纪律，本期只提交短 GPU smoke；没有长期占卡或持续监控。"
+    }
+  ],
+  "timeline": [
+    {
+      "date": "2026-08-23",
+      "project": "工程造价方向",
+      "event": "完成工程造价自动估算调研，确认 DrawingPT 更适合作为图纸理解和工程量中间层，而非直接输出黑箱总价。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "CADTransformer baseline",
+      "event": "完成 PQ/SQ/RQ 评估门禁审计，确认当前 release 缺少官方 evaluate_pq.py 和 prediction export 链路。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "DrawingPT v0",
+      "event": "冻结 primitive token manifest、低标注比例清单和 pseudo-BoQ 表，并记录 SHA-256。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "DrawingPT v0",
+      "event": "服务器完成 2048-token masked pretrain short，并保存 checkpoint。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "DrawingPT v0",
+      "event": "完成 semantic scratch/pretrained/weighted smoke，识别 background shortcut 与 wall/window/sink 高频类塌缩。"
+    }
+  ],
+  "generation": {
+    "generated_at": "2026-09-01",
+    "method": "Codex evidence audit -> work-summary-v1 JSON -> make_work_summary.py synchronized Markdown and HTML",
+    "notes": [
+      "所有本地 evidence 文件已填写 SHA-256，并由 make_work_summary.py --check 校验。",
+      "报告只收录本期新增且可以核验的进展；未完成的实验不会写成已经完成。",
+      "服务器敏感连接信息、密码、SSH key、个人绝对路径不进入周报。",
+      "本地与服务器最新工作副本为 8a91962；GitHub 远端最终 push 因本机网络连接 github.com:443 失败，需要网络恢复后再执行。"
+    ]
+  }
+}
