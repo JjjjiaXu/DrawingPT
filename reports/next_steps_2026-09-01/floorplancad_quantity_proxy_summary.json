@@ -8,6 +8,11 @@
     "test": 3827
   },
   "length_unit_warning": "approx_svg_length_units is a geometry proxy in SVG coordinate units. It is not meters, square meters, or a priced quantity.",
+  "pseudo_boq_fields": {
+    "door/window/opening/stairs/elevator/equipment/cabinet": "non-negative instanceId count by semantic class group",
+    "wall/curtain_wall/railing/parking_length_proxy_units": "approximate SVG geometry length by semantic class",
+    "parking_spot_semantic_elements": "semantic primitive count; FloorPlanCAD parking instanceId is not reliable for count"
+  },
   "file_level_core_semantic_elements": {
     "min": 0,
     "median": 186.0,

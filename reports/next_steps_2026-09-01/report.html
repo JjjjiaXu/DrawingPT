@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DrawingPT 下一阶段三件事推进记录</title>
+  <title>DrawingPT 下一阶段推进记录</title>
   <style>
 :root {
   color-scheme: light;
@@ -157,88 +157,117 @@ li { margin: 5px 0; }
       <span class="badge">DrawingPT</span>
       <span class="badge">下一阶段</span>
       <span class="badge">三件事推进</span>
-      <h1>DrawingPT 下一阶段三件事推进记录</h1>
+      <h1>DrawingPT 下一阶段推进记录</h1>
       <p>把 CADTransformer 评估门禁、DrawingPT v0 prereg 和 FloorPlanCAD 工程量 proxy 收束成下次组会可讲的材料。</p>
     </section>
     <section class="content">
       <p>生成日期：2026-09-01</p>
-<h2>1. 本轮推进了什么</h2>
-<p>本轮把下一阶段最关键的三件事推进到了可汇报状态：</p>
+<h2>1. 本轮实际完成了什么</h2>
+<p>这轮不是直接开大训练，而是把开训前最容易“以后说不清”的三类资产先冻结下来：</p>
 <ol>
-<li><strong>CADTransformer PQ/SQ/RQ 门禁</strong>：确认当前不是训练失败，而是公开 release 缺少完整 PQ 评估链路。</li>
-<li><strong>DrawingPT v0 prereg</strong>：把低标注自监督预训练实验写成正式协议草案。</li>
-<li><strong>FloorPlanCAD 工程量 proxy</strong>：从 11,602 张 SVG 真实统计出门窗、墙体、楼梯、车位、厨卫设备等 proxy 表。</li>
+<li><strong>primitive token 数据管线</strong>：把 FloorPlanCAD SVG 转成 DrawingPT v0 可用的 primitive token manifest。</li>
+<li><strong>低标注比例清单</strong>：固定 1%、5%、10%、25%、50%、100% 的 train 文件列表，并记录 seed/hash。</li>
+<li><strong>每图 pseudo-BoQ 表</strong>：把每张图的门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备等工程量中间层做成表。</li>
 </ol>
-<h2>2. CADTransformer PQ/SQ/RQ：当前是“门禁未过”，不是“结果为 0”</h2>
-<p>CADTransformer 当前保守 full-data baseline 已经完成，job 969 的 best validation Total FG F1 是 <code>0.827501</code>。但这仍然不能当成论文 Table 1 的 PQ。</p>
-<p>原因：</p>
+<p>这三件事的价值是：后面不管模型结果好不好，都能追溯“用了哪些数据、哪些样本、怎样把图纸预测转成工程量 proxy”。</p>
+<h2>2. 新冻结资产和 hash</h2>
+<table>
+<tr><th>资产</th><th>说明</th><th>SHA256</th></tr>
+<tr><td><code>floorplancad_token_manifest_by_file.csv</code></td><td>每图 token/window 摘要，11,602 行</td><td><code>b6dd60a4976a3e5791eb8fc786a9cfbb24f1a9a466a5bb97d9aafd40b7412370</code></td></tr>
+<tr><td><code>floorplancad_token_summary.json</code></td><td>token 全局摘要</td><td><code>358b22e4e86797caf4d9927920a33e4dfce921824b838b262906c6b1f142bd65</code></td></tr>
+<tr><td><code>configs/label_fractions/manifest.csv</code></td><td>18 组低标注清单索引</td><td><code>7c9e55fdf58d06d9eaf6eb8af51e92e15d9d417920083231ba1e152ec273f603</code></td></tr>
+<tr><td><code>floorplancad_pseudo_boq_by_file.csv</code></td><td>每图 pseudo-BoQ 工程量 proxy，11,602 行</td><td><code>0060106a229f87606d49f6b4e220ed3eee86bc9ec0f2e406cda945f52e014679</code></td></tr>
+</table>
+<p>这些都是从公开 FloorPlanCAD 派生的 compact 统计/清单；原始 SVG、processed NPY、checkpoint、全量 token JSONL 仍然留在本地或服务器，不提交 Git。</p>
+<h2>3. primitive token 数据：DrawingPT v0 可以开始接 Dataset 了</h2>
+<p>本轮新增脚本：</p>
+<pre><code>scripts/build_primitive_tokens.py</code></pre>
+<p>v0 里，一个 SVG geometry primitive 对应一个 token。当前 token 包含：primitive 类型、semanticId、instanceId、bbox、归一化 bbox、中心点、宽高、近似长度 proxy、bbox 面积 proxy、stroke/fill 弱样式特征和 style hash。</p>
+<p>全量统计：</p>
+<table>
+<tr><th>split</th><th>SVG 文件数</th><th>token 数</th><th>semantic token 数</th><th>2048-token window 数</th></tr>
+<tr><td>train</td><td>6,965</td><td>7,764,513</td><td>3,735,611</td><td>8,568</td></tr>
+<tr><td>val</td><td>810</td><td>904,517</td><td>487,965</td><td>1,001</td></tr>
+<tr><td>test</td><td>3,827</td><td>3,952,258</td><td>1,605,418</td><td>4,548</td></tr>
+<tr><td>all</td><td>11,602</td><td>12,621,288</td><td>5,828,994</td><td>14,117</td></tr>
+</table>
+<p>全数据 token 类型：</p>
+<table>
+<tr><th>类型</th><th>数量</th><th>占比</th></tr>
+<tr><td>path</td><td>12,454,181</td><td>98.68%</td></tr>
+<tr><td>circle</td><td>157,009</td><td>1.24%</td></tr>
+<tr><td>ellipse</td><td>10,098</td><td>0.08%</td></tr>
+</table>
+<p>文件级 token 数：min 6、median 544、mean 1,087.85、p90 2,298、max 53,919。意思是大部分图 1-2 个 window 就能覆盖，但少数超大图需要切成多达 27 个 window。</p>
+<p>重要限制：这里的 bbox/length 是为了机器学习输入做的稳定 proxy，不是精确 CAD 几何，也不是米或平方米。</p>
+<h2>4. 低标注比例：label-efficiency curve 的样本已经冻结</h2>
+<p>本轮新增脚本：</p>
+<pre><code>scripts/build_label_fractions.py</code></pre>
+<p>输出位置：</p>
+<pre><code>configs/label_fractions/</code></pre>
+<p>设置：</p>
+<table>
+<tr><th>比例</th><th>每个 seed 的 train 文件数</th></tr>
+<tr><td>1%</td><td>70</td></tr>
+<tr><td>5%</td><td>349</td></tr>
+<tr><td>10%</td><td>697</td></tr>
+<tr><td>25%</td><td>1,742</td></tr>
+<tr><td>50%</td><td>3,483</td></tr>
+<tr><td>100%</td><td>6,965</td></tr>
+</table>
+<p>seed 是 304、1004、2026。同一个 seed 下，小比例清单是大比例清单的前缀。这样后续画 label-efficiency curve 时，1%/5%/10% 的差异主要来自标注量变化，而不是样本完全换了一批。</p>
+<p>注意：当前清单没有强行做类别均衡。rare class 如果表现波动，需要先看对应低标注子集有没有覆盖到足够样本。</p>
+<h2>5. 每图 pseudo-BoQ：补齐了“工程量中间层”表</h2>
+<p>本轮增强脚本：</p>
+<pre><code>scripts/floorplancad_quantity_proxy.py</code></pre>
+<p>新增表：</p>
+<pre><code>reports/next_steps_2026-09-01/floorplancad_pseudo_boq_by_file.csv</code></pre>
+<p>每张图一行，核心字段包括：</p>
+<ul>
+<li>门、窗、opening symbol 数量；</li>
+<li>墙体、幕墙、栏杆长度 proxy；</li>
+<li>楼梯、电梯、扶梯数量；</li>
+<li>厨卫设备、厨房设备、空调、柜体数量；</li>
+<li>车位 semantic primitive 数和长度 proxy；</li>
+<li>core semantic element / core instance / core length 总量。</li>
+</ul>
+<p>训练集几个关键汇总：</p>
+<table>
+<tr><th>proxy</th><th>train 汇总</th></tr>
+<tr><td>门 instance</td><td>34,704</td></tr>
+<tr><td>窗 instance</td><td>15,376</td></tr>
+<tr><td>墙体长度 proxy</td><td>8,836,841.492</td></tr>
+<tr><td>楼梯 instance</td><td>4,345</td></tr>
+<tr><td>电梯 instance</td><td>3,206</td></tr>
+<tr><td>车位 semantic primitive</td><td>148,711</td></tr>
+<tr><td>厨卫设备 instance</td><td>16,722</td></tr>
+<tr><td>柜体 instance</td><td>7,278</td></tr>
+</table>
+<p>这一步不是在做真实造价，而是在做更可靠的中间任务：把图纸理解结果转成可解释的工程量 proxy。等 CADTransformer 或 DrawingPT 有预测 SVG/primitive prediction 后，就可以用同一口径生成预测侧 pseudo-BoQ，并计算误差。</p>
+<h2>6. CADTransformer PQ/SQ/RQ 门禁仍然单独保留</h2>
+<p>CADTransformer 当前 full-data conservative baseline 已经跑通，job 969 的 best validation Total FG F1 是 <code>0.827501</code>。但这仍不能当作论文 Table 1 的 PQ。</p>
+<p>已确认的问题：</p>
 <ul>
 <li>官方 README 提到 <code>scripts/evaluate_pq.py</code>；</li>
-<li>当前 release 的 <code>scripts/</code> 目录里没有这个文件；</li>
-<li><code>train_cad_ddp.py --val_only/--test_only</code> 只输出 primitive-level F1；</li>
-<li>服务器只读检查没有发现 <code>npy_pred</code> 或 <code>svg_pred</code> 预测目录；</li>
-<li>当前模型入口只返回 semantic logits，没有完整接出 panoptic instance prediction。</li>
+<li>当前 release 没有这个文件；</li>
+<li>当前 <code>train_cad_ddp.py --val_only/--test_only</code> 只输出 primitive-level F1；</li>
+<li>服务器检查没有发现 <code>npy_pred</code> 或 <code>svg_pred</code> prediction 目录；</li>
+<li>当前训练入口没有完整接出 panoptic instance prediction。</li>
 </ul>
-<p>因此下次组会最稳的说法是：</p>
-<blockquote><p>CADTransformer 训练链路已经跑通，但 PQ/SQ/RQ 评估门禁未过。原因是 release 缺少 README 所述的 PQ 评估脚本和预测导出链路，目前只有 primitive-level Total FG F1，不能和论文 PQ/SQ/RQ 直接比较。</p></blockquote>
-<p>后续建议：并行推进 DrawingPT v0，同时继续追官方 PQ evaluation/export 代码；不要让缺失脚本卡住主线。</p>
-<h2>3. DrawingPT v0：正式 prereg 已经补齐</h2>
-<p>v0 的研究问题被收束为：</p>
-<blockquote><p>2D CAD/SVG/DXF 的矢量 primitive 自监督预训练，能否在 FloorPlanCAD 少标注 fine-tuning 场景下带来稳定收益？</p></blockquote>
-<p>冻结设置：</p>
-<table>
-<tr><th>项目</th><th>设置</th></tr>
-<tr><td>预训练数据</td><td>FloorPlanCAD train split</td></tr>
-<tr><td>下游数据</td><td>FloorPlanCAD train/val/test</td></tr>
-<tr><td>token</td><td><code>path</code> / <code>circle</code> / <code>ellipse</code> primitive</td></tr>
-<tr><td>主自监督目标</td><td>masked primitive modeling</td></tr>
-<tr><td>标注比例</td><td>1%、5%、10%、25%、50%、100%</td></tr>
-<tr><td>seed</td><td>304、1004、2026</td></tr>
-<tr><td>主要指标</td><td>micro F1、macro F1、rare-class F1；PQ/SQ/RQ 取决于评估链路</td></tr>
-<tr><td>成功门槛</td><td>低标注区间绝对提升 ≥ 0.02 或 relative improvement ≥ 5%</td></tr>
-</table>
-<p>这让 DrawingPT v0 不再只是“想法”，而是一个能真正执行和失败诊断的实验协议。</p>
-<h2>4. 工程量 proxy：已经从 FloorPlanCAD 统计出第一版表</h2>
-<p>本轮脚本从 FloorPlanCAD 公开 11,602 张 SVG 中统计了工程量相关 proxy。</p>
-<p>全局数字：</p>
-<table>
-<tr><th>指标</th><th>数值</th></tr>
-<tr><td>SVG 文件数</td><td>11,602</td></tr>
-<tr><td>train / val / test</td><td>6,965 / 810 / 3,827</td></tr>
-<tr><td>每图核心语义元素中位数</td><td>186</td></tr>
-<tr><td>每图核心非负实例数中位数</td><td>7</td></tr>
-<tr><td>每图核心近似 SVG 长度中位数</td><td>1,812</td></tr>
-</table>
-<p>训练集里最重要的工程量 proxy：</p>
-<table>
-<tr><th>角色</th><th>语义元素数</th><th>非负实例数</th><th>覆盖文件比例</th><th>近似 SVG 长度</th></tr>
-<tr><td>墙体/围护</td><td>991,664</td><td>0</td><td>96.50%</td><td>9,814,343</td></tr>
-<tr><td>开口/门窗</td><td>421,488</td><td>50,996</td><td>77.59%</td><td>2,520,288</td></tr>
-<tr><td>垂直交通</td><td>212,847</td><td>7,904</td><td>47.75%</td><td>2,439,014</td></tr>
-<tr><td>厨卫/设备点位</td><td>720,068</td><td>20,940</td><td>33.93%</td><td>0</td></tr>
-<tr><td>柜体/固定家具</td><td>187,546</td><td>7,278</td><td>12.42%</td><td>0</td></tr>
-<tr><td>车位</td><td>148,711</td><td>0</td><td>9.15%</td><td>992,790</td></tr>
-</table>
-<p>解释：</p>
-<ul>
-<li>门窗适合做 instance count；</li>
-<li>墙体/幕墙/栏杆适合做长度 proxy；</li>
-<li>厨卫设备适合做点位清单 proxy；</li>
-<li>车位适合做平面布置/数量 proxy，但 <code>instanceId</code> 不可靠；</li>
-<li>这些还不是米、平方米或元，只是面向工程量的图纸中间层。</li>
-</ul>
-<h2>5. 下次组会建议讲法</h2>
-<p>可以这样讲：</p>
-<blockquote><p>我把后续路线拆成三件可验证的事。第一，CADTransformer 的训练链路已经通，但 PQ/SQ/RQ 评估门禁还没过，主要原因是 release 缺少 README 提到的评估脚本和预测导出链路。第二，DrawingPT v0 已经写成正式 prereg，主问题是 primitive 自监督预训练能否提升 FloorPlanCAD 低标注 fine-tuning。第三，为了回应工程造价方向，我没有直接做总价黑箱预测，而是先从 FloorPlanCAD 统计门窗、墙体、楼梯、车位和厨卫设备的工程量 proxy。下一步可以用 CADTransformer/DrawingPT 的预测结果生成同样的 proxy 表，比较工程量误差。</p></blockquote>
-<h2>6. 下周真正要过的门禁</h2>
+<p>所以组会建议口径是：</p>
+<blockquote><p>CADTransformer 训练链路已跑通，但 PQ/SQ/RQ 评估门禁未过；当前只有 primitive-level Total FG F1，不能和论文 PQ/SQ/RQ 直接比较。</p></blockquote>
+<h2>7. 下周真正要过的门禁</h2>
 <table>
 <tr><th>门禁</th><th>通过标准</th></tr>
+<tr><td>Dataset 门禁</td><td>训练代码能读取 <code>configs/label_fractions/*.txt</code> 和 token manifest，按 2048-token window 出 batch</td></tr>
+<tr><td>自监督门禁</td><td>masked primitive modeling 能在 train split 跑通一个 smoke epoch</td></tr>
+<tr><td>低标注门禁</td><td>1%、5%、10% 至少各跑一个 seed，记录 runtime/checkpoint/hash</td></tr>
+<tr><td>pseudo-BoQ 预测门禁</td><td>模型 prediction 能转成同字段 BoQ proxy，并和 GT 表算 count MAE / length error</td></tr>
 <tr><td>CADTransformer PQ 门禁</td><td>找回官方 evaluation/export，或明确采用非官方 proxy PQ</td></tr>
-<tr><td>DrawingPT v0 数据门禁</td><td>token dataset 能从 train split 生成固定窗口，输出文件列表 hash</td></tr>
-<tr><td>低标注采样门禁</td><td>1/5/10/25/50/100% train 文件列表固定，记录 seed 和 hash</td></tr>
-<tr><td>工程量 proxy 门禁</td><td>能从 GT 和模型预测两边生成同口径 proxy 表</td></tr>
-<tr><td>资源门禁</td><td>GPU 只用于必要训练/评估，不用时不占卡</td></tr>
+<tr><td>资源门禁</td><td>只在训练/评估时申请 GPU，不做无意义常驻占卡</td></tr>
 </table>
+<h2>8. 组会 1 分钟讲法</h2>
+<blockquote><p>我这周没有直接跳到大训练，而是先把 DrawingPT v0 的实验资产冻结了。第一，FloorPlanCAD primitive token manifest 已生成，全数据 1262 万 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些中间工程量拿出来。下一步我会先跑 masked primitive modeling 的 smoke，再做低标注 fine-tuning 曲线；造价方向暂时不做黑箱总价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。</p></blockquote>
     </section>
   </main>
 </body>

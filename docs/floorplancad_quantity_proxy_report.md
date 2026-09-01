@@ -51,24 +51,49 @@ FloorPlanCAD 可以支持一个“工程量 proxy”任务：从 SVG 标注里�
 | parking spot | instance 不可靠，但图元数量和长度 proxy 可作为平面布置指标 |
 | sink / toilet / bath / washing machine | 可作为厨卫设备点位清单 proxy |
 
-## 可以马上做的实验
+## 已补齐的每图 pseudo-BoQ 表
 
-### 实验 1：GT 工程量 proxy 表
+已经生成每张图一行的 pseudo-BoQ 表：
 
-直接用 GT `semanticId` / `instanceId` 生成每张图的工程量 proxy：
+```text
+reports/next_steps_2026-09-01/floorplancad_pseudo_boq_by_file.csv
+```
 
-- 门数量；
-- 窗数量；
-- 墙体长度 proxy；
-- 幕墙长度 proxy；
-- 栏杆长度 proxy；
-- 楼梯/电梯/扶梯数量；
-- 车位图元/长度 proxy；
-- 厨卫设备点位数量。
+文件行数：11,602；SHA256：
 
-产出类似 BoQ 的表格，但明确单位是 proxy。
+```text
+0060106a229f87606d49f6b4e220ed3eee86bc9ec0f2e406cda945f52e014679
+```
 
-### 实验 2：预测结果工程量误差
+主要字段：
+
+- `door_instance_count`
+- `window_instance_count`
+- `wall_length_proxy_units`
+- `stairs_instance_count`
+- `elevator_instance_count`
+- `parking_spot_semantic_elements`
+- `sanitary_fixture_instance_count`
+- `cabinet_instance_count`
+
+训练集汇总：
+
+| proxy | train 汇总 |
+|---|---:|
+| 门 instance | 34,704 |
+| 窗 instance | 15,376 |
+| 墙体长度 proxy | 8,836,841.492 |
+| 楼梯 instance | 4,345 |
+| 电梯 instance | 3,206 |
+| 车位 semantic primitive | 148,711 |
+| 厨卫设备 instance | 16,722 |
+| 柜体 instance | 7,278 |
+
+这一步把原先“可以做”的 GT 工程量 proxy 表变成了实际资产。下一步等模型 prediction 导出后，用同一个脚本口径生成预测侧 pseudo-BoQ，再算误差。
+
+## 可以继续做的实验
+
+### 实验 1：预测结果工程量误差
 
 当 CADTransformer 或 DrawingPT 输出 semantic prediction 后，把预测结果转成同样的 proxy 表，再和 GT 表比较：
 
@@ -80,7 +105,7 @@ FloorPlanCAD 可以支持一个“工程量 proxy”任务：从 SVG 标注里�
 
 这能把“识别指标”转成更接近造价任务的“工程量误差”。
 
-### 实验 3：合成单价 demo
+### 实验 2：合成单价 demo
 
 用人工单价表做演示：
 
@@ -107,8 +132,10 @@ FloorPlanCAD 可以支持一个“工程量 proxy”任务：从 SVG 标注里�
 
 - `reports/next_steps_2026-09-01/floorplancad_quantity_proxy_by_class.csv`
 - `reports/next_steps_2026-09-01/floorplancad_quantity_proxy_by_role.csv`
+- `reports/next_steps_2026-09-01/floorplancad_pseudo_boq_by_file.csv`
 - `reports/next_steps_2026-09-01/floorplancad_quantity_proxy_summary.json`
 
 本地 audit 表：
 
 - `outputs/reports/floorplancad_quantity_proxy_by_file.csv`
+- `outputs/reports/floorplancad_pseudo_boq_by_file.csv`

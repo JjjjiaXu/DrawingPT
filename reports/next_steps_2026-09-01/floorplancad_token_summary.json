@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-09-01",
+  "token_version": "floorplancad-primitive-token-v0.1",
+  "source_root": "data\\raw\\FloorPlanCAD",
+  "scope": "FloorPlanCAD public baseline split SVG files",
+  "split_file_counts": {
+    "train": 6965,
+    "val": 810,
+    "test": 3827
+  },
+  "window_size": 2048,
+  "token_count_by_split": {
+    "train": 7764513,
+    "val": 904517,
+    "test": 3952258
+  },
+  "semantic_token_count_by_split": {
+    "train": 3735611,
+    "val": 487965,
+    "test": 1605418
+  },
+  "window_count_by_split": {
+    "train": 8568,
+    "val": 1001,
+    "test": 4548
+  },
+  "total_tokens": 12621288,
+  "total_semantic_tokens": 5828994,
+  "file_level_token_count": {
+    "min": 6,
+    "median": 544.0,
+    "mean": 1087.85,
+    "p90": 2298,
+    "max": 53919
+  },
+  "file_level_window_count": {
+    "min": 1,
+    "median": 1.0,
+    "mean": 1.22,
+    "p90": 2,
+    "max": 27
+  },
+  "global_tag_counts": {
+    "path": 12454181,
+    "circle": 157009,
+    "ellipse": 10098
+  },
+  "path_command_counts": {
+    "M": 12454181,
+    "L": 10806671,
+    "A": 1647510
+  },
+  "manifest_sha256": "b6dd60a4976a3e5791eb8fc786a9cfbb24f1a9a466a5bb97d9aafd40b7412370",
+  "report_manifest_sha256": "b6dd60a4976a3e5791eb8fc786a9cfbb24f1a9a466a5bb97d9aafd40b7412370",
+  "sample_token_files": [
+    {
+      "split": "train",
+      "file": "0000-0002.svg",
+      "token_file": "outputs\\tokens\\floorplancad_v0\\tokens\\train\\0000-0002.jsonl",
+      "sha256": "866bac0e23b6e640157cef093710f5368bb8a94d80514be0e75b28172a91b44b",
+      "token_count": 2007
+    },
+    {
+      "split": "val",
+      "file": "0000-0015.svg",
+      "token_file": "outputs\\tokens\\floorplancad_v0\\tokens\\val\\0000-0015.jsonl",
+      "sha256": "c7149d357691ebb3c765ea0822562b939773693a87af6707e59e0495fd6968df",
+      "token_count": 90
+    },
+    {
+      "split": "test",
+      "file": "0000-0003.svg",
+      "token_file": "outputs\\tokens\\floorplancad_v0\\tokens\\test\\0000-0003.jsonl",
+      "sha256": "fe2fdebf1ddebf6ec630d0be64c87f0124f280855f70c4ada6651ef1cbffb3ca",
+      "token_count": 32
+    }
+  ],
+  "caveats": [
+    "This is a primitive-token manifest and optional JSONL export, not a physical quantity or priced estimate.",
+    "Path bbox is a dependency-free rough bbox based on numeric path coordinates; exact arc/Bezier envelopes are not recovered.",
+    "Token JSONL files are local generated artifacts under outputs/ and should not be committed."
+  ]
+}

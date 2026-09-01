@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-09-01",
+  "dataset": "FloorPlanCAD",
+  "source_root": "data\\raw\\FloorPlanCAD",
+  "split": "train",
+  "total_train_files": 6965,
+  "fractions_percent": [
+    1,
+    5,
+    10,
+    25,
+    50,
+    100
+  ],
+  "seeds": [
+    304,
+    1004,
+    2026
+  ],
+  "counts_by_fraction": {
+    "1": 70,
+    "5": 349,
+    "10": 697,
+    "25": 1742,
+    "50": 3483,
+    "100": 6965
+  },
+  "output_dir": "configs\\label_fractions",
+  "manifest_path": "configs\\label_fractions\\manifest.csv",
+  "manifest_sha256": "7c9e55fdf58d06d9eaf6eb8af51e92e15d9d417920083231ba1e152ec273f603",
+  "caveats": [
+    "These lists freeze which labeled train files are visible during low-label fine-tuning.",
+    "The lists do not change validation/test usage; val remains for model selection and test remains for final evaluation.",
+    "Class-balance diagnostics are not baked into the sampler yet; inspect coverage before interpreting rare-class failures."
+  ]
+}

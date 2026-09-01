@@ -80,3 +80,9 @@ python scripts/inspect_dxf.py --input path\to\drawing.dxf
 1. CADTransformer PQ/SQ/RQ 评估门禁：当前 release 缺少 README 所述 `scripts/evaluate_pq.py` 和 prediction export 链路，因此 PQ/SQ/RQ 尚未产出；详见 `docs/cadtransformer_pq_gate.md`。
 2. DrawingPT v0 prereg：已冻结低标注自监督预训练协议草案；详见 `docs/drawingpt_v0_prereg.md`。
 3. FloorPlanCAD 工程量 proxy：已从 11,602 张 SVG 统计出门窗、墙体、楼梯、车位、厨卫设备等 proxy 表；详见 `docs/floorplancad_quantity_proxy_report.md`。
+
+2026-09-01 已继续补齐 DrawingPT v0 开训前资产，见 `docs/drawingpt_v0_implementation_assets.md`：
+
+- primitive token manifest：12,621,288 个 token；按 2048 token/window 得到 14,117 个 window；
+- 低标注比例清单：1/5/10/25/50/100%，seed 为 304/1004/2026，清单和 hash 已固定在 `configs/label_fractions/`；
+- 每图 pseudo-BoQ 表：`reports/next_steps_2026-09-01/floorplancad_pseudo_boq_by_file.csv`，11,602 行。

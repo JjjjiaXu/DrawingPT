@@ -171,6 +171,9 @@ class FileStat:
     core_semantic_elements: int = 0
     core_instances: set[tuple[int, str]] = field(default_factory=set)
     approximate_svg_length: float = 0.0
+    class_semantic_elements: collections.Counter[int] = field(default_factory=collections.Counter)
+    class_instances: dict[int, set[str]] = field(default_factory=lambda: collections.defaultdict(set))
+    class_approximate_svg_length: collections.Counter[int] = field(default_factory=collections.Counter)
 
 
 def local_name(tag: str) -> str:
@@ -411,6 +414,7 @@ def inspect_file(split: str, path: Path, class_stats: dict[tuple[str, int], Clas
         stat.semantic_elements += 1
         stat.files.add(path.name)
         file_stat.semantic_elements += 1
+        file_stat.class_semantic_elements[class_id] += 1
         if class_id in CORE_CLASS_IDS:
             file_stat.core_semantic_elements += 1
 
@@ -418,6 +422,7 @@ def inspect_file(split: str, path: Path, class_stats: dict[tuple[str, int], Clas
         if instance_id is not None and instance_id >= 0:
             instance_key = (path.name, str(instance_id))
             stat.instances.add(instance_key)
+            file_stat.class_instances[class_id].add(str(instance_id))
             if class_id in CORE_CLASS_IDS:
                 file_stat.core_instances.add((class_id, str(instance_id)))
 
@@ -425,6 +430,7 @@ def inspect_file(split: str, path: Path, class_stats: dict[tuple[str, int], Clas
             length = geometry_length(tag, attrs)
             stat.tagged_geometry_elements += 1
             stat.approximate_svg_length += length
+            file_stat.class_approximate_svg_length[class_id] += length
             if class_id in CORE_CLASS_IDS:
                 file_stat.approximate_svg_length += length
 
@@ -451,6 +457,59 @@ def write_csv(path: Path, rows: list[dict[str, object]], fields: list[str]) -> N
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
+
+
+def count_instances(stat: FileStat, class_ids: set[int]) -> int:
+    return sum(len(stat.class_instances.get(class_id, set())) for class_id in class_ids)
+
+
+def count_elements(stat: FileStat, class_ids: set[int]) -> int:
+    return sum(stat.class_semantic_elements.get(class_id, 0) for class_id in class_ids)
+
+
+def length_proxy(stat: FileStat, class_ids: set[int]) -> float:
+    return sum(stat.class_approximate_svg_length.get(class_id, 0.0) for class_id in class_ids)
+
+
+def pseudo_boq_row(stat: FileStat) -> dict[str, object]:
+    door_ids = {1, 2, 3, 4, 5, 6}
+    window_ids = {7, 8, 9}
+    opening_ids = door_ids | window_ids | {10}
+    sanitary_ids = {19, 22, 23, 24, 25, 26, 27}
+    kitchen_ids = {18, 20}
+    vertical_ids = {28, 29, 30}
+    wall_ids = {33, 34, 35}
+    ffe_ids = {11, 12, 13, 14, 15, 31}
+
+    return {
+        "split": stat.split,
+        "file": stat.file,
+        "semantic_elements": stat.semantic_elements,
+        "core_semantic_elements": stat.core_semantic_elements,
+        "core_instance_count_nonnegative": len(stat.core_instances),
+        "core_approx_svg_length_units": round(stat.approximate_svg_length, 3),
+        "door_instance_count": count_instances(stat, door_ids),
+        "window_instance_count": count_instances(stat, window_ids),
+        "opening_symbol_instance_count": count_instances(stat, {10}),
+        "door_window_opening_instance_count": count_instances(stat, opening_ids),
+        "wall_semantic_elements": count_elements(stat, {33}),
+        "wall_length_proxy_units": round(length_proxy(stat, {33}), 3),
+        "curtain_wall_semantic_elements": count_elements(stat, {34}),
+        "curtain_wall_length_proxy_units": round(length_proxy(stat, {34}), 3),
+        "railing_semantic_elements": count_elements(stat, {35}),
+        "railing_length_proxy_units": round(length_proxy(stat, {35}), 3),
+        "stairs_instance_count": count_instances(stat, {28}),
+        "elevator_instance_count": count_instances(stat, {29}),
+        "escalator_instance_count": count_instances(stat, {30}),
+        "vertical_transport_instance_count": count_instances(stat, vertical_ids),
+        "sanitary_fixture_instance_count": count_instances(stat, sanitary_ids),
+        "kitchen_equipment_instance_count": count_instances(stat, kitchen_ids),
+        "hvac_instance_count": count_instances(stat, {21}),
+        "cabinet_instance_count": count_instances(stat, {16, 17}),
+        "parking_spot_semantic_elements": count_elements(stat, {32}),
+        "parking_spot_length_proxy_units": round(length_proxy(stat, {32}), 3),
+        "ffe_instance_count": count_instances(stat, ffe_ids),
+    }
 
 
 def main() -> None:
@@ -551,6 +610,7 @@ def main() -> None:
         }
         for stat in file_stats
     ]
+    pseudo_boq_rows = [pseudo_boq_row(stat) for stat in file_stats]
 
     write_csv(
         args.out_dir / "floorplancad_quantity_proxy_by_class.csv",
@@ -593,6 +653,40 @@ def main() -> None:
             "core_approx_svg_length_units",
         ],
     )
+    pseudo_boq_fields = [
+        "split",
+        "file",
+        "semantic_elements",
+        "core_semantic_elements",
+        "core_instance_count_nonnegative",
+        "core_approx_svg_length_units",
+        "door_instance_count",
+        "window_instance_count",
+        "opening_symbol_instance_count",
+        "door_window_opening_instance_count",
+        "wall_semantic_elements",
+        "wall_length_proxy_units",
+        "curtain_wall_semantic_elements",
+        "curtain_wall_length_proxy_units",
+        "railing_semantic_elements",
+        "railing_length_proxy_units",
+        "stairs_instance_count",
+        "elevator_instance_count",
+        "escalator_instance_count",
+        "vertical_transport_instance_count",
+        "sanitary_fixture_instance_count",
+        "kitchen_equipment_instance_count",
+        "hvac_instance_count",
+        "cabinet_instance_count",
+        "parking_spot_semantic_elements",
+        "parking_spot_length_proxy_units",
+        "ffe_instance_count",
+    ]
+    write_csv(
+        args.out_dir / "floorplancad_pseudo_boq_by_file.csv",
+        pseudo_boq_rows,
+        pseudo_boq_fields,
+    )
 
     # Commit only compact summaries under reports/. The full by-file table stays
     # in outputs/ because it is larger and mainly for local audit.
@@ -626,6 +720,11 @@ def main() -> None:
             "approx_svg_length_units",
         ],
     )
+    write_csv(
+        report_dir / "floorplancad_pseudo_boq_by_file.csv",
+        pseudo_boq_rows,
+        pseudo_boq_fields,
+    )
 
     summary = {
         "generated_at": "2026-09-01",
@@ -636,6 +735,11 @@ def main() -> None:
             "approx_svg_length_units is a geometry proxy in SVG coordinate units. "
             "It is not meters, square meters, or a priced quantity."
         ),
+        "pseudo_boq_fields": {
+            "door/window/opening/stairs/elevator/equipment/cabinet": "non-negative instanceId count by semantic class group",
+            "wall/curtain_wall/railing/parking_length_proxy_units": "approximate SVG geometry length by semantic class",
+            "parking_spot_semantic_elements": "semantic primitive count; FloorPlanCAD parking instanceId is not reliable for count",
+        },
         "file_level_core_semantic_elements": summarize_file_counts(
             [stat.core_semantic_elements for stat in file_stats]
         ),
