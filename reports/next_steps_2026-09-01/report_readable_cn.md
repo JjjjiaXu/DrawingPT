@@ -167,20 +167,34 @@ Masked primitive modeling smoke：
 
 这只是 CPU 上 5 step 的 smoke，不代表模型有效；但它证明了 Dataset、mask、Transformer forward/backward、loss、optimizer、checkpoint 保存这条链路已经通了。
 
-服务器低资源 smoke 脚本也已准备好：
+服务器低资源 smoke 脚本也已跑通：
 
 ```text
 scripts/server/drawingpt_v0_masked_smoke.sbatch
 ```
 
-默认申请 1 张 GPU、30 分钟，用于后续确认 Slurm/CUDA 环境，不做长期占卡。
+结果：
+
+| 项目 | 结果 |
+|---|---|
+| Slurm job | 1404 |
+| GPU | NVIDIA GeForce RTX 5090 |
+| torch | 2.11.0+cu128 |
+| window size | 512 |
+| batch size | 8 |
+| steps | 100 |
+| runtime | 57.583 秒 |
+| loss | 2.643315 → 0.103848 |
+| checkpoint SHA256 | `10adabe1b4f23f160d1488360bd406e9cd35d8074f1f9fe24ad7a50008077a62` |
+
+默认申请 1 张 GPU、30 分钟；本次实际约 58 秒完成，没有长期占卡。
 
 ## 8. 下周真正要过的门禁
 
 | 门禁 | 通过标准 |
 |---|---|
-| 服务器 smoke 门禁 | 1 GPU 100-step masked primitive modeling 能跑完并保存日志/checkpoint |
 | 2048 window 门禁 | 使用 prereg 的 2048-token window 跑通 train 1% short epoch |
+| fine-tuning 门禁 | 增加 semantic head，先跑 1% seed0304 scratch baseline |
 | 低标注门禁 | 1%、5%、10% 至少各跑一个 seed，记录 runtime/checkpoint/hash |
 | pseudo-BoQ 预测门禁 | 模型 prediction 能转成同字段 BoQ proxy，并和 GT 表算 count MAE / length error |
 | CADTransformer PQ 门禁 | 找回官方 evaluation/export，或明确采用非官方 proxy PQ |
@@ -188,4 +202,4 @@ scripts/server/drawingpt_v0_masked_smoke.sbatch
 
 ## 9. 组会 1 分钟讲法
 
-> 我这周没有直接跳到大训练，而是先把 DrawingPT v0 的实验资产冻结了。第一，FloorPlanCAD primitive token manifest 已生成，全数据 1262 万 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些中间工程量拿出来。最新进展是，Dataset 和 masked primitive modeling 的最小训练闭环已经跑通，5-step CPU smoke 可以正常降 loss 并保存 checkpoint。下一步会在服务器上做保守的 100-step GPU smoke，再进入 1%/5% 低标注 fine-tuning 对照；造价方向暂时不做黑箱总价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。
+> 我这周没有直接跳到大训练，而是先把 DrawingPT v0 的实验资产冻结了。第一，FloorPlanCAD primitive token manifest 已生成，全数据 1262 万 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些中间工程量拿出来。最新进展是，Dataset 和 masked primitive modeling 的最小训练闭环已经跑通，服务器 100-step GPU smoke 也已经完成，约 58 秒跑完并保存 checkpoint。下一步进入 2048-token window short epoch 和 1%/5% 低标注 fine-tuning 对照；造价方向暂时不做黑箱总价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。

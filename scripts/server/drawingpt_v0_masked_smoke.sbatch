@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=drawingpt-v0-smoke
-#SBATCH --qos=spare
+#SBATCH --qos=normal
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G

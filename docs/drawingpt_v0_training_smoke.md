@@ -95,6 +95,33 @@ python scripts\train_masked_primitive.py `
 
 注意：5 step loss 下降只能说明训练闭环没有明显 bug，不能说明模型有效。
 
+## 服务器 GPU smoke
+
+服务器上已完成 100-step GPU smoke。
+
+| 项目 | 数值 |
+|---|---|
+| job id | 1404 |
+| remote repo | 隔离 DrawingPT worktree，绝对用户路径不写入 Git |
+| data root | 服务器 processed FloorPlanCAD SVG 布局 |
+| device | CUDA / NVIDIA GeForce RTX 5090 |
+| torch | 2.11.0+cu128 |
+| dataset windows | 188 |
+| window size | 512 |
+| batch size | 8 |
+| steps | 100 |
+| runtime | 57.583 秒 |
+| loss | 2.643315 → 0.103848 |
+| checkpoint | `outputs/checkpoints/drawingpt_v0_masked_smoke.pt` |
+| checkpoint SHA256 | `10adabe1b4f23f160d1488360bd406e9cd35d8074f1f9fe24ad7a50008077a62` |
+
+日志：
+
+- `logs/slurm/drawingpt-v0-smoke-1404.out`
+- `logs/slurm/drawingpt-v0-smoke-1404.err`
+
+这一步证明：服务器 Slurm、CUDA、processed SVG 布局、Dataset、mask、Transformer forward/backward、optimizer 和 checkpoint 保存都能跑通。
+
 ## 当前模型定义
 
 最小模型：
@@ -118,12 +145,11 @@ python scripts\train_masked_primitive.py `
 
 建议接下来不要马上大规模跑，而是按下面顺序推进：
 
-1. 服务器 1 GPU 跑 100-step smoke，确认 CUDA/Slurm/路径都正常；
-2. 改成 2048-token window，跑 train 1% 的 short epoch；
-3. 增加 semantic fine-tuning head，先做 1% seed0304 scratch baseline；
-4. 用同一模型加载 smoke pretrain checkpoint，再跑 1% fine-tune；
-5. 如果 1% 能出可比数字，再扩到 5%、10% 和 3 个 seed。
+1. 改成 2048-token window，跑 train 1% 的 short epoch；
+2. 增加 semantic fine-tuning head，先做 1% seed0304 scratch baseline；
+3. 用同一模型加载 smoke pretrain checkpoint，再跑 1% fine-tune；
+4. 如果 1% 能出可比数字，再扩到 5%、10% 和 3 个 seed。
 
 组会口径：
 
-> DrawingPT v0 已经跑通最小训练闭环。现在不是只有设计草案了，Dataset 能读取低标注清单和 primitive window，masked primitive modeling 可以正常前向/反向/保存 checkpoint。下一步才是服务器 100-step smoke 和 1% 低标注 fine-tuning 对照。
+> DrawingPT v0 已经跑通最小训练闭环。现在不是只有设计草案了，Dataset 能读取低标注清单和 primitive window，masked primitive modeling 可以正常前向/反向/保存 checkpoint。服务器 100-step GPU smoke 也已经完成，下一步是 2048-token window short epoch 和 1% 低标注 fine-tuning 对照。

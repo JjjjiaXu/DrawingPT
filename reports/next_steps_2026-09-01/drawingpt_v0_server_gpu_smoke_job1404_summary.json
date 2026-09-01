@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-09-01",
+  "server_job_id": 1404,
+  "remote_project_root": "server isolated DrawingPT worktree; absolute user path intentionally omitted",
+  "task": "masked primitive modeling smoke",
+  "device": "cuda",
+  "torch_version": "2.11.0+cu128",
+  "dataset_windows": 188,
+  "split": "train",
+  "label_list": "configs/label_fractions/floorplancad_train_seed0304_001pct.txt",
+  "window_size": 512,
+  "batch_size": 8,
+  "steps": 100,
+  "mask_ratio": 0.3,
+  "hidden_dim": 128,
+  "layers": 2,
+  "heads": 4,
+  "runtime_seconds": 57.583,
+  "first_loss": 2.643315315246582,
+  "last_loss": 0.10384833812713623,
+  "checkpoint_out": "outputs/checkpoints/drawingpt_v0_masked_smoke.pt",
+  "checkpoint_sha256": "10adabe1b4f23f160d1488360bd406e9cd35d8074f1f9fe24ad7a50008077a62",
+  "log_stdout": "logs/slurm/drawingpt-v0-smoke-1404.out",
+  "log_stderr": "logs/slurm/drawingpt-v0-smoke-1404.err",
+  "caveats": [
+    "This is a smoke test for the self-supervised training loop, not a meaningful convergence result.",
+    "The default local command is intentionally tiny and may run on CPU.",
+    "Longer runs should use the server GPU with conservative Slurm resource requests."
+  ]
+}

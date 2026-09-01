@@ -148,16 +148,27 @@ scripts/floorplancad_quantity_proxy.py
 
 注意：这是训练链路 smoke，不是正式模型结果。
 
+服务器 100-step GPU smoke 也已完成：
+
+| 项目 | 结果 |
+|---|---|
+| Slurm job | 1404 |
+| device | CUDA / NVIDIA GeForce RTX 5090 |
+| torch | 2.11.0+cu128 |
+| steps | 100 |
+| runtime | 57.583 秒 |
+| loss | 2.643315 → 0.103848 |
+| checkpoint SHA256 | `10adabe1b4f23f160d1488360bd406e9cd35d8074f1f9fe24ad7a50008077a62` |
+
 ## 5. 下一步代码门禁
 
 真正开始训练前，建议按下面顺序过门禁：
 
-1. 服务器 1 GPU 跑 100-step smoke，确认 CUDA/Slurm/路径都正常。
-2. 改成 2048-token window，跑 train 1% 的 short epoch。
-3. 增加 semantic fine-tuning head，先做 1% seed0304 scratch baseline。
-4. 用同一模型加载 pretrain checkpoint，再跑 1% fine-tune。
-5. 在 1%、5%、10% 三个低标注比例先跑 smoke，再扩到 25%、50%、100%。
-6. 把 semantic prediction 也转成 pseudo-BoQ，与 GT pseudo-BoQ 比较 count MAE / length relative error。
+1. 改成 2048-token window，跑 train 1% 的 short epoch。
+2. 增加 semantic fine-tuning head，先做 1% seed0304 scratch baseline。
+3. 用同一模型加载 pretrain checkpoint，再跑 1% fine-tune。
+4. 在 1%、5%、10% 三个低标注比例先跑 smoke，再扩到 25%、50%、100%。
+5. 把 semantic prediction 也转成 pseudo-BoQ，与 GT pseudo-BoQ 比较 count MAE / length relative error。
 
 ## 6. 组会可讲口径
 
@@ -165,4 +176,4 @@ scripts/floorplancad_quantity_proxy.py
 
 如果要加一句最新进展：
 
-> 另外，DrawingPT v0 的最小训练闭环也已经跑通：Dataset 能输出 primitive window，masked primitive modeling 的 5-step CPU smoke 可以正常降 loss 并保存 checkpoint。下一步是在服务器上做 100-step GPU smoke。
+> 另外，DrawingPT v0 的最小训练闭环也已经跑通：Dataset 能输出 primitive window，masked primitive modeling 的 5-step CPU smoke 可以正常降 loss 并保存 checkpoint；服务器 100-step GPU smoke 也已完成。下一步是 2048-token window short epoch 和 1% 低标注 fine-tuning 对照。
