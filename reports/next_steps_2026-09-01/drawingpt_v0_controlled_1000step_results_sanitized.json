@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-09-01",
+  "task": "DrawingPT v0 1% seed0304 class-aware 1000-step controlled semantic experiment",
+  "sanitization": {
+    "server_absolute_paths_removed": true,
+    "passwords_or_connection_secrets_included": false,
+    "notes": "This evidence keeps Slurm job status, model settings, metrics, and checkpoint SHA-256 values. Server-local absolute paths from raw summaries/logs are intentionally omitted."
+  },
+  "common_setting": {
+    "label_fraction": "1%",
+    "seed": 304,
+    "window_size": 2048,
+    "train_windows": 88,
+    "val_windows": 1001,
+    "sampler": "class_aware",
+    "class_weighting": "inverse_sqrt",
+    "max_window_sample_weight": 8.0,
+    "max_class_weight": 8.0,
+    "steps": 1000,
+    "device": "cuda",
+    "gpu_request": 1,
+    "slurm_strategy": "scratch first, pretrained afterok dependency"
+  },
+  "runs": [
+    {
+      "job_id": 1440,
+      "name": "drawingpt_v0_semantic_classaware_weighted_scratch_1pct_seed0304_1000step",
+      "mode": "scratch",
+      "slurm_state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed": "00:02:17",
+      "runtime_seconds": 123.634,
+      "final_train_loss": 0.9434401988983154,
+      "final_val_loss": 3.772857964038849,
+      "foreground_accuracy": 0.2048137005322842,
+      "foreground_macro_f1": 0.02701390990833964,
+      "rare_macro_f1": 0.0021542599682519473,
+      "supported_classes": 24,
+      "nonzero_f1_classes": 16,
+      "checkpoint_sha256": "d2473a512c478ece3008dc593ee8eddf780ac5fadc9549e64a9c384af6f11064",
+      "top_predicted_classes": [
+        {"class_name": "wall", "pred_count": 23035, "precision": 0.1679, "recall": 0.5946, "f1": 0.2618},
+        {"class_name": "double door", "pred_count": 2996, "precision": 0.0330, "recall": 0.0999, "f1": 0.0497},
+        {"class_name": "sink", "pred_count": 2601, "precision": 0.1096, "recall": 0.1765, "f1": 0.1352},
+        {"class_name": "toilet", "pred_count": 1992, "precision": 0.0382, "recall": 0.0485, "f1": 0.0427},
+        {"class_name": "single door", "pred_count": 1811, "precision": 0.0193, "recall": 0.0425, "f1": 0.0266}
+      ]
+    },
+    {
+      "job_id": 1441,
+      "name": "drawingpt_v0_semantic_classaware_weighted_pretrained_1pct_seed0304_1000step",
+      "mode": "pretrained_finetune",
+      "slurm_state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed": "00:02:17",
+      "runtime_seconds": 124.704,
+      "final_train_loss": 1.6199421882629395,
+      "final_val_loss": 3.5552113950252533,
+      "foreground_accuracy": 0.21781994908585975,
+      "foreground_macro_f1": 0.03201150784448758,
+      "rare_macro_f1": 0.00834202809940515,
+      "supported_classes": 24,
+      "nonzero_f1_classes": 13,
+      "checkpoint_sha256": "6bce6aef2592f5a51acdf9116649e6cd0b480c4c426f4eebd4e90dc21030545b",
+      "top_predicted_classes": [
+        {"class_name": "wall", "pred_count": 21984, "precision": 0.1692, "recall": 0.5720, "f1": 0.2612},
+        {"class_name": "toilet", "pred_count": 4996, "precision": 0.1261, "recall": 0.4020, "f1": 0.1920},
+        {"class_name": "double door", "pred_count": 3284, "precision": 0.0292, "recall": 0.0969, "f1": 0.0449},
+        {"class_name": "window", "pred_count": 2674, "precision": 0.0183, "recall": 0.1388, "f1": 0.0324},
+        {"class_name": "stairs", "pred_count": 2062, "precision": 0.0039, "recall": 0.0073, "f1": 0.0051}
+      ]
+    }
+  ],
+  "deltas_pretrained_minus_scratch": {
+    "foreground_accuracy": 0.01300624855357555,
+    "foreground_macro_f1": 0.00499759793614794,
+    "rare_macro_f1": 0.006187768131153203,
+    "final_val_loss": -0.2176465690135957,
+    "runtime_seconds": 1.07
+  },
+  "interpretation": [
+    "The pretrained run is better than scratch on foreground accuracy, foreground macro F1, rare macro F1, and validation loss under the same 1% seed0304 controlled setting.",
+    "The gain is modest and should be treated as a v0 single-seed signal, not a final claim.",
+    "Dominant predictions remain concentrated in high-frequency classes, so the next gate is a 1%/5%/10% multi-seed label-efficiency curve with per-class support and rare F1."
+  ]
+}

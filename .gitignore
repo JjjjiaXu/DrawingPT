@@ -37,6 +37,7 @@ reports/**/prereg.txt
 reports/**/AUTHOR_TODO.md
 reports/**/B_LAYER_FILLING_AID.md
 reports/**/report_filled_*.html
+reports/next_steps_2026-09-01/controlled_run_1000step_server/
 
 # External baseline clones: keep only our manifest/readme.
 third_party/*

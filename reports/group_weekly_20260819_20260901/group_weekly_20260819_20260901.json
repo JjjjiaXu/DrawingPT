@@ -1,7 +1,7 @@
 {
   "schema": "work-summary-v1",
   "title": "DrawingPT 组会周报：从文献定位到数据资产与训练闭环诊断",
-  "tagline": "本期重点是四件可核验增量：文献定位、资产冻结、训练闭环诊断、下一步可实现门禁。",
+  "tagline": "本期重点是四件可核验增量：文献定位、资产冻结、训练闭环诊断、1% 低标注正式受控实验。",
   "report_type": "group_weekly",
   "baseline": "上一期参考 reports/group_meeting_2026-08-18/report.html；本期只收录 2026-08-19 至 2026-09-01 新增且有证据的进展。",
   "period": {
@@ -47,8 +47,12 @@
       "value": "88"
     },
     {
-      "label": "controlled run plan",
-      "value": "1000×2"
+      "label": "controlled runs completed",
+      "value": "2/2"
+    },
+    {
+      "label": "best controlled macro F1",
+      "value": "0.0320"
     }
   ],
   "meeting_summary": {
@@ -56,10 +60,10 @@
     "project_snapshots": [
       {
         "project": "DrawingPT v0",
-        "completed": "冻结 1262 万 primitive token、14,117 个 2048-token window、18 组低标注清单；服务器已跑通 2048-token pretrain 和 1% semantic smoke；新增 class-aware sampler、1% 窗口暴露审计和 1000-step controlled run 脚本。",
-        "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并把长尾诊断落实成可执行采样入口。",
-        "boundary": "当前都是 smoke/诊断，不是论文级结果；class-aware 审计只说明采样暴露被改变，尚不能证明模型效果提升。",
-        "next": "在服务器排队运行 class-aware 1000-step scratch/pretrained controlled pair；要求 foreground macro F1 明显高于当前 best smoke 0.0209，同时 rare-class support 解释清楚。"
+        "completed": "冻结 1262 万 primitive token、14,117 个 2048-token window、18 组低标注清单；服务器已跑通 2048-token pretrain、1% semantic smoke 和 1000-step class-aware controlled run。正式对照中 pretrained macro F1=0.0320、rare macro F1=0.0083，均高于 scratch。",
+        "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并把长尾诊断落实成可执行采样入口和 scratch/pretrained 受控对照。",
+        "boundary": "这是 1% 单 seed 的 v0 低标注结果，不是论文级充分结论；绝对 macro F1 仍低，模型仍明显受 wall/toilet/double door/window 等高频类影响。",
+        "next": "把 1% 结果扩成 5%、10% 与多 seed label-efficiency curve；若高频类塌缩仍在，再比较 focal loss、更强 class-aware sampler 或 longer schedule。"
       },
       {
         "project": "FloorPlanCAD 数据画像",
@@ -95,8 +99,8 @@
     {
       "id": "drawingpt-v0",
       "name": "DrawingPT v0 数据资产与训练闭环",
-      "status": "smoke 完成，类别均衡入口已落地",
-      "headline": "DrawingPT v0 已从设计草案推进到服务器 GPU 可运行闭环；本期进一步把高频类塌缩问题落实为 class-aware sampler 和窗口暴露审计。",
+      "status": "正式 controlled run 已完成，预训练小幅优于 scratch",
+      "headline": "DrawingPT v0 已从设计草案推进到服务器 GPU 可运行闭环；本期完成 1% seed0304、1000-step、class-aware + inverse-sqrt 的 scratch/pretrained 正式对照，pretrained 在 macro F1 与 rare macro F1 上小幅领先。",
       "progress": [
         "生成并冻结 FloorPlanCAD primitive token manifest：11,602 张 SVG，共 12,621,288 个 primitive token；按 2048 token/window 得到 14,117 个 window。",
         "固定 1%、5%、10%、25%、50%、100% train 低标注清单，seed 为 304、1004、2026；同一 seed 下小比例是大比例前缀，便于后续 label-efficiency curve 对比。",
@@ -107,7 +111,8 @@
         "新增 `--sampler class_aware` 训练入口：按 foreground 类别稀有度给 window 加权，默认 random 保持旧实验兼容；三个服务器 sbatch 脚本已支持通过 SAMPLER 环境变量透传。",
         "完成 1% seed0304 class-aware sampler exposure audit：一轮仍采 88 个 window，但 replacement 后 unique window 为 46；rare token share 从 8.48% 到 8.82%，wall share 从 28.04% 小降到 27.70%。",
         "本机 CPU 20-step class-aware+weighted sanity 可正常输出 validation summary，但 macro F1 只有 0.0024；它只证明入口可运行，不能作为效果提升证据。",
-        "新增正式 controlled run 方案和 Slurm 提交入口：scratch 与 pretrained 两组串行 afterok，默认单 GPU、1000 steps、2048-token window、full val、class-aware sampler、inverse-sqrt class weighting。"
+        "新增正式 controlled run 方案和 Slurm 提交入口：scratch 与 pretrained 两组串行 afterok，默认单 GPU、1000 steps、2048-token window、full val、class-aware sampler、inverse-sqrt class weighting。",
+        "服务器完成两组 1000-step controlled run：scratch job 1440 与 pretrained job 1441 均 COMPLETED/ExitCode 0:0；pretrained 在 full val 上 foreground accuracy 0.2178、macro F1 0.0320、rare macro F1 0.0083，高于 scratch 的 0.2048、0.0270、0.0022。"
       ],
       "metrics": [
         {
@@ -152,54 +157,68 @@
         },
         {
           "label": "controlled run val",
-          "value": "full val windows"
+          "value": "1001 windows"
+        },
+        {
+          "label": "controlled scratch macro F1",
+          "value": "0.0270"
+        },
+        {
+          "label": "controlled pretrained macro F1",
+          "value": "0.0320"
+        },
+        {
+          "label": "controlled pretrained rare F1",
+          "value": "0.0083"
+        },
+        {
+          "label": "controlled runtime",
+          "value": "124s / run"
         }
       ],
       "comparison": {
-        "title": "1% semantic smoke 对比",
-        "note": "同一 1% seed0304、2048-token window、100 step；这些是轻量 smoke 指标，用来判断链路和训练目标。",
+        "title": "1% semantic controlled run 对比",
+        "note": "同一 1% seed0304、2048-token window、class-aware sampler、inverse-sqrt class weighting；1000-step 结果使用 1001 个 validation windows，smoke anchor 仅作上一轮轻量基线参照。",
         "columns": [
           "job",
           "设置",
+          "steps",
+          "val windows",
           "foreground accuracy",
           "foreground macro F1",
+          "rare macro F1",
           "判断"
         ],
         "rows": [
           [
-            "1406",
-            "background 参与 loss",
-            "0.0000",
-            "0.0000",
-            "诊断：background shortcut"
-          ],
-          [
-            "1407",
-            "foreground-only scratch",
-            "0.3391",
-            "0.0168",
-            "开始命中前景，但偏 wall/sink"
-          ],
-          [
-            "1409",
-            "foreground-only pretrained",
-            "0.3412",
-            "0.0177",
-            "略高于 scratch，但差距太小"
-          ],
-          [
             "1411",
-            "inverse-sqrt weighted scratch",
+            "100-step weighted scratch smoke anchor",
+            "100",
+            "128",
             "0.2512",
             "0.0209",
-            "macro F1 略升，准确率下降"
+            "未记录",
+            "上一轮轻量锚点；不能与 full val 直接等价比较"
           ],
           [
-            "1412",
-            "inverse-sqrt weighted pretrained",
-            "0.2931",
-            "0.0141",
-            "低于 weighted scratch"
+            "1440",
+            "1000-step class-aware weighted scratch",
+            "1000",
+            "1001",
+            "0.2048",
+            "0.0270",
+            "0.0022",
+            "macro F1 高于 smoke anchor，但仍受高频类预测主导"
+          ],
+          [
+            "1441",
+            "1000-step class-aware weighted pretrained",
+            "1000",
+            "1001",
+            "0.2178",
+            "0.0320",
+            "0.0083",
+            "当前最好；预训练带来小幅收益，但还不足以形成论文级结论"
           ]
         ]
       },
@@ -213,8 +232,8 @@
         ],
         "boundary": "当前创新点是实验链路和表示设计层面的 v0 prototype；SOTA 比较放到低标注曲线稳定后再做。"
       },
-      "boundary": "所有 semantic 数字只来自 1% seed0304、100 step、128 个 validation window 的 smoke；class-aware audit 是采样暴露检查，不是模型性能结果；本机 CPU 20-step sanity 也不与服务器 100-step smoke 横向比较。",
-      "next": "在服务器运行 `submit_drawingpt_v0_classaware_controlled_pair.sh`，用同一 1% seed0304 重跑 1000-step scratch vs pretrained；若 foreground macro F1 明显高于 0.0209 且 rare-class support 可解释，再扩到 5%、10% 和多个 seed。",
+      "boundary": "1000-step controlled run 已完成，但仍只覆盖 1% seed0304 和 v0 小模型；与 100-step smoke 的验证窗口数不同，不能把差值解释成纯训练步数收益。pretrained 优于 scratch 是单 seed 现象，仍需 5%/10% 和多 seed 验证；当前 dominant predictions 仍集中在 wall、toilet、double door、window 等高频类。",
+      "next": "把 controlled run 扩成 1%/5%/10% × scratch/pretrained × 多 seed 的 label-efficiency curve；同时记录 per-class support、dominant predictions 和 rare F1，若 5%/10% 仍低，再比较 focal loss、更强 sampler 或 longer schedule。",
       "evidence": [
         {
           "path": "../next_steps_2026-09-01/floorplancad_token_manifest_by_file.csv",
@@ -310,6 +329,16 @@
           "path": "../../scripts/summarize_semantic_controlled_results.py",
           "sha256": "877b5211fab2a15d8e76c53c75e7143d3d3d8ccc31e89fe7ee9cf938cbaf0eeb",
           "note": "controlled run 结果汇总脚本"
+        },
+        {
+          "path": "../next_steps_2026-09-01/drawingpt_v0_controlled_1000step_results_sanitized.md",
+          "sha256": "55269ef2a965ca5b2ddd66e3556e4c225c0014431e293fadc2497d2ed1099c9f",
+          "note": "1000-step controlled run 脱敏可读结果表"
+        },
+        {
+          "path": "../next_steps_2026-09-01/drawingpt_v0_controlled_1000step_results_sanitized.json",
+          "sha256": "a0c97c983d8ebe8fe9b389d7245393960ac57cacb7c8aa30abbe10b2aa7ad980",
+          "note": "1000-step controlled run 脱敏结构化结果，含 job 状态、指标、checkpoint SHA-256 和解释边界"
         }
       ]
     },
@@ -784,6 +813,11 @@
       "date": "2026-09-01",
       "project": "DrawingPT v0",
       "event": "新增 1000-step controlled run 计划和 Slurm 提交脚本，设置为单 GPU、scratch→pretrained 串行、full val，用于替代纯 smoke 口径。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "DrawingPT v0",
+      "event": "服务器完成 1% seed0304 1000-step class-aware controlled run：scratch job 1440 与 pretrained job 1441 均成功完成，pretrained macro F1=0.0320、rare macro F1=0.0083，均高于 scratch。"
     }
   ],
   "generation": {
@@ -791,7 +825,7 @@
     "method": "Codex evidence audit -> work-summary-v1 JSON -> make_work_summary.py synchronized Markdown and HTML",
     "notes": [
       "所有本地 evidence 文件已填写 SHA-256，并由 make_work_summary.py --check 校验。",
-      "报告按“已完成资产、轻量 smoke、下一步门禁”分层表达，避免把阶段边界写成负面清单。",
+      "报告按“已完成资产、轻量 smoke、正式 controlled run、下一步门禁”分层表达，避免把阶段边界写成负面清单。",
       "服务器敏感连接信息、密码、SSH key、个人绝对路径不进入周报。",
       "GitHub 远端最终同步状态不作为组会正文内容；以本地 evidence 文件和 SHA-256 为核验依据。"
     ]

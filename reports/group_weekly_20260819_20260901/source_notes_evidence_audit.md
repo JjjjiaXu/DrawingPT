@@ -14,7 +14,7 @@
 ### 2.1 本地 Git 与工作区
 
 - `git log --since=2026-08-19` 显示本期新增提交覆盖工程造价调研、DrawingPT v0 设计/资产冻结、训练 smoke、语义分类和 weighted loss 诊断。
-- 本期核心代码与证据提交以 `8a91962 Document weighted semantic smoke results` 为界；后续提交主要是周报组织与表达调整。
+- 本期核心代码与证据覆盖资产冻结、sampler 实现、controlled run 脚本和服务器结果拉取；周报正文只引用本地 evidence 文件和 SHA-256 可核验内容。
 - 服务器隔离工作副本同步状态不进入组会正文；本周报以本地 evidence 文件和 SHA-256 为核验依据。
 - GitHub 远端同步状态只在交付说明中报告，不作为组会正文证据。
 - 工作区唯一未跟踪文件是 `reports/group_meeting_2026-08-18/talk_script_cn.md`，它是既有讲稿草稿，本周报不收录为证据。
@@ -80,11 +80,17 @@
 - `scripts/summarize_semantic_controlled_results.py`
   - SHA-256：`877b5211fab2a15d8e76c53c75e7143d3d3d8ccc31e89fe7ee9cf938cbaf0eeb`
   - 说明：controlled run 结果汇总脚本。
+- `reports/next_steps_2026-09-01/drawingpt_v0_controlled_1000step_results_sanitized.md`
+  - SHA-256：`55269ef2a965ca5b2ddd66e3556e4c225c0014431e293fadc2497d2ed1099c9f`
+  - 说明：1000-step controlled run 脱敏可读结果表。
+- `reports/next_steps_2026-09-01/drawingpt_v0_controlled_1000step_results_sanitized.json`
+  - SHA-256：`a0c97c983d8ebe8fe9b389d7245393960ac57cacb7c8aa30abbe10b2aa7ad980`
+  - 说明：1000-step controlled run 脱敏结构化结果，含 job 状态、指标、checkpoint SHA-256 和解释边界。
 
 本周报收录判断：
 
-- 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果、class-aware sampler 实现、sampler exposure audit、本机 CPU sanity 和 1000-step controlled run 计划/脚本。
-- 阶段边界：sampler exposure audit 不是模型效果；本机 CPU 20-step sanity 不与服务器 100-step smoke 横向比较；1000-step controlled run 当前作为正式实验入口和门禁计划收录，只有实际 Slurm summary 产出后才能写成实验完成；本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
+- 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果、class-aware sampler 实现、sampler exposure audit、本机 CPU sanity、1000-step controlled run 计划/脚本和服务器完成的 1% scratch/pretrained 结果。
+- 阶段边界：sampler exposure audit 不是模型效果；本机 CPU 20-step sanity 不与服务器结果横向比较；1000-step controlled run 是 1% 单 seed 的 v0 结果，可以汇报为正式受控实验完成，但不能写成论文级充分结论；本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
 
 ### 2.3 FloorPlanCAD 数据画像与长尾风险证据
 
@@ -196,9 +202,9 @@
 3. FloorPlanCAD 数据画像解释采样和评估风险，不替代模型效果证据。
 4. 文献调研支持方法定位、baseline 选择和 novelty 边界，不替代实验结果。
 5. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
-6. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
-7. class-aware sampler 已经实现并完成 exposure audit，但它只证明采样分布被调整；模型效果仍需服务器 1000-step scratch/pretrained controlled run 对照。
-8. 1000-step controlled run 已准备 Slurm 入口；未取得 Slurm summary 前只表述为正式实验计划/待提交门禁，不表述为完成结果。
+6. DrawingPT 预训练在 1% seed0304 的 1000-step controlled run 中小幅优于 scratch，但有效性仍需 5%/10% 与多 seed 低标注曲线验证。
+7. class-aware sampler 已经实现并完成 exposure audit；模型效果证据来自服务器 1000-step scratch/pretrained controlled run summary，而不是来自 sampler audit 本身。
+8. 1000-step controlled run 可表述为已完成正式受控实验；但由于它仍是 v0 小模型、1% 单 seed，不能表述为论文级最终性能。
 9. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
 10. GitHub 远端同步状态不进入组会正文。
 
