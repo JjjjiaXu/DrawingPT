@@ -68,11 +68,23 @@
 - `scripts/server/drawingpt_v0_semantic_weighted_smoke.sbatch`
   - SHA-256：`c00dbee06adf5a5111606f64a9a9031ee2af6cb249269fd5e579c0ef97ba8d1c`
   - 说明：weighted semantic smoke 服务器脚本，支持 `SAMPLER` 透传。
+- `docs/drawingpt_v0_formal_experiment_plan.md`
+  - SHA-256：`5f35323f3b723eff2766d867e3e5d6f3158aaaf0e090ac10aea68167376cd26a`
+  - 说明：DrawingPT v0 1000-step controlled run 计划，固定 1% seed0304、class-aware sampler、scratch vs pretrained、full val。
+- `scripts/server/drawingpt_v0_semantic_controlled.sbatch`
+  - SHA-256：`4bea342b654199d7c95b3363216894423a050fa0640c0128a123cbf6d55032b7`
+  - 说明：正式 semantic controlled run 单作业 Slurm 脚本。
+- `scripts/server/submit_drawingpt_v0_classaware_controlled_pair.sh`
+  - SHA-256：`491264018da829415ffc6cfffe5079533224d432eace3651de5bbcb5e99afb31`
+  - 说明：scratch→pretrained 串行 controlled pair 提交脚本。
+- `scripts/summarize_semantic_controlled_results.py`
+  - SHA-256：`877b5211fab2a15d8e76c53c75e7143d3d3d8ccc31e89fe7ee9cf938cbaf0eeb`
+  - 说明：controlled run 结果汇总脚本。
 
 本周报收录判断：
 
-- 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果、class-aware sampler 实现、sampler exposure audit 和本机 CPU sanity。
-- 阶段边界：sampler exposure audit 不是模型效果；本机 CPU 20-step sanity 不与服务器 100-step smoke 横向比较；本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
+- 收录：数据资产冻结、低标注清单、2048-token pretrain、semantic smoke、background shortcut 诊断、weighted loss 初步结果、class-aware sampler 实现、sampler exposure audit、本机 CPU sanity 和 1000-step controlled run 计划/脚本。
+- 阶段边界：sampler exposure audit 不是模型效果；本机 CPU 20-step sanity 不与服务器 100-step smoke 横向比较；1000-step controlled run 当前作为正式实验入口和门禁计划收录，只有实际 Slurm summary 产出后才能写成实验完成；本期只把大规模训练、论文级 PQ/SQ/RQ、真实造价预测列为后续门禁，不作为已完成成果。
 
 ### 2.3 FloorPlanCAD 数据画像与长尾风险证据
 
@@ -185,9 +197,10 @@
 4. 文献调研支持方法定位、baseline 选择和 novelty 边界，不替代实验结果。
 5. CADTransformer 本期定位为 semantic baseline 与 PQ/SQ/RQ 评估链路审计；论文主指标走 official/proxy 门禁。
 6. DrawingPT 预训练当前只支持 smoke 结论；有效性要等低标注曲线验证。
-7. class-aware sampler 已经实现并完成 exposure audit，但它只证明采样分布被调整；模型效果仍需服务器 100-step scratch/pretrained 对照。
-8. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
-9. GitHub 远端同步状态不进入组会正文。
+7. class-aware sampler 已经实现并完成 exposure audit，但它只证明采样分布被调整；模型效果仍需服务器 1000-step scratch/pretrained controlled run 对照。
+8. 1000-step controlled run 已准备 Slurm 入口；未取得 Slurm summary 前只表述为正式实验计划/待提交门禁，不表述为完成结果。
+9. 工程造价方向当前是文献定位和 pseudo-BoQ 中间层；真实造价模型需要后续 BoQ、单价、材料和造价标签。
+10. GitHub 远端同步状态不进入组会正文。
 
 ## 4. 报告结构选择
 

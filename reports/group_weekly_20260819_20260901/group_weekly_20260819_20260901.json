@@ -45,6 +45,10 @@
     {
       "label": "class-aware audit windows",
       "value": "88"
+    },
+    {
+      "label": "controlled run plan",
+      "value": "1000×2"
     }
   ],
   "meeting_summary": {
@@ -52,10 +56,10 @@
     "project_snapshots": [
       {
         "project": "DrawingPT v0",
-        "completed": "冻结 1262 万 primitive token、14,117 个 2048-token window、18 组低标注清单；服务器已跑通 2048-token pretrain 和 1% semantic smoke；新增 class-aware sampler 与 1% 窗口暴露审计。",
+        "completed": "冻结 1262 万 primitive token、14,117 个 2048-token window、18 组低标注清单；服务器已跑通 2048-token pretrain 和 1% semantic smoke；新增 class-aware sampler、1% 窗口暴露审计和 1000-step controlled run 脚本。",
         "innovation": "把 2D SVG/CAD primitive 表示学习推进到可训练闭环，并把长尾诊断落实成可执行采样入口。",
         "boundary": "当前都是 smoke/诊断，不是论文级结果；class-aware 审计只说明采样暴露被改变，尚不能证明模型效果提升。",
-        "next": "在服务器重跑 class-aware 100-step scratch/pretrained；要求 foreground macro F1 明显高于当前 best smoke 0.0209，同时 rare-class support 解释清楚。"
+        "next": "在服务器排队运行 class-aware 1000-step scratch/pretrained controlled pair；要求 foreground macro F1 明显高于当前 best smoke 0.0209，同时 rare-class support 解释清楚。"
       },
       {
         "project": "FloorPlanCAD 数据画像",
@@ -102,7 +106,8 @@
         "foreground-only scratch/pretrained/weighted smoke 都已跑通；weighted scratch 将 foreground macro F1 从 0.0168 小幅提高到 0.0209，下一步处理 wall/window/sink 高频类主导的问题。",
         "新增 `--sampler class_aware` 训练入口：按 foreground 类别稀有度给 window 加权，默认 random 保持旧实验兼容；三个服务器 sbatch 脚本已支持通过 SAMPLER 环境变量透传。",
         "完成 1% seed0304 class-aware sampler exposure audit：一轮仍采 88 个 window，但 replacement 后 unique window 为 46；rare token share 从 8.48% 到 8.82%，wall share 从 28.04% 小降到 27.70%。",
-        "本机 CPU 20-step class-aware+weighted sanity 可正常输出 validation summary，但 macro F1 只有 0.0024；它只证明入口可运行，不能作为效果提升证据。"
+        "本机 CPU 20-step class-aware+weighted sanity 可正常输出 validation summary，但 macro F1 只有 0.0024；它只证明入口可运行，不能作为效果提升证据。",
+        "新增正式 controlled run 方案和 Slurm 提交入口：scratch 与 pretrained 两组串行 afterok，默认单 GPU、1000 steps、2048-token window、full val、class-aware sampler、inverse-sqrt class weighting。"
       ],
       "metrics": [
         {
@@ -140,6 +145,14 @@
         {
           "label": "wall token share audit",
           "value": "28.04% → 27.70%"
+        },
+        {
+          "label": "controlled run steps",
+          "value": "1000 × scratch/pretrained"
+        },
+        {
+          "label": "controlled run val",
+          "value": "full val windows"
         }
       ],
       "comparison": {
@@ -201,7 +214,7 @@
         "boundary": "当前创新点是实验链路和表示设计层面的 v0 prototype；SOTA 比较放到低标注曲线稳定后再做。"
       },
       "boundary": "所有 semantic 数字只来自 1% seed0304、100 step、128 个 validation window 的 smoke；class-aware audit 是采样暴露检查，不是模型性能结果；本机 CPU 20-step sanity 也不与服务器 100-step smoke 横向比较。",
-      "next": "在服务器用 `SAMPLER=class_aware` 重跑同一 1% seed0304 scratch vs pretrained；若 foreground macro F1 明显高于 0.0209 且 rare-class support 可解释，再扩到 5%、10% 和多个 seed。",
+      "next": "在服务器运行 `submit_drawingpt_v0_classaware_controlled_pair.sh`，用同一 1% seed0304 重跑 1000-step scratch vs pretrained；若 foreground macro F1 明显高于 0.0209 且 rare-class support 可解释，再扩到 5%、10% 和多个 seed。",
       "evidence": [
         {
           "path": "../next_steps_2026-09-01/floorplancad_token_manifest_by_file.csv",
@@ -277,6 +290,26 @@
           "path": "../../scripts/server/drawingpt_v0_semantic_weighted_smoke.sbatch",
           "sha256": "c00dbee06adf5a5111606f64a9a9031ee2af6cb249269fd5e579c0ef97ba8d1c",
           "note": "weighted semantic smoke 服务器脚本，支持 SAMPLER 透传"
+        },
+        {
+          "path": "../../docs/drawingpt_v0_formal_experiment_plan.md",
+          "sha256": "5f35323f3b723eff2766d867e3e5d6f3158aaaf0e090ac10aea68167376cd26a",
+          "note": "DrawingPT v0 1000-step controlled run 计划"
+        },
+        {
+          "path": "../../scripts/server/drawingpt_v0_semantic_controlled.sbatch",
+          "sha256": "4bea342b654199d7c95b3363216894423a050fa0640c0128a123cbf6d55032b7",
+          "note": "正式 semantic controlled run 单作业 Slurm 脚本"
+        },
+        {
+          "path": "../../scripts/server/submit_drawingpt_v0_classaware_controlled_pair.sh",
+          "sha256": "491264018da829415ffc6cfffe5079533224d432eace3651de5bbcb5e99afb31",
+          "note": "scratch→pretrained 串行 controlled pair 提交脚本"
+        },
+        {
+          "path": "../../scripts/summarize_semantic_controlled_results.py",
+          "sha256": "877b5211fab2a15d8e76c53c75e7143d3d3d8ccc31e89fe7ee9cf938cbaf0eeb",
+          "note": "controlled run 结果汇总脚本"
         }
       ]
     },
@@ -746,6 +779,11 @@
       "date": "2026-09-01",
       "project": "DrawingPT v0",
       "event": "实现 class-aware sampler，完成 1% seed0304 exposure audit 和本机 CPU 20-step sanity，为服务器重跑 scratch/pretrained 准备好入口。"
+    },
+    {
+      "date": "2026-09-01",
+      "project": "DrawingPT v0",
+      "event": "新增 1000-step controlled run 计划和 Slurm 提交脚本，设置为单 GPU、scratch→pretrained 串行、full val，用于替代纯 smoke 口径。"
     }
   ],
   "generation": {
