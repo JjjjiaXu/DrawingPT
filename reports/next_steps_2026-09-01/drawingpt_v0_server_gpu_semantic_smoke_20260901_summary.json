@@ -103,13 +103,76 @@
         {"class_id": 19, "class_name": "sink", "support": 1263, "pred_count": 387, "f1": 0.12846580406631212}
       ],
       "checkpoint_sha256": "e5c4e9bb93db642c23f4acf2347cc844ee3b75840f57b8c759580d8102c37d1f"
+    },
+    {
+      "job_id": 1411,
+      "name": "semantic weighted scratch with foreground-only loss",
+      "state": "COMPLETED",
+      "slurm_elapsed": "00:00:21",
+      "device": "cuda",
+      "torch_version": "2.11.0+cu128",
+      "window_size": 2048,
+      "batch_size": 2,
+      "steps": 100,
+      "train_dataset_windows": 88,
+      "val_dataset_windows": 128,
+      "runtime_seconds": 11.609,
+      "loss_target": "foreground semantic IDs 1..35",
+      "class_weighting": "inverse_sqrt",
+      "max_class_weight": 8.0,
+      "first_train_loss": 4.119515419006348,
+      "last_train_loss": 2.3292224407196045,
+      "final_val_loss": 3.3629816472530365,
+      "final_accuracy_all": 0.1201332313093577,
+      "final_accuracy_fg": 0.25117635987201203,
+      "final_macro_f1_fg": 0.02092289733620827,
+      "final_rare_macro_f1": 0.0,
+      "dominant_predictions": [
+        {"class_id": 33, "class_name": "wall", "support": 3520, "pred_count": 12997, "f1": 0.2986014409396379},
+        {"class_id": 7, "class_name": "window", "support": 263, "pred_count": 8035, "f1": 0.0337},
+        {"class_id": 28, "class_name": "stairs", "support": 406, "pred_count": 989, "f1": 0.034408602150537634}
+      ],
+      "checkpoint_sha256": "cfc1eddc6e2b8e99a2b4eb0d2ac3064741e909257c4c3ff61a3157321a5f4c74"
+    },
+    {
+      "job_id": 1412,
+      "name": "semantic weighted pretrained with foreground-only loss",
+      "state": "COMPLETED",
+      "slurm_elapsed": "00:00:21",
+      "device": "cuda",
+      "torch_version": "2.11.0+cu128",
+      "window_size": 2048,
+      "batch_size": 2,
+      "steps": 100,
+      "train_dataset_windows": 88,
+      "val_dataset_windows": 128,
+      "runtime_seconds": 11.476,
+      "loss_target": "foreground semantic IDs 1..35",
+      "class_weighting": "inverse_sqrt",
+      "max_class_weight": 8.0,
+      "loaded_pretrain_keys": 30,
+      "skipped_pretrain_head_keys": 4,
+      "pretrain_checkpoint_sha256": "ceb52ad65ae94c69a9b0409fb2404b875f33a2de6975d5190862efb09d50317e",
+      "first_train_loss": 4.905745983123779,
+      "last_train_loss": 2.313664674758911,
+      "final_val_loss": 3.330118328332901,
+      "final_accuracy_all": 0.140207948867984,
+      "final_accuracy_fg": 0.29314888010540185,
+      "final_macro_f1_fg": 0.014103791947805982,
+      "final_rare_macro_f1": 0.0,
+      "dominant_predictions": [
+        {"class_id": 33, "class_name": "wall", "support": 3520, "pred_count": 17583, "f1": 0.2864047765720514},
+        {"class_id": 7, "class_name": "window", "support": 263, "pred_count": 4634, "f1": 0.038}
+      ],
+      "checkpoint_sha256": "0d26507b42c234ff2e20770117b486744b21dfae58a1764c69a90ae0d2974ab8"
     }
   ],
   "takeaways": [
     "The 2048-token masked pretrain loop runs on the server GPU and saves a reproducible checkpoint.",
     "The first semantic diagnostic showed that supervising background/unlabeled class 0 can produce a misleading high all-token accuracy with zero foreground accuracy.",
     "Foreground-only loss fixes the background-only shortcut, but 100-step 1% smoke still collapses mostly to frequent wall/sink classes.",
-    "Pretrained initialization loads successfully and is slightly better than scratch in this tiny smoke, but the difference is too small to claim a real pretraining benefit.",
-    "Next gate should add class-aware sampling or loss weighting before running 1%, 5%, and 10% label-efficiency curves."
+    "Pretrained initialization loads successfully and is slightly better than scratch in the unweighted tiny smoke, but the difference is too small to claim a real pretraining benefit.",
+    "Inverse-sqrt class weighting spreads predictions across more classes and improves scratch macro F1 from 0.0168 to 0.0209, but it also lowers foreground accuracy and does not fix rare classes.",
+    "Next gate should add class-aware window sampling before running 1%, 5%, and 10% label-efficiency curves."
   ]
 }

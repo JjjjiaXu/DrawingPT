@@ -95,4 +95,4 @@ python scripts\train_masked_primitive.py --split train --label-list configs\labe
 python scripts\train_semantic_primitive.py --label-list configs\label_fractions\floorplancad_train_seed0304_001pct.txt --window-size 512 --limit-windows 64 --steps 10
 ```
 
-本地 smoke 只是证明训练链路通了；服务器 100-step GPU smoke 也已完成。最新补齐了 2048-token pretrain、1% semantic scratch 和 1% semantic pretrained smoke。当前结论是：训练入口已通，但语义短跑会向 wall/sink 高频类塌缩；下一步先做 class-aware sampling / weighted loss，再扩 1%、5%、10% label-efficiency curve。正式训练请继续使用 Slurm，并保守申请资源。
+本地 smoke 只是证明训练链路通了；服务器 100-step GPU smoke 也已完成。最新补齐了 2048-token pretrain、1% semantic scratch、1% semantic pretrained 和 inverse-sqrt weighted semantic smoke。当前结论是：训练入口已通，但语义短跑会向 wall/window/sink 高频类塌缩；weighted loss 只带来小幅 macro F1 改善，下一步先做 class-aware window sampling，再扩 1%、5%、10% label-efficiency curve。正式训练请继续使用 Slurm，并保守申请资源。

@@ -19,6 +19,7 @@ DrawingPT v0 已经从“数据资产冻结”推进到“最小训练闭环跑�
 | `scripts/server/drawingpt_v0_pretrain_short.sbatch` | 2048-token masked pretrain 短跑脚本 |
 | `scripts/server/drawingpt_v0_semantic_scratch_smoke.sbatch` | 1% 标注 semantic scratch smoke 脚本 |
 | `scripts/server/drawingpt_v0_semantic_pretrained_smoke.sbatch` | 加载自监督 checkpoint 后的 1% 标注 semantic fine-tune smoke 脚本 |
+| `scripts/server/drawingpt_v0_semantic_weighted_smoke.sbatch` | inverse-sqrt class weighting 的 1% 标注 semantic smoke 脚本 |
 
 Dataset 同时兼容两种 FloorPlanCAD SVG 布局：
 
@@ -153,6 +154,8 @@ python scripts\train_masked_primitive.py `
 | 1406 | all valid tokens including background | 0.521718 | 0.000000 | 0.000000 | 模型学成了 background shortcut，不能当有效结果 |
 | 1407 | foreground semantic IDs 1..35 | 0.162173 | 0.339074 | 0.016764 | 不再全猜 background，但短跑偏向 wall/sink |
 | 1409 | pretrained + foreground semantic IDs 1..35 | 0.163208 | 0.341238 | 0.017662 | pretrained 略高于 scratch，但差异太小，不能宣称有效 |
+| 1411 | inverse-sqrt weighted + foreground semantic IDs 1..35 | 0.120133 | 0.251176 | 0.020923 | scratch macro F1 略升，但 foreground accuracy 下降 |
+| 1412 | pretrained + inverse-sqrt weighted + foreground semantic IDs 1..35 | 0.140208 | 0.293149 | 0.014104 | weighted pretrained 没有优于 weighted scratch |
 
 pretrained job 加载了自监督 checkpoint 中 30 个 encoder 参数键，跳过 4 个 pretrain head 参数键，并重新初始化 semantic head。
 
@@ -160,7 +163,8 @@ pretrained job 加载了自监督 checkpoint 中 30 个 encoder 参数键，跳�
 
 - 如果 class 0 参与 loss，overall accuracy 会虚高，但 foreground 完全没学到；
 - 改成 foreground-only loss 后，模型能开始预测前景，但 100 step / 1% 标注下主要塌到高频 `wall` 和少量 `sink`；
-- 下一个技术门禁应是 class-aware sampling、class-weighted loss 或 focal loss，再谈 1%/5%/10% label-efficiency curve。
+- inverse-sqrt class weighting 能把预测从纯高频类里稍微打散，scratch macro F1 从 0.0168 到 0.0209，但还没解决 rare class；
+- 下一个技术门禁应是 class-aware window sampling 或 focal loss，再谈 1%/5%/10% label-efficiency curve。
 
 ## 当前模型定义
 
@@ -185,11 +189,11 @@ pretrained job 加载了自监督 checkpoint 中 30 个 encoder 参数键，跳�
 
 建议接下来不要马上大规模跑，而是先过类别均衡门禁：
 
-1. 在 semantic loader 或 loss 中加入 class-aware sampling / class weights；
-2. 对同一 1% seed0304 跑 scratch vs pretrained，检查 foreground macro F1 是否明显高于当前 0.0168/0.0177；
-3. 如果 1% 不再塌到 wall/sink，再扩到 5%、10% 和 3 个 seed；
+1. 在 semantic loader 中加入 class-aware window sampling，避免每个 batch 仍被 wall/window 等高频窗口主导；
+2. 对同一 1% seed0304 跑 scratch vs pretrained，检查 foreground macro F1 是否明显高于当前 0.0209；
+3. 如果 1% 不再塌到 wall/window/sink，再扩到 5%、10% 和 3 个 seed；
 4. semantic prediction 稳定后，再把预测结果转成 pseudo-BoQ，计算 count MAE / length relative error。
 
 组会口径：
 
-> DrawingPT v0 已经跑通最小训练闭环。现在不是只有设计草案了，Dataset 能读取低标注清单和 primitive window，masked primitive modeling 与 semantic classification 都可以正常前向/反向/保存 checkpoint。服务器上 2048-token pretrain 和 1% semantic scratch/pretrained smoke 都已完成；目前发现的主要问题不是能不能跑，而是语义短跑会偏向 wall/sink，高频类塌缩需要用采样或加权 loss 解决。
+> DrawingPT v0 已经跑通最小训练闭环。现在不是只有设计草案了，Dataset 能读取低标注清单和 primitive window，masked primitive modeling 与 semantic classification 都可以正常前向/反向/保存 checkpoint。服务器上 2048-token pretrain 和 1% semantic scratch/pretrained/weighted smoke 都已完成；目前发现的主要问题不是能不能跑，而是语义短跑会偏向 wall/window/sink 高频类。class weighting 有一点改善，但还不够，下一步要做 class-aware window sampling。

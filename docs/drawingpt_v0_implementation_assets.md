@@ -137,6 +137,7 @@ scripts/floorplancad_quantity_proxy.py
 - `scripts/server/drawingpt_v0_pretrain_short.sbatch`
 - `scripts/server/drawingpt_v0_semantic_scratch_smoke.sbatch`
 - `scripts/server/drawingpt_v0_semantic_pretrained_smoke.sbatch`
+- `scripts/server/drawingpt_v0_semantic_weighted_smoke.sbatch`
 
 本地 CPU smoke 结果见 `docs/drawingpt_v0_training_smoke.md`。
 
@@ -172,13 +173,15 @@ scripts/floorplancad_quantity_proxy.py
 | semantic scratch，class 0 参与 loss | 1406 | all accuracy 0.521718，但 foreground accuracy/F1 为 0；诊断为 background shortcut |
 | semantic scratch，foreground-only loss | 1407 | foreground accuracy 0.339074，macro F1 0.016764；不再全猜 background，但偏 wall/sink |
 | semantic pretrained，foreground-only loss | 1409 | foreground accuracy 0.341238，macro F1 0.017662；加载 30 个 encoder key，略高于 scratch 但还不能宣称有效 |
+| semantic weighted scratch，foreground-only loss | 1411 | foreground accuracy 0.251176，macro F1 0.020923；预测更分散但仍未解决长尾 |
+| semantic weighted pretrained，foreground-only loss | 1412 | foreground accuracy 0.293149，macro F1 0.014104；没有优于 weighted scratch |
 
 ## 5. 下一步代码门禁
 
 下一步不建议直接开大训练，应该先过下面门禁：
 
-1. 类别均衡门禁：给 semantic fine-tuning 加 class-aware sampling / class weights / focal loss，避免 wall/sink 高频类塌缩。
-2. 1% 对照门禁：同一 seed0304 下重新跑 scratch vs pretrained，要求 foreground macro F1 明显高于当前 0.0168/0.0177。
+1. 类别均衡门禁：给 semantic fine-tuning 加 class-aware window sampling / focal loss，避免 wall/window/sink 高频类塌缩。
+2. 1% 对照门禁：同一 seed0304 下重新跑 scratch vs pretrained，要求 foreground macro F1 明显高于当前 best smoke 0.0209。
 3. 低标注曲线门禁：1%、5%、10% 至少各跑一个 seed，记录 runtime/checkpoint/hash。
 4. pseudo-BoQ 预测门禁：把 semantic prediction 转成同字段 BoQ proxy，并和 GT 表算 count MAE / length error。
 
@@ -188,4 +191,4 @@ scripts/floorplancad_quantity_proxy.py
 
 如果要加一句最新进展：
 
-> 另外，DrawingPT v0 的最小训练闭环也已经跑通：Dataset 能输出 primitive window，masked primitive modeling 和 semantic classification 都能保存 checkpoint；服务器 2048-token pretrain 与 1% scratch/pretrained semantic smoke 已完成。当前发现的问题是短跑语义分类会向 wall/sink 高频类塌缩，所以下一步先做类别均衡门禁，再扩低标注曲线。
+> 另外，DrawingPT v0 的最小训练闭环也已经跑通：Dataset 能输出 primitive window，masked primitive modeling 和 semantic classification 都能保存 checkpoint；服务器 2048-token pretrain 与 1% scratch/pretrained/weighted semantic smoke 已完成。当前发现的问题是短跑语义分类会向 wall/window/sink 高频类塌缩；class weighting 只带来很小改善，所以下一步先做 class-aware window sampling，再扩低标注曲线。
