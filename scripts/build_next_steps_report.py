@@ -29,8 +29,9 @@ def main() -> None:
       <span class="badge">DrawingPT</span>
       <span class="badge">下一阶段</span>
       <span class="badge">三件事推进</span>
+      <span class="badge">训练闭环 smoke</span>
       <h1>{html.escape(title)}</h1>
-      <p>把 CADTransformer 评估门禁、DrawingPT v0 prereg 和 FloorPlanCAD 工程量 proxy 收束成下次组会可讲的材料。</p>
+      <p>把 CADTransformer 评估门禁、DrawingPT v0 prereg、FloorPlanCAD 工程量 proxy 和最小 masked primitive 训练闭环收束成下次组会可讲的材料。</p>
     </section>
     <section class="content">
       {content}

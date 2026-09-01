@@ -137,17 +137,55 @@ CADTransformer 当前 full-data conservative baseline 已经跑通，job 969 的
 
 > CADTransformer 训练链路已跑通，但 PQ/SQ/RQ 评估门禁未过；当前只有 primitive-level Total FG F1，不能和论文 PQ/SQ/RQ 直接比较。
 
-## 7. 下周真正要过的门禁
+## 7. 最新推进：DrawingPT v0 最小训练闭环已经跑通
+
+在数据资产冻结后，又补了两个核心代码文件：
+
+```text
+scripts/drawingpt_v0_dataset.py
+scripts/train_masked_primitive.py
+```
+
+Dataset smoke：
+
+| 项目 | 结果 |
+|---|---:|
+| inspected windows | 8 |
+| feature dim | 13 |
+| finite feature windows | 8 / 8 |
+| valid tokens/window mean | 430.12 |
+
+Masked primitive modeling smoke：
+
+| step | loss | type loss | feature loss |
+|---:|---:|---:|---:|
+| 1 | 1.786738 | 1.462767 | 0.323970 |
+| 2 | 1.642764 | 1.303607 | 0.339157 |
+| 3 | 1.520735 | 1.192848 | 0.327887 |
+| 4 | 1.362035 | 1.056409 | 0.305626 |
+| 5 | 1.189145 | 0.895564 | 0.293581 |
+
+这只是 CPU 上 5 step 的 smoke，不代表模型有效；但它证明了 Dataset、mask、Transformer forward/backward、loss、optimizer、checkpoint 保存这条链路已经通了。
+
+服务器低资源 smoke 脚本也已准备好：
+
+```text
+scripts/server/drawingpt_v0_masked_smoke.sbatch
+```
+
+默认申请 1 张 GPU、30 分钟，用于后续确认 Slurm/CUDA 环境，不做长期占卡。
+
+## 8. 下周真正要过的门禁
 
 | 门禁 | 通过标准 |
 |---|---|
-| Dataset 门禁 | 训练代码能读取 `configs/label_fractions/*.txt` 和 token manifest，按 2048-token window 出 batch |
-| 自监督门禁 | masked primitive modeling 能在 train split 跑通一个 smoke epoch |
+| 服务器 smoke 门禁 | 1 GPU 100-step masked primitive modeling 能跑完并保存日志/checkpoint |
+| 2048 window 门禁 | 使用 prereg 的 2048-token window 跑通 train 1% short epoch |
 | 低标注门禁 | 1%、5%、10% 至少各跑一个 seed，记录 runtime/checkpoint/hash |
 | pseudo-BoQ 预测门禁 | 模型 prediction 能转成同字段 BoQ proxy，并和 GT 表算 count MAE / length error |
 | CADTransformer PQ 门禁 | 找回官方 evaluation/export，或明确采用非官方 proxy PQ |
 | 资源门禁 | 只在训练/评估时申请 GPU，不做无意义常驻占卡 |
 
-## 8. 组会 1 分钟讲法
+## 9. 组会 1 分钟讲法
 
-> 我这周没有直接跳到大训练，而是先把 DrawingPT v0 的实验资产冻结了。第一，FloorPlanCAD primitive token manifest 已生成，全数据 1262 万 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些中间工程量拿出来。下一步我会先跑 masked primitive modeling 的 smoke，再做低标注 fine-tuning 曲线；造价方向暂时不做黑箱总价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。
+> 我这周没有直接跳到大训练，而是先把 DrawingPT v0 的实验资产冻结了。第一，FloorPlanCAD primitive token manifest 已生成，全数据 1262 万 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些中间工程量拿出来。最新进展是，Dataset 和 masked primitive modeling 的最小训练闭环已经跑通，5-step CPU smoke 可以正常降 loss 并保存 checkpoint。下一步会在服务器上做保守的 100-step GPU smoke，再进入 1%/5% 低标注 fine-tuning 对照；造价方向暂时不做黑箱总价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。

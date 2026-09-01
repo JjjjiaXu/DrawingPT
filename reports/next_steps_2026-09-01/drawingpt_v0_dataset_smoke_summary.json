@@ -1,0 +1,91 @@
+{
+  "dataset_version": "drawingpt-v0-window-dataset-0.1",
+  "split": "train",
+  "window_size": 512,
+  "dataset_windows": 8,
+  "inspected_windows": 8,
+  "feature_dim": 13,
+  "feature_names": [
+    "bbox_x0_norm",
+    "bbox_y0_norm",
+    "bbox_x1_norm",
+    "bbox_y1_norm",
+    "center_x_norm",
+    "center_y_norm",
+    "width_norm",
+    "height_norm",
+    "length_log",
+    "area_log",
+    "stroke_width_log",
+    "has_fill",
+    "has_stroke"
+  ],
+  "valid_tokens_per_inspected_window": {
+    "min": 6,
+    "median": 512.0,
+    "mean": 430.12,
+    "p90": 512,
+    "max": 512
+  },
+  "finite_feature_windows": 8,
+  "type_counts": {
+    "path": 3422,
+    "circle": 19
+  },
+  "top_semantic_classes": [
+    {
+      "class_id": 33,
+      "class_name": "wall",
+      "count": 634
+    },
+    {
+      "class_id": 29,
+      "class_name": "elevator",
+      "count": 144
+    },
+    {
+      "class_id": 2,
+      "class_name": "double door",
+      "count": 86
+    },
+    {
+      "class_id": 28,
+      "class_name": "stairs",
+      "count": 69
+    },
+    {
+      "class_id": 3,
+      "class_name": "sliding door",
+      "count": 53
+    },
+    {
+      "class_id": 9,
+      "class_name": "blind window",
+      "count": 42
+    },
+    {
+      "class_id": 1,
+      "class_name": "single door",
+      "count": 30
+    },
+    {
+      "class_id": 19,
+      "class_name": "sink",
+      "count": 21
+    },
+    {
+      "class_id": 7,
+      "class_name": "window",
+      "count": 4
+    },
+    {
+      "class_id": 35,
+      "class_name": "railing",
+      "count": 2
+    }
+  ],
+  "manifest": "reports\\next_steps_2026-09-01\\floorplancad_token_manifest_by_file.csv",
+  "manifest_sha256": "b6dd60a4976a3e5791eb8fc786a9cfbb24f1a9a466a5bb97d9aafd40b7412370",
+  "label_list": "configs\\label_fractions\\floorplancad_train_seed0304_001pct.txt",
+  "label_list_sha256": "ac455839041c993ff7e4cfab19b938063f774dfd5641dea893c4f72e29d67000"
+}

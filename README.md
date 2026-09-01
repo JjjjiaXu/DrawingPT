@@ -86,3 +86,12 @@ python scripts/inspect_dxf.py --input path\to\drawing.dxf
 - primitive token manifest：12,621,288 个 token；按 2048 token/window 得到 14,117 个 window；
 - 低标注比例清单：1/5/10/25/50/100%，seed 为 304/1004/2026，清单和 hash 已固定在 `configs/label_fractions/`；
 - 每图 pseudo-BoQ 表：`reports/next_steps_2026-09-01/floorplancad_pseudo_boq_by_file.csv`，11,602 行。
+
+DrawingPT v0 最小训练闭环 smoke 已跑通，见 `docs/drawingpt_v0_training_smoke.md`。新增 Dataset 和 masked primitive modeling 脚本：
+
+```powershell
+python scripts\drawingpt_v0_dataset.py --split train --label-list configs\label_fractions\floorplancad_train_seed0304_001pct.txt --window-size 512 --limit-windows 8
+python scripts\train_masked_primitive.py --split train --label-list configs\label_fractions\floorplancad_train_seed0304_001pct.txt --window-size 128 --limit-windows 16 --steps 5 --device cpu
+```
+
+本地 smoke 只是证明训练链路通了；正式训练请使用服务器 Slurm 脚本 `scripts/server/drawingpt_v0_masked_smoke.sbatch` 并保守申请资源。

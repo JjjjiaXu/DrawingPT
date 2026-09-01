@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-09-01",
+  "task": "masked primitive modeling smoke",
+  "dataset_windows": 16,
+  "split": "train",
+  "label_list": "configs\\label_fractions\\floorplancad_train_seed0304_001pct.txt",
+  "window_size": 128,
+  "batch_size": 2,
+  "steps": 5,
+  "mask_ratio": 0.3,
+  "hidden_dim": 32,
+  "layers": 1,
+  "heads": 4,
+  "device": "cpu",
+  "torch_version": "1.13.1+cpu",
+  "runtime_seconds": 0.43,
+  "first_loss": 1.7867375612258911,
+  "last_loss": 1.1891448497772217,
+  "loss_history": [
+    {
+      "step": 1.0,
+      "loss": 1.7867375612258911,
+      "type_loss": 1.4627673625946045,
+      "feature_loss": 0.323970228433609,
+      "masked_tokens": 74.0
+    },
+    {
+      "step": 2.0,
+      "loss": 1.6427639722824097,
+      "type_loss": 1.3036069869995117,
+      "feature_loss": 0.33915695548057556,
+      "masked_tokens": 86.0
+    },
+    {
+      "step": 3.0,
+      "loss": 1.5207346677780151,
+      "type_loss": 1.192847728729248,
+      "feature_loss": 0.3278869092464447,
+      "masked_tokens": 68.0
+    },
+    {
+      "step": 4.0,
+      "loss": 1.362034797668457,
+      "type_loss": 1.0564086437225342,
+      "feature_loss": 0.3056260943412781,
+      "masked_tokens": 65.0
+    },
+    {
+      "step": 5.0,
+      "loss": 1.1891448497772217,
+      "type_loss": 0.8955641984939575,
+      "feature_loss": 0.29358065128326416,
+      "masked_tokens": 33.0
+    }
+  ],
+  "checkpoint_out": "outputs\\checkpoints\\drawingpt_v0_masked_smoke.pt",
+  "checkpoint_sha256": "fe2a8618e4e44435de85f5d1559d9e41f0c3a49d6a435dc336e031da9a75d416",
+  "caveats": [
+    "This is a smoke test for the self-supervised training loop, not a meaningful convergence result.",
+    "The default local command is intentionally tiny and may run on CPU.",
+    "Longer runs should use the server GPU with conservative Slurm resource requests."
+  ]
+}

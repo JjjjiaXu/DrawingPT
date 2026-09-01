@@ -126,16 +126,43 @@ scripts/floorplancad_quantity_proxy.py
 
 这张表解决的是“能不能把语义识别结果转成工程量中间层”。它不是造价表，因为缺少真实比例尺、墙高/厚度、材料做法、地区定额、单价和楼层信息。
 
-## 4. 下一步代码门禁
+## 4. 最小训练闭环 smoke 已补齐
+
+本轮后续已经新增：
+
+- `scripts/drawingpt_v0_dataset.py`
+- `scripts/train_masked_primitive.py`
+- `scripts/server/drawingpt_v0_masked_smoke.sbatch`
+
+本地 CPU smoke 结果见 `docs/drawingpt_v0_training_smoke.md`。
+
+核心结论：
+
+| 项目 | 结果 |
+|---|---|
+| Dataset smoke | 8/8 inspected windows feature 全为有限值 |
+| feature dim | 13 |
+| masked pretrain smoke | 5 step 正常前向/反向/更新 |
+| loss | 1.786738 → 1.189145 |
+| checkpoint | `outputs/checkpoints/drawingpt_v0_masked_smoke.pt`，不提交 Git |
+
+注意：这是训练链路 smoke，不是正式模型结果。
+
+## 5. 下一步代码门禁
 
 真正开始训练前，建议按下面顺序过门禁：
 
-1. 写 `Dataset`：读取 label fraction 清单和 token manifest，按 2048-token window 取样。
-2. 写 masked primitive modeling：随机 mask type/geometry/style，先只在 train split 自监督。
-3. 写从零训练 vs 预训练 fine-tune 的统一入口：保持模型结构、seed、epoch、batch size 可比。
-4. 在 1%、5%、10% 三个低标注比例先跑 smoke，再扩到 25%、50%、100%。
-5. 把 semantic prediction 也转成 pseudo-BoQ，与 GT pseudo-BoQ 比较 count MAE / length relative error。
+1. 服务器 1 GPU 跑 100-step smoke，确认 CUDA/Slurm/路径都正常。
+2. 改成 2048-token window，跑 train 1% 的 short epoch。
+3. 增加 semantic fine-tuning head，先做 1% seed0304 scratch baseline。
+4. 用同一模型加载 pretrain checkpoint，再跑 1% fine-tune。
+5. 在 1%、5%、10% 三个低标注比例先跑 smoke，再扩到 25%、50%、100%。
+6. 把 semantic prediction 也转成 pseudo-BoQ，与 GT pseudo-BoQ 比较 count MAE / length relative error。
 
-## 5. 组会可讲口径
+## 6. 组会可讲口径
 
 > 我这周把 DrawingPT v0 的三个实验前资产冻结了。第一，FloorPlanCAD 全量 primitive token manifest 已生成，全数据 1262 万个 token，按 2048 token/window 是 14117 个 window；第二，1%、5%、10%、25%、50%、100% 的 train 文件清单已经按 3 个 seed 固定，并记录 hash；第三，我补了每张图一行的 pseudo-BoQ 表，可以把门窗数量、墙体长度 proxy、楼梯/电梯/车位/厨卫设备这些可计量中间层拿出来。下一步不急着宣称端到端造价，而是先验证“图纸表示学习 → 语义预测 → 工程量 proxy”的链路。
+
+如果要加一句最新进展：
+
+> 另外，DrawingPT v0 的最小训练闭环也已经跑通：Dataset 能输出 primitive window，masked primitive modeling 的 5-step CPU smoke 可以正常降 loss 并保存 checkpoint。下一步是在服务器上做 100-step GPU smoke。
